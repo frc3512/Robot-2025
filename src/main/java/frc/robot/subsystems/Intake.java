@@ -8,12 +8,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase{
 
-    public final TalonFX floorAlgaeRollerMotor;
-    public final TalonFX floorAlgaePivotMotor;
-    public final TalonFX reefAlgaePivotMotor;
-    public final TalonFX intakeMotor;
+    private final TalonFX floorAlgaeRollerMotor;
+    private final TalonFX floorAlgaePivotMotor;
+    private final TalonFX reefAlgaePivotMotor;
+    private final TalonFX intakeMotor;
 
-    public final DigitalInput hasCoral;
+    private final DigitalInput hasCoral;
 
     boolean coralIn = false;
     boolean shouldScoreCoral = false;
@@ -101,7 +101,6 @@ public class Intake extends SubsystemBase{
         } else {
 
             intakeMotor.set(0);
-            System.out.println("piss off");
 
         }
         */

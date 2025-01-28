@@ -8,12 +8,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
     
-    public final TalonFX climbMotor1;
-    public final TalonFX climbMotor2;
+    private final TalonFX climbMotor1;
+    private final TalonFX climbMotor2;
 
-    public boolean canClimbUp = false;
-    public boolean wantClimbUp = false;
-    public boolean shouldClimbUp = false;
+    private boolean canClimbUp = false;
+    private boolean wantClimbUp = false;
+    private boolean shouldClimbUp = false;
     //make function
     
     public Climber() {
