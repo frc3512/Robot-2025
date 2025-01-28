@@ -23,19 +23,23 @@ public class Intake extends SubsystemBase{
         // Floor algae
         floorAlgaeRollerMotor = new TalonFX(15);
         floorAlgaePivotMotor = new TalonFX(16);
+
         floorAlgaeRollerMotor.setNeutralMode(NeutralModeValue.Brake);
         floorAlgaePivotMotor.setNeutralMode(NeutralModeValue.Brake);
         
         //Reef algae
         reefAlgaePivotMotor = new TalonFX(17);
+
         reefAlgaePivotMotor.setNeutralMode(NeutralModeValue.Brake);
 
         //Intake
         intakeMotor = new TalonFX(18);
+
         intakeMotor.setNeutralMode(NeutralModeValue.Brake);
 
         //Beam Break
         hasCoral = new DigitalInput(0);
+
     }
 
     public void floorAlgaeIntake() {
@@ -49,7 +53,8 @@ public class Intake extends SubsystemBase{
         floorAlgaeRollerMotor.set(-0.5);
         
     }
-        public void floorAlgaeStop() {
+
+    public void floorAlgaeStop() {
     
         floorAlgaeRollerMotor.set(0);
         
@@ -119,4 +124,4 @@ public class Intake extends SubsystemBase{
 
     }
 
-    }
+}

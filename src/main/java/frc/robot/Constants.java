@@ -1,5 +1,15 @@
 package frc.robot;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
+
 public class Constants {
     
     public static class ElevatorConstants {
@@ -7,7 +17,7 @@ public class Constants {
         public static final int elevatorMotorRt = 13;
         public static final int elevatorMotorLt = 14;
 
-        public static final double kP = 0.001;
+        public static final double kP = 1;
         public static final double kI = 0;
         public static final double kD = 0;
         
@@ -26,6 +36,29 @@ public class Constants {
     public final int floorAlgaePivotMotor = 16;
     public final int reefAlgaePivotMotor = 17;
     public final int coralRollerMotor = 18;
+
+    }
+
+    public static class VisionConstants {
+
+        public static final String visionName = "Arducam OV9281 USB Camera";
+
+    public static final Pair<Integer, Translation2d> blueSpeaker =
+        new Pair<Integer, Translation2d>(7, new Translation2d(0.00, 5.55));
+    public static final Pair<Integer, Translation2d> redSpeaker =
+        new Pair<Integer, Translation2d>(4, new Translation2d(15.64, 5.55));
+
+    public static final Transform3d robotToCam =
+        new Transform3d(
+            Units.inchesToMeters(-11.0),
+            Units.inchesToMeters(7.0),
+            Units.inchesToMeters(16.5),
+            new Rotation3d(0.0, Units.degreesToRadians(105.0), Units.degreesToRadians(180.0)));
+    public static final Transform3d camToRobot = robotToCam.inverse();
+
+    public static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(0.9, 0.9, 0.9);
+    public static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.9, 0.9, 0.9);
+
 
     }
 

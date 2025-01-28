@@ -1,12 +1,11 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-@SuppressWarnings("removal")
 public class Climber extends SubsystemBase {
     
     public final TalonFX climbMotor1;
@@ -25,8 +24,7 @@ public class Climber extends SubsystemBase {
         climbMotor1.setNeutralMode(NeutralModeValue.Brake);
         climbMotor2.setNeutralMode(NeutralModeValue.Brake);
 
-        climbMotor1.setInverted(false);
-        climbMotor2.setInverted(true);
+        climbMotor2.setControl(new Follower(10, true));
 
     }
 
@@ -60,4 +58,5 @@ public class Climber extends SubsystemBase {
     public void climbLogic() {
 
     }
+
 }

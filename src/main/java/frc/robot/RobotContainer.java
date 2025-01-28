@@ -18,8 +18,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Climber;
-import frc.robot.subsystems.Elevator;
+// import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
 
 @SuppressWarnings("unused")
@@ -37,12 +38,14 @@ public class RobotContainer {
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
   private final Telemetry logger = new Telemetry(MaxSpeed);
+  private final double visionTurnP = 0.01;
 
   // Subsystem Objects
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
-  public final Elevator elevator = new Elevator();
+  // public final Elevator elevator = new Elevator();
   public final Climber climber = new Climber();
   public final Intake intake = new Intake();
+  public final Vision vision = new Vision();
 
   // Controller Objects
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -78,19 +81,21 @@ public class RobotContainer {
     controller.b().whileTrue(drivetrain.applyRequest(() -> 
     point.withModuleDirection(new Rotation2d(-controller.getLeftY(), -controller.getLeftX()))));
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
+    controller.leftBumper().whileTrue(drivetrain.applyRequest(() -> drive.withRotationalRate((vision.getYawOffset() - vision.getTargetYaw()) * visionTurnP * MaxAngularRate)));
     
     drivetrain.registerTelemetry(logger::telemeterize);
 
     // Bindings for the appendage joystick
 
     // Elevator control
-    appendageJoystick.button(1).onTrue(new InstantCommand(() -> elevator.elevatorUp()));
-    appendageJoystick.button(1).onFalse(new InstantCommand(() -> elevator.elevatorStop()));
+    // appendageJoystick.button(1).onTrue(new InstantCommand(() -> elevator.elevatorUp()));
+    // appendageJoystick.button(1).onFalse(new InstantCommand(() -> elevator.elevatorStop()));
 
-    appendageJoystick.button(4).onTrue(new InstantCommand(() -> elevator.elevatorDown()));
-    appendageJoystick.button(4).onFalse(new InstantCommand(() -> elevator.elevatorStop()));
+    // appendageJoystick.button(4).onTrue(new InstantCommand(() -> elevator.elevatorDown()));
+    // appendageJoystick.button(4).onFalse(new InstantCommand(() -> elevator.elevatorStop()));
 
-    appendageJoystick.button(2).onTrue(new InstantCommand(() -> elevator.l1()));
+    // appendageJoystick.button(2).onTrue(new InstantCommand(() -> elevator.l1()));
 
     // Climber control
     // appendageJoystick.button(10).onTrue(new InstantCommand(() -> climber.climbUp()));
@@ -99,7 +104,7 @@ public class RobotContainer {
     // appendageJoystick.button(11).onTrue(new InstantCommand(() -> climber.climbDown()));
     // appendageJoystick.button(11).onFalse(new InstantCommand(() -> climber.climbStop()));
 
-   // Intake control
+    // Intake control
     // appendageJoystick.button(2).onTrue(new InstantCommand(() -> intake.floorAlgaeIntake()));
     // appendageJoystick.button(2).onFalse(new InstantCommand(() -> intake.floorAlgaeStop()));
 
