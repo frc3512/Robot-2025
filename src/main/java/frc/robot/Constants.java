@@ -1,11 +1,9 @@
 package frc.robot;
 
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
@@ -41,12 +39,7 @@ public class Constants {
 
     public static class VisionConstants {
 
-        public static final String visionName = "Arducam OV9281 USB Camera";
-
-    public static final Pair<Integer, Translation2d> blueSpeaker =
-        new Pair<Integer, Translation2d>(7, new Translation2d(0.00, 5.55));
-    public static final Pair<Integer, Translation2d> redSpeaker =
-        new Pair<Integer, Translation2d>(4, new Translation2d(15.64, 5.55));
+    public static final String visionName = "Arducam OV9281 USB Camera";
 
     public static final Transform3d robotToCam =
         new Transform3d(

@@ -16,7 +16,9 @@ public class Vision extends SubsystemBase {
 
   private static PhotonCamera photonCamera = new PhotonCamera(Constants.VisionConstants.visionName);
   private Thread m_driverCamThread;
+
   private boolean targetVisible = false;
+  
   private double targetYaw = 0;
   private final double visionYawOffset = 0;
 
@@ -54,43 +56,64 @@ public class Vision extends SubsystemBase {
     m_driverCamThread.start();
 
     PhotonCamera.setVersionCheckEnabled(false);
+
   }
 
 
   public static PhotonCamera returnCamera() {
+
     return photonCamera;
+
   }
 
   public boolean isTargetVisible() {
+
     return targetVisible;
+
   }
 
   public double getTargetYaw() {
+
     return targetYaw;
+
   }
 
   public double getYawOffset() {
+
     return visionYawOffset;
+
   }
 
   @Override
   public void periodic() {
+
     targetVisible = false;
     targetYaw = 0.0;
 
     var results = photonCamera.getAllUnreadResults();
+
     if (!results.isEmpty()) {
+
       var result = results.get(results.size() - 1);
 
       if (result.hasTargets()) {
+
         for (var target : result.getTargets()) {
+
           if (target.getFiducialId() == 7) {
+
             targetYaw = target.getYaw();
 
             targetVisible = true;
+
           }
+
         }
+
       }
+
     }
+
   }
+
 }

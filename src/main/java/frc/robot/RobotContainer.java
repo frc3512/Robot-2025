@@ -37,8 +37,8 @@ public class RobotContainer {
 
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+
   private final Telemetry logger = new Telemetry(MaxSpeed);
-  private final double visionTurnP = 0.01;
 
   // Subsystem Objects
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
@@ -51,9 +51,12 @@ public class RobotContainer {
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandJoystick appendageJoystick = new CommandJoystick(1);
 
-    PIDController xPID = new PIDController(3, 0, 0);
-    PIDController yPID = new PIDController(3, 0, 0);
-    PIDController rPID = new PIDController(3, 0, 0);
+  // PID Controllers 
+  PIDController xPID = new PIDController(3, 0, 0);
+  PIDController yPID = new PIDController(3, 0, 0);
+  PIDController rPID = new PIDController(3, 0, 0);
+
+  private final double visionTurnP = 0.01; 
 
   public boolean isRed() {
 
@@ -82,10 +85,10 @@ public class RobotContainer {
     point.withModuleDirection(new Rotation2d(-controller.getLeftY(), -controller.getLeftX()))));
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-    controller.leftBumper().whileTrue(drivetrain.applyRequest(() -> drive.withRotationalRate((vision.getYawOffset() - vision.getTargetYaw()) * visionTurnP * MaxAngularRate)));
+    // Vison alignment drive command
+    controller.leftBumper().whileTrue(drivetrain.applyRequest(() -> 
+    drive.withRotationalRate((vision.getYawOffset() - vision.getTargetYaw()) * visionTurnP * MaxAngularRate)));
     
-    drivetrain.registerTelemetry(logger::telemeterize);
-
     // Bindings for the appendage joystick
 
     // Elevator control
@@ -116,6 +119,8 @@ public class RobotContainer {
 
     // appendageJoystick.button(6).onTrue(new InstantCommand(() -> intake.reefAlgaeOuttake()));
     // appendageJoystick.button(6).onFalse(new InstantCommand(() -> intake.reefAlgaeStop()));    
+
+    drivetrain.registerTelemetry(logger::telemeterize);
 
   }
   
