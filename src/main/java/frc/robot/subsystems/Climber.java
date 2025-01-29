@@ -6,6 +6,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+@SuppressWarnings("unused")
 public class Climber extends SubsystemBase {
     
     private final TalonFX climbMotor1;
@@ -49,7 +50,7 @@ public class Climber extends SubsystemBase {
 
     }
 
-    public void setClimbUp(){
+    public void setClimbUp() {
 
 
 

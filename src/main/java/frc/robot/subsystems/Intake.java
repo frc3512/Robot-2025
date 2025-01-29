@@ -112,12 +112,14 @@ public class Intake extends SubsystemBase{
         intakeMotor.set(0.5);
 
     }
+
     public void reefAlgaeOuttake() {
 
         intakeMotor.set(-0.5);
 
     }
-        public void reefAlgaeStop() {
+    
+    public void reefAlgaeStop() {
 
         intakeMotor.set(0);
 

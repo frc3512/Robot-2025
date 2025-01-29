@@ -39,7 +39,7 @@ public class Constants {
 
     public static class VisionConstants {
 
-    public static final String visionName = "Arducam OV9281 USB Camera";
+    public static final String visionName = "Arducam OV9281 3512 left";
 
     public static final Transform3d robotToCam =
         new Transform3d(

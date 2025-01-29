@@ -1,5 +1,7 @@
 package frc.robot;
 
+import org.photonvision.PhotonCamera;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
@@ -40,6 +42,8 @@ public class RobotContainer {
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
+  // private final PhotonCamera camera = new PhotonCamera(Constants.VisionConstants.visionName);
+
   // Subsystem Objects
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
   // public final Elevator elevator = new Elevator();
@@ -56,7 +60,7 @@ public class RobotContainer {
   PIDController yPID = new PIDController(3, 0, 0);
   PIDController rPID = new PIDController(3, 0, 0);
 
-  private final double visionTurnP = 0.01; 
+  private final double visionTurnP = 1; // TUNE THIS VALUE 
 
   public boolean isRed() {
 
@@ -129,10 +133,10 @@ public class RobotContainer {
     // drivetrain.setDefaultCommand(
     //   new RunCommand(() -> {
     //   // x, y, rotation, doaim (button), PhotonVision camera 
-    //   drivetrain.drive(() -> joystick.getLeftX(), 
-    //     () -> joystick.getLeftY(), 
-    //     () -> joystick.getRightX(), 
-    //     () -> joystick.leftBumper().getAsBoolean(), camera);
+    //   drivetrain.drive(() -> controller.getLeftX(), 
+    //     () -> controller.getLeftY(), 
+    //     () -> controller.getRightX(), 
+    //     () -> controller.leftBumper().getAsBoolean(), camera);
     //   }));
 
      drivetrain.setDefaultCommand(
