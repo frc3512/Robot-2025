@@ -6,16 +6,18 @@ import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.photonvision.PhotonCamera;
 
+import frc.robot.Constants;
+
 public class Vision extends SubsystemBase {
 
-  private static PhotonCamera photonCamera = new PhotonCamera(Constants.VisionConstants.visionName);
+  private static PhotonCamera photonCamera = new PhotonCamera(Constants.VisionConstants.leftCamera);
   private Thread m_driverCamThread;
 
   private boolean targetVisible = false;
@@ -88,6 +90,8 @@ public class Vision extends SubsystemBase {
   @Override
   public void periodic() {
 
+    SmartDashboard.putBoolean("photonvision/TargetVisible", targetVisible);
+
     targetVisible = false;
     targetYaw = 0.0;
 
@@ -114,8 +118,6 @@ public class Vision extends SubsystemBase {
       }
 
     }
-
-    SmartDashboard.putBoolean("photonvision/TargetVisible", targetVisible);
 
   }
 

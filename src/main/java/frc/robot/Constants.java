@@ -30,16 +30,21 @@ public class Constants {
     
     public static class IntakeConstants {
 
-    public final int floorAlgaeRollerMotor = 15;
-    public final int floorAlgaePivotMotor = 16;
-    public final int reefAlgaePivotMotor = 17;
-    public final int coralRollerMotor = 18;
+        public static final int floorAlgaeRollerMotor = 15;
+        public static final int floorAlgaePivotMotor = 16;
+        public static final int reefAlgaePivotMotor = 17;
+        public static final int coralRollerMotor = 18;
+
+        public static final double kP = 1;
+        public static final double kI = 0;
+        public static final double kD = 0;
 
     }
 
     public static class VisionConstants {
 
-    public static final String visionName = "Arducam OV9281 3512 left";
+    public static final String leftCamera = "Arducam OV9281 3512 left";
+    public static final String rightCamera = "Arducam OV9281 3512 right";
 
     public static final Transform3d robotToCam =
         new Transform3d(
@@ -52,6 +57,7 @@ public class Constants {
     public static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(0.9, 0.9, 0.9);
     public static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.9, 0.9, 0.9);
 
+    public static final double visionTurnP = 1; // TUNE THIS VALUE 
 
     }
 

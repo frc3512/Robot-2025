@@ -8,6 +8,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,49 +20,18 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
-import frc.robot.subsystems.Swerve;
-import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Climber;
 // import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Vision;
 
 @SuppressWarnings("unused")
 public class RobotContainer {
     
-  private double MaxSpeed = DriveConstants.MaxSpeed * 0.5; // 0.1 is about 0.5 mps, 0.7 / 90% is max, go no higher
-                                                           // Value should be tuned with new 2025 code
-
-  private double MaxAngularRate = DriveConstants.MaxAngularRate; // Controls how fast the robot quick turns
+  private double MaxSpeed = DriveConstants.MaxSpeed; 
+  private double MaxAngularRate = DriveConstants.MaxAngularRate;
   
-  private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-    .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.07) // Add a 7% deadband
-    .withDriveRequestType(DriveRequestType.Velocity); 
-
-  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-  private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
-
-  private final Telemetry logger = new Telemetry(MaxSpeed);
-
-  // private final PhotonCamera camera = new PhotonCamera(Constants.VisionConstants.visionName);
-
-  // Subsystem Objects
-  public final Swerve drivetrain = DriveConstants.createDrivetrain();
-  // public final Elevator elevator = new Elevator();
-  public final Climber climber = new Climber();
-  public final Intake intake = new Intake();
-  public final Vision vision = new Vision();
-
-  // Controller Objects
-  private final CommandXboxController controller = new CommandXboxController(0);
-  private final CommandJoystick appendageJoystick = new CommandJoystick(1);
-
-  // PID Controllers 
-  PIDController xPID = new PIDController(3, 0, 0);
-  PIDController yPID = new PIDController(3, 0, 0);
-  PIDController rPID = new PIDController(3, 0, 0);
-
-  private final double visionTurnP = 1; // TUNE THIS VALUE 
-
   public boolean isRed() {
 
     if (DriverStation.getAlliance().isPresent()) {
@@ -73,6 +43,32 @@ public class RobotContainer {
     return false;
 
     }
+  
+  private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+    .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.07) // Add a 7% deadband
+    .withDriveRequestType(DriveRequestType.Velocity); 
+
+  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+  private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+
+  private final Telemetry logger = new Telemetry(MaxSpeed);
+
+  // Subsystem Objects
+  public final Climber climber = new Climber();
+  // public final Elevator elevator = new Elevator();
+  public final Intake intake = new Intake();
+  public final Swerve drivetrain = DriveConstants.createDrivetrain();
+  public final Vision vision = new Vision();
+
+  // Controller Objects
+  private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandJoystick appendageJoystick = new CommandJoystick(1);
+
+  // PID Controllers ( auton )
+  PIDController xPID = new PIDController(3, 0, 0);
+  PIDController yPID = new PIDController(3, 0, 0);
+  PIDController rPID = new PIDController(3, 0, 0);
+
 
   public RobotContainer() {
 
@@ -85,13 +81,13 @@ public class RobotContainer {
 
     // Bindings for the controller
     controller.a().whileTrue(drivetrain.applyRequest(() -> brake));
-    controller.b().whileTrue(drivetrain.applyRequest(() -> 
-    point.withModuleDirection(new Rotation2d(-controller.getLeftY(), -controller.getLeftX()))));
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     // Vison alignment drive command
     controller.leftBumper().whileTrue(drivetrain.applyRequest(() -> 
-    drive.withRotationalRate((vision.getYawOffset() - vision.getTargetYaw()) * visionTurnP * MaxAngularRate)));
+      drive.withVelocityX(DriveConstants.forward)
+        .withVelocityY(DriveConstants.strafe)
+        .withRotationalRate((vision.getYawOffset() - vision.getTargetYaw()) * Constants.VisionConstants.visionTurnP * MaxAngularRate)));
     
     // Bindings for the appendage joystick
 
@@ -129,20 +125,11 @@ public class RobotContainer {
   }
   
   private void configureAxisActions() {
-    
-    // drivetrain.setDefaultCommand(
-    //   new RunCommand(() -> {
-    //   // x, y, rotation, doaim (button), PhotonVision camera 
-    //   drivetrain.drive(() -> controller.getLeftX(), 
-    //     () -> controller.getLeftY(), 
-    //     () -> controller.getRightX(), 
-    //     () -> controller.leftBumper().getAsBoolean(), camera);
-    //   }));
 
      drivetrain.setDefaultCommand(
-      drivetrain.applyRequest(() -> drive.withVelocityX(-controller.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-            .withVelocityY(-controller.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-            .withRotationalRate(-controller.getRightX() * MaxAngularRate))); // Drive counterclockwise with negative X (left)
+      drivetrain.applyRequest(() -> drive.withVelocityX(DriveConstants.forward)
+            .withVelocityY(DriveConstants.strafe)
+            .withRotationalRate(DriveConstants.turn)));
 
   }
 

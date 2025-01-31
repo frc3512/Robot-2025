@@ -11,6 +11,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.*;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -51,8 +52,17 @@ public class DriveConstants {
 
     public static final CANBus kCANBus = new CANBus("Drivetrain", "./logs/example.hoot");
 
-    public static double MaxSpeed = 5.2;
-    public static double MaxAngularRate = 2.7;
+    private final static CommandXboxController controller = new CommandXboxController(0);
+    
+    public static double MaxSpeed = 5.2 * 0.65; // 0.1 is about 0.5 mps, 0.7 / 90% is max, go no higher
+                                                    // Value should be tuned with new 2025 code
+    
+    public static double MaxAngularRate = 2.85; // Controls how fast the robot quick turns
+    
+    public static final double forward = -controller.getLeftY() * MaxSpeed; // Drives robot forward
+    public static final double strafe = -controller.getLeftX() * MaxSpeed; // Drives robot sideways
+    public static final double turn = -controller.getRightX() * MaxAngularRate; // Turns robot
+
 
     private static final double kCoupleRatio = 3.5714285714285716;
     private static final double kDriveGearRatio = 6.122448979591837;
