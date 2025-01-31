@@ -90,10 +90,11 @@ public class Vision extends SubsystemBase {
   @Override
   public void periodic() {
 
-    SmartDashboard.putBoolean("photonvision/TargetVisible", targetVisible);
-
-    targetVisible = false;
-    targetYaw = 0.0;
+    // targetVisible = false;
+    // targetYaw = 0.0;
+    
+    SmartDashboard.putBoolean("PhotonVision/Target Visible", isTargetVisible());
+    SmartDashboard.putNumber("PhotonVision/Target Yaw", getTargetYaw());
 
     var results = photonCamera.getAllUnreadResults();
 
@@ -105,7 +106,7 @@ public class Vision extends SubsystemBase {
 
         for (var target : result.getTargets()) {
 
-          if (target.getFiducialId() == 10 || target.getFiducialId() == 21) {
+          if (target.getFiducialId() == 18) {
 
             targetYaw = target.getYaw();
 

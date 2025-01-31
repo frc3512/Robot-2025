@@ -85,9 +85,9 @@ public class RobotContainer {
 
     // Vison alignment drive command
     controller.leftBumper().whileTrue(drivetrain.applyRequest(() -> 
-      drive.withVelocityX(DriveConstants.forward)
-        .withVelocityY(DriveConstants.strafe)
-        .withRotationalRate((vision.getYawOffset() - vision.getTargetYaw()) * Constants.VisionConstants.visionTurnP * MaxAngularRate)));
+      drive.withVelocityX(-controller.getLeftY() * MaxSpeed)
+           .withVelocityY(-controller.getLeftX() * MaxSpeed)
+           .withRotationalRate((vision.getYawOffset() - vision.getTargetYaw()) * Constants.VisionConstants.visionTurnP * MaxAngularRate)));
     
     // Bindings for the appendage joystick
 
@@ -101,24 +101,24 @@ public class RobotContainer {
     // appendageJoystick.button(2).onTrue(new InstantCommand(() -> elevator.l1()));
 
     // Climber control
-    // appendageJoystick.button(10).onTrue(new InstantCommand(() -> climber.climbUp()));
-    // appendageJoystick.button(10).onFalse(new InstantCommand(() -> climber.climbStop()));
+    appendageJoystick.button(10).onTrue(new InstantCommand(() -> climber.climbUp()));
+    appendageJoystick.button(10).onFalse(new InstantCommand(() -> climber.climbStop()));
 
-    // appendageJoystick.button(11).onTrue(new InstantCommand(() -> climber.climbDown()));
-    // appendageJoystick.button(11).onFalse(new InstantCommand(() -> climber.climbStop()));
+    appendageJoystick.button(11).onTrue(new InstantCommand(() -> climber.climbDown()));
+    appendageJoystick.button(11).onFalse(new InstantCommand(() -> climber.climbStop()));
 
     // Intake control
-    // appendageJoystick.button(2).onTrue(new InstantCommand(() -> intake.floorAlgaeIntake()));
-    // appendageJoystick.button(2).onFalse(new InstantCommand(() -> intake.floorAlgaeStop()));
+    appendageJoystick.button(2).onTrue(new InstantCommand(() -> intake.floorAlgaeIntake()));
+    appendageJoystick.button(2).onFalse(new InstantCommand(() -> intake.floorAlgaeStop()));
 
-    // appendageJoystick.button(3).onTrue(new InstantCommand(() -> intake.floorAlgaeOuttake()));
-    // appendageJoystick.button(3).onFalse(new InstantCommand(() -> intake.floorAlgaeStop()));
+    appendageJoystick.button(3).onTrue(new InstantCommand(() -> intake.floorAlgaeOuttake()));
+    appendageJoystick.button(3).onFalse(new InstantCommand(() -> intake.floorAlgaeStop()));
     
-    // appendageJoystick.button(5).onTrue(new InstantCommand(() -> intake.reefAlgaeIntake()));
-    // appendageJoystick.button(5).onFalse(new InstantCommand(() -> intake.reefAlgaeStop()));
+    appendageJoystick.button(5).onTrue(new InstantCommand(() -> intake.reefAlgaeIntake()));
+    appendageJoystick.button(5).onFalse(new InstantCommand(() -> intake.reefAlgaeStop()));
 
-    // appendageJoystick.button(6).onTrue(new InstantCommand(() -> intake.reefAlgaeOuttake()));
-    // appendageJoystick.button(6).onFalse(new InstantCommand(() -> intake.reefAlgaeStop()));    
+    appendageJoystick.button(6).onTrue(new InstantCommand(() -> intake.reefAlgaeOuttake()));
+    appendageJoystick.button(6).onFalse(new InstantCommand(() -> intake.reefAlgaeStop()));    
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
@@ -127,9 +127,9 @@ public class RobotContainer {
   private void configureAxisActions() {
 
      drivetrain.setDefaultCommand(
-      drivetrain.applyRequest(() -> drive.withVelocityX(DriveConstants.forward)
-            .withVelocityY(DriveConstants.strafe)
-            .withRotationalRate(DriveConstants.turn)));
+      drivetrain.applyRequest(() -> drive.withVelocityX(-controller.getLeftY() * MaxSpeed)
+            .withVelocityY(-controller.getLeftX() * MaxSpeed)
+            .withRotationalRate(-controller.getRightX() * MaxAngularRate)));
 
   }
 

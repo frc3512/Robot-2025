@@ -43,8 +43,8 @@ public class Constants {
 
     public static class VisionConstants {
 
-    public static final String leftCamera = "Arducam OV9281 3512 left";
-    public static final String rightCamera = "Arducam OV9281 3512 right";
+    public static final String leftCamera = "3512 Left";
+    public static final String rightCamera = "3512 Right";
 
     public static final Transform3d robotToCam =
         new Transform3d(
@@ -57,7 +57,7 @@ public class Constants {
     public static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(0.9, 0.9, 0.9);
     public static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.9, 0.9, 0.9);
 
-    public static final double visionTurnP = 1; // TUNE THIS VALUE 
+    public static final double visionTurnP = 0.08; // This is used for vision alignment
 
     }
 
