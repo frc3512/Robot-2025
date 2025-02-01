@@ -71,10 +71,9 @@ public class RobotContainer {
 
 
   public RobotContainer() {
-
+    configureVisionActions();
     configureBindings();
     configureAxisActions();
-    configureVisionActions();
 
   }
 
@@ -98,7 +97,7 @@ public class RobotContainer {
     // Climber control
     appendageJoystick.button(10).onTrue(new InstantCommand(() -> climber.climbUp()));
     appendageJoystick.button(10).onFalse(new InstantCommand(() -> climber.climbStop()));
-
+      
     appendageJoystick.button(11).onTrue(new InstantCommand(() -> climber.climbDown()));
     appendageJoystick.button(11).onFalse(new InstantCommand(() -> climber.climbStop()));
 
@@ -113,7 +112,7 @@ public class RobotContainer {
     appendageJoystick.button(5).onFalse(new InstantCommand(() -> intake.reefAlgaeStop()));
 
     appendageJoystick.button(6).onTrue(new InstantCommand(() -> intake.reefAlgaeOuttake()));
-    appendageJoystick.button(6).onFalse(new InstantCommand(() -> intake.reefAlgaeStop()));    
+    appendageJoystick.button(6).onFalse(new InstantCommand(() -> intake.reefAlgaeStop()));
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
@@ -132,10 +131,16 @@ public class RobotContainer {
   private void configureVisionActions() {
 
     // Vision alignment command
-    vision.setDefaultCommand(
+    controller.leftBumper().whileTrue(
       drivetrain.applyRequest(() -> 
-      drive.withVelocityX(vision.getRangeOffset() - vision.getTargetRange() * Constants.VisionConstants.visionDriveP * MaxSpeed)
+      drive.withVelocityX(-controller.getLeftY() * MaxSpeed)
             .withVelocityY(-controller.getLeftX() * MaxSpeed)
+            .withRotationalRate((vision.getYawOffset() - vision.getTargetYaw()) * Constants.VisionConstants.visionTurnP * MaxAngularRate)));
+
+    // Vision drive to target command
+    controller.rightBumper().whileTrue(
+      drivetrain.applyRequest(() -> 
+      drive.withVelocityX((vision.getRangeOffset() - vision.getTargetRange()) * Constants.VisionConstants.visionDriveP * MaxSpeed)
             .withRotationalRate((vision.getYawOffset() - vision.getTargetYaw()) * Constants.VisionConstants.visionTurnP * MaxAngularRate)));
 
   }

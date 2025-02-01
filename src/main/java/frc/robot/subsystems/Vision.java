@@ -20,7 +20,7 @@ public class Vision extends SubsystemBase {
   private double targetYaw = 0;
   private double targetRange = 0;
 
-  private final double visionYawOffset = 5;
+  private final double visionYawOffset = 0;
   private final double visionRangeOffset = 0;
 
   public Vision() {
@@ -86,17 +86,12 @@ public class Vision extends SubsystemBase {
 
         for (var target : result.getTargets()) {
 
-          if ( target.getFiducialId() == 17 
-            || target.getFiducialId() == 18 
-            || target.getFiducialId() == 19
-            || target.getFiducialId() == 20
-            || target.getFiducialId() == 21
-            || target.getFiducialId() == 22 ) {
+          if (target.getFiducialId() == 19) {
 
             targetYaw = target.getYaw();
             targetRange =
                           PhotonUtils.calculateDistanceToTargetMeters(
-                          0.5, // Height of the camera above the floor, in meters
+                          0.25, // Height of the camera above the floor, in meters
                           0.22, // Height of the april tag we are using, in meters
                           Units.degreesToRadians(0), // Angle of the camera relative to the floor, in degrees
                           Units.degreesToRadians(target.getPitch()));

@@ -57,7 +57,7 @@ public class Constants {
     public static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(0.9, 0.9, 0.9);
     public static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.9, 0.9, 0.9);
 
-    public static final double visionTurnP = 0.08; // This is used for vision alignment
+    public static final double visionTurnP = 0.04; // This is used for vision alignment
     public static final double visionDriveP = 0.1; // This is used to drive the robot to the target
 
     }
