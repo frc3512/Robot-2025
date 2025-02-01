@@ -1,124 +1,124 @@
-package frc.robot.subsystems;
+// package frc.robot.subsystems;
 
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.CvSink;
-import edu.wpi.first.cscore.CvSource;
-import edu.wpi.first.cscore.UsbCamera;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+// import edu.wpi.first.cameraserver.CameraServer;
+// import edu.wpi.first.cscore.CvSink;
+// import edu.wpi.first.cscore.CvSource;
+// import edu.wpi.first.cscore.UsbCamera;
+// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+// import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
-import org.photonvision.PhotonCamera;
+// import org.opencv.core.Mat;
+// import org.opencv.core.Point;
+// import org.opencv.core.Scalar;
+// import org.opencv.imgproc.Imgproc;
+// import org.photonvision.PhotonCamera;
 
-import frc.robot.Constants;
+// import frc.robot.Constants;
 
-public class Vision extends SubsystemBase {
+// public class Vision extends SubsystemBase {
 
-  private static PhotonCamera photonCamera = new PhotonCamera(Constants.VisionConstants.leftCamera);
-  private Thread m_driverCamThread;
+//   private static PhotonCamera photonCamera = new PhotonCamera(Constants.VisionConstants.leftCamera);
+//   private Thread m_driverCamThread;
 
-  private boolean targetVisible = false;
+//   private boolean targetVisible = false;
   
-  private double targetYaw = 0;
-  private final double visionYawOffset = 0;
+//   private double targetYaw = 0;
+//   private final double visionYawOffset = 0;
 
-  public Vision() {
+//   public Vision() {
 
-    m_driverCamThread =
-        new Thread(
-            () -> {
-              UsbCamera driverCamera = CameraServer.startAutomaticCapture();
+//     m_driverCamThread =
+//         new Thread(
+//             () -> {
+//               UsbCamera driverCamera = CameraServer.startAutomaticCapture();
 
-              driverCamera.setResolution(320, 200);
+//               driverCamera.setResolution(320, 200);
 
-              CvSink cvSink = CameraServer.getVideo();
-              CvSource outputStream = CameraServer.putVideo("Rectangle", 640, 400);
+//               CvSink cvSink = CameraServer.getVideo();
+//               CvSource outputStream = CameraServer.putVideo("Rectangle", 640, 400);
 
-              Mat mat = new Mat();
+//               Mat mat = new Mat();
 
-              while (!Thread.interrupted()) {
+//               while (!Thread.interrupted()) {
 
-                if (cvSink.grabFrame(mat) == 0) {
+//                 if (cvSink.grabFrame(mat) == 0) {
 
-                  outputStream.notifyError(cvSink.getError());
-                  continue;
+//                   outputStream.notifyError(cvSink.getError());
+//                   continue;
 
-                }
+//                 }
 
-                Imgproc.rectangle(
-                    mat, new Point(100, 100), new Point(400, 400), new Scalar(255, 255, 255), 5);
-                outputStream.putFrame(mat);
-              }
+//                 Imgproc.rectangle(
+//                     mat, new Point(100, 100), new Point(400, 400), new Scalar(255, 255, 255), 5);
+//                 outputStream.putFrame(mat);
+//               }
 
-            });
+//             });
 
-    m_driverCamThread.setDaemon(true);
-    m_driverCamThread.start();
+//     m_driverCamThread.setDaemon(true);
+//     m_driverCamThread.start();
 
-    PhotonCamera.setVersionCheckEnabled(false);
+//     PhotonCamera.setVersionCheckEnabled(false);
 
-  }
+//   }
 
 
-  public static PhotonCamera returnCamera() {
+//   public static PhotonCamera returnCamera() {
 
-    return photonCamera;
+//     return photonCamera;
 
-  }
+//   }
 
-  public boolean isTargetVisible() {
+//   public boolean isTargetVisible() {
 
-    return targetVisible;
+//     return targetVisible;
 
-  }
+//   }
 
-  public double getTargetYaw() {
+//   public double getTargetYaw() {
 
-    return targetYaw;
+//     return targetYaw;
 
-  }
+//   }
 
-  public double getYawOffset() {
+//   public double getYawOffset() {
 
-    return visionYawOffset;
+//     return visionYawOffset;
 
-  }
+//   }
 
-  @Override
-  public void periodic() {
+//   @Override
+//   public void periodic() {
 
-    SmartDashboard.putBoolean("photonvision/TargetVisible", targetVisible);
+//     SmartDashboard.putBoolean("photonvision/TargetVisible", targetVisible);
 
-    targetVisible = false;
-    targetYaw = 0.0;
+//     targetVisible = false;
+//     targetYaw = 0.0;
 
-    var results = photonCamera.getAllUnreadResults();
+//     var results = photonCamera.getAllUnreadResults();
 
-    if (!results.isEmpty()) {
+//     if (!results.isEmpty()) {
 
-      var result = results.get(results.size() - 1);
+//       var result = results.get(results.size() - 1);
 
-      if (result.hasTargets()) {
+//       if (result.hasTargets()) {
 
-        for (var target : result.getTargets()) {
+//         for (var target : result.getTargets()) {
 
-          if (target.getFiducialId() == 10 || target.getFiducialId() == 21) {
+//           if (target.getFiducialId() == 10 || target.getFiducialId() == 21) {
 
-            targetYaw = target.getYaw();
+//             targetYaw = target.getYaw();
 
-            targetVisible = true;
+//             targetVisible = true;
 
-          }
+//           }
 
-        }
+//         }
 
-      }
+//       }
 
-    }
+//     }
 
-  }
+//   }
 
-}
+// }
