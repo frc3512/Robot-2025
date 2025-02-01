@@ -74,6 +74,7 @@ public class RobotContainer {
 
     configureBindings();
     configureAxisActions();
+    configureVisionActions();
 
   }
 
@@ -82,12 +83,6 @@ public class RobotContainer {
     // Bindings for the controller
     controller.a().whileTrue(drivetrain.applyRequest(() -> brake));
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-
-    // Vison alignment drive command
-    controller.leftBumper().whileTrue(drivetrain.applyRequest(() -> 
-      drive.withVelocityX(-controller.getLeftY() * MaxSpeed)
-           .withVelocityY(-controller.getLeftX() * MaxSpeed)
-           .withRotationalRate((vision.getYawOffset() - vision.getTargetYaw()) * Constants.VisionConstants.visionTurnP * MaxAngularRate)));
     
     // Bindings for the appendage joystick
 
@@ -127,9 +122,21 @@ public class RobotContainer {
   private void configureAxisActions() {
 
      drivetrain.setDefaultCommand(
-      drivetrain.applyRequest(() -> drive.withVelocityX(-controller.getLeftY() * MaxSpeed)
+      drivetrain.applyRequest(() -> 
+      drive.withVelocityX(-controller.getLeftY() * MaxSpeed)
             .withVelocityY(-controller.getLeftX() * MaxSpeed)
             .withRotationalRate(-controller.getRightX() * MaxAngularRate)));
+
+  }
+
+  private void configureVisionActions() {
+
+    // Vision alignment command
+    vision.setDefaultCommand(
+      drivetrain.applyRequest(() -> 
+      drive.withVelocityX(vision.getRangeOffset() - vision.getTargetRange() * Constants.VisionConstants.visionDriveP * MaxSpeed)
+            .withVelocityY(-controller.getLeftX() * MaxSpeed)
+            .withRotationalRate((vision.getYawOffset() - vision.getTargetYaw()) * Constants.VisionConstants.visionTurnP * MaxAngularRate)));
 
   }
 
