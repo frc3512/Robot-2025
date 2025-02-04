@@ -35,9 +35,13 @@ public class Constants {
         public static final int reefAlgaePivotMotor = 17;
         public static final int coralRollerMotor = 18;
 
-        public static final double kP = 1;
-        public static final double kI = 0;
-        public static final double kD = 0;
+        public static final double algaeP = 1;
+        public static final double algaeI = 0;
+        public static final double algaeD = 0;
+
+        public static final double reefP = 1;
+        public static final double reefI = 0;
+        public static final double reefD = 0;
 
     }
 
@@ -49,9 +53,9 @@ public class Constants {
     public static final Transform3d robotToCam =
         new Transform3d(
             Units.inchesToMeters(-11.0),
-            Units.inchesToMeters(7.0),
-            Units.inchesToMeters(16.5),
-            new Rotation3d(0.0, Units.degreesToRadians(105.0), Units.degreesToRadians(180.0)));
+            Units.inchesToMeters(8.5),
+            Units.inchesToMeters(2.0),
+        new Rotation3d(0.0, Units.degreesToRadians(0), Units.degreesToRadians(0)));
     public static final Transform3d camToRobot = robotToCam.inverse();
 
     public static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(0.9, 0.9, 0.9);
