@@ -9,14 +9,12 @@ import frc.robot.subsystems.Swerve;
 
 public class Autos extends TimedRobot{
 
-        private final Swerve driveSubsystem = new Swerve(null, null);
-        
+        private final Swerve driveSubsystem = new Swerve(null, null); 
         private AutoFactory autoFactory;
     
-        @Override
-        public void robotInit() {
+        public void Robot() {
             autoFactory = new AutoFactory(
-                driveSubsystem::odometry.getPoseMeters(), // A function that returns the current robot pose
+                driveSubsystem::getPose, // A function that returns the current robot pose
                 driveSubsystem::resetOdometry, // A function that resets the current robot pose to the provided Pose2d
                 driveSubsystem::followTrajectory, // The drive subsystem trajectory follower 
                 true, // If alliance flipping should be enabled 
