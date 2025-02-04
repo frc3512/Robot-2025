@@ -33,18 +33,6 @@ public class RobotContainer {
   private double MaxSpeed = DriveConstants.MaxSpeed; 
   private double MaxAngularRate = DriveConstants.MaxAngularRate;
   
-  public boolean isRed() {
-
-    if (DriverStation.getAlliance().isPresent()) {
-
-      return DriverStation.getAlliance().get() ==  Alliance.Red;
-
-    }
-
-    return false;
-
-    }
-  
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
     .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.07) // Add a 7% deadband
     .withDriveRequestType(DriveRequestType.Velocity); 
@@ -109,11 +97,11 @@ public class RobotContainer {
     appendageJoystick.button(11).onFalse(new InstantCommand(() -> climber.climbStop()));
 
     // Intake control
-    appendageJoystick.button(2).onTrue(new InstantCommand(() -> intake.floorAlgaeIntake()));
-    appendageJoystick.button(2).onFalse(new InstantCommand(() -> intake.floorAlgaeStop()));
+    controller.b().onTrue(new InstantCommand(() -> intake.floorAlgaeIntake()));
+    controller.b().onFalse(new InstantCommand(() -> intake.floorAlgaeStop()));
 
-    appendageJoystick.button(3).onTrue(new InstantCommand(() -> intake.floorAlgaeOuttake()));
-    appendageJoystick.button(3).onFalse(new InstantCommand(() -> intake.floorAlgaeStop()));
+    controller.y().onTrue(new InstantCommand(() -> intake.floorAlgaeOuttake()));    
+    controller.y().onFalse(new InstantCommand(() -> intake.floorAlgaeStop()));
     
     appendageJoystick.button(5).onTrue(new InstantCommand(() -> intake.reefAlgaeIntake()));
     appendageJoystick.button(5).onFalse(new InstantCommand(() -> intake.reefAlgaeStop()));

@@ -44,7 +44,7 @@ public class Intake extends SubsystemBase{
 
     public void floorAlgaeIntake() {
     
-        floorAlgaeRollerMotor.set(0.5);
+        floorAlgaeRollerMotor.set(0.3);
         
     }
     
