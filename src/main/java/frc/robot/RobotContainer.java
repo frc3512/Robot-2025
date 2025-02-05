@@ -95,20 +95,20 @@ public class RobotContainer {
 
     appendageJoystick.button(11).onTrue(new InstantCommand(() -> climber.climbDown()));
     appendageJoystick.button(11).onFalse(new InstantCommand(() -> climber.climbStop()));
-
+    
     // Intake control
-    controller.b().onTrue(new InstantCommand(() -> intake.floorAlgaeIntake()));
-    controller.b().onFalse(new InstantCommand(() -> intake.floorAlgaeStop()));
-
-    controller.y().onTrue(new InstantCommand(() -> intake.floorAlgaeOuttake()));    
-    controller.y().onFalse(new InstantCommand(() -> intake.floorAlgaeStop()));
+    controller.leftTrigger().onTrue(new InstantCommand(() -> intake.floorAlgaeIntake()));
+    controller.leftTrigger().onFalse(new InstantCommand(() -> intake.floorAlgaeStop()));
+    
+    controller.rightTrigger().onTrue(new InstantCommand(() -> intake.floorAlgaeOuttake()));    
+    controller.rightTrigger().onFalse(new InstantCommand(() -> intake.floorAlgaeStop()));
     
     appendageJoystick.button(5).onTrue(new InstantCommand(() -> intake.reefAlgaeIntake()));
     appendageJoystick.button(5).onFalse(new InstantCommand(() -> intake.reefAlgaeStop()));
-
+    
     appendageJoystick.button(6).onTrue(new InstantCommand(() -> intake.reefAlgaeOuttake()));
     appendageJoystick.button(6).onFalse(new InstantCommand(() -> intake.reefAlgaeStop()));    
-
+    
     drivetrain.registerTelemetry(logger::telemeterize);
 
   }
