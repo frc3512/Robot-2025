@@ -9,6 +9,7 @@
 
 // public class Autos extends TimedRobot{
 
+<<<<<<< HEAD
 //         private final Swerve driveSubsystem = new Swerve(null, null);
         
 //         private AutoFactory autoFactory;
@@ -23,6 +24,20 @@
 //                 driveSubsystem // The drive subsystem
 //             );
 //         }
+=======
+        private final Swerve driveSubsystem = new Swerve(null, null); 
+        private AutoFactory autoFactory;
+    
+        public void Robot() {
+            autoFactory = new AutoFactory(
+                driveSubsystem::getPose, // A function that returns the current robot pose
+                driveSubsystem::resetOdometry, // A function that resets the current robot pose to the provided Pose2d
+                driveSubsystem::followTrajectory, // The drive subsystem trajectory follower 
+                true, // If alliance flipping should be enabled 
+                driveSubsystem // The drive subsystem
+            );
+        }
+>>>>>>> 534ce38e67a8841795498c8ce2d615361ab704a1
 
 // public AutoRoutine DriveForward() {
 //     // Create the routine
