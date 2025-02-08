@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import org.photonvision.PhotonCamera;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -34,7 +36,7 @@ import frc.robot.subsystems.Elevator;
 // import frc.robot.subsystems.Vision;
 
 @SuppressWarnings("unused")
-public class RobotContainer {
+public class RobotContainer<DriveSubsystem> {
     
   private double MaxSpeed = DriveConstants.MaxSpeed; 
   private double MaxAngularRate = DriveConstants.MaxAngularRate;
@@ -80,9 +82,13 @@ public class RobotContainer {
   PIDController yController = new PIDController(1, 0.0, 0.0);
   PIDController headingController = new PIDController(0.75, 0.0, 0.0);
 
+  //Auton
   private final AutoFactory autoFactory;
+  public double distance;
+      
 
-  public RobotContainer() {
+
+        public RobotContainer() {
 
     headingController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -96,7 +102,13 @@ public class RobotContainer {
 
     configureBindings();
     configureAxisActions();
+    Command DriveDistance;
 
+    DriveDistance(distance inches) {
+
+      distance = inches;
+
+    }
   }
 
   private void configureBindings() {
