@@ -5,12 +5,17 @@ import org.photonvision.PhotonCamera;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import choreo.auto.AutoFactory;
+import choreo.auto.AutoRoutine;
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -70,8 +75,23 @@ public class RobotContainer {
   PIDController yPID = new PIDController(3, 0, 0);
   PIDController rPID = new PIDController(3, 0, 0);
 
+  PIDController xController = new PIDController(1, 0.0, 0.0);
+  PIDController yController = new PIDController(1, 0.0, 0.0);
+  PIDController headingController = new PIDController(0.75, 0.0, 0.0);
+
+  private final AutoFactory autoFactory;
 
   public RobotContainer() {
+
+    headingController.enableContinuousInput(-Math.PI, Math.PI);
+
+    autoFactory = new AutoFactory(
+            () -> drivetrain.getState().Pose,
+            drivetrain::resetPose,
+            this::followTrajectory,
+            true,
+            drivetrain
+    );
 
     configureBindings();
     configureAxisActions();
@@ -134,10 +154,35 @@ public class RobotContainer {
 
   }
 
-  public Command getAutonomousCommand() {
+   public void followTrajectory(SwerveSample sample) {
+        // Get the current pose of the robot
+        Pose2d pose = drivetrain.getState().Pose;
 
-    return null;
+        // Generate the next speeds for the robot
+        ChassisSpeeds speeds = new ChassisSpeeds(
+            sample.vx + xController.calculate(pose.getX(), sample.x),
+            sample.vy + yController.calculate(pose.getY(), sample.y),
+            sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
+        );
+ 
+        // Apply the generated speeds
+        drivetrain.applyRequest(
+            () ->
+                drive
+                  .withVelocityX(speeds.vxMetersPerSecond)
+                  .withVelocityY(speeds.vyMetersPerSecond)
+                  .withRotationalRate(speeds.omegaRadiansPerSecond));
 
   }
+
+
+  public AutoRoutine testAuto(String factory) {
+
+    final AutoRoutine routine = factory.newRoutine("Forward");
+
+    return routine;
+
+  }
+
 
 }
