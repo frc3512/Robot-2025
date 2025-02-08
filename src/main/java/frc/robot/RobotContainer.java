@@ -7,6 +7,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
+import choreo.auto.AutoTrajectory;
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -175,14 +176,20 @@ public class RobotContainer {
 
   }
 
+  public Command getAutonomousCommand() {
+    Command myTrajectory = autoFactory.trajectoryCmd("Test");
+    return myTrajectory;
+  }
 
-  public AutoRoutine testAuto(String factory) {
+  public AutoRoutine testAuto(AutoFactory autoFactory2) {
+  
+      final AutoRoutine routine = autoFactory2.newRoutine("Forward");
 
-    final AutoRoutine routine = factory.newRoutine("Forward");
+    final AutoTrajectory trajectory = routine.trajectory("Forward");
+    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
 
     return routine;
 
   }
-
 
 }
