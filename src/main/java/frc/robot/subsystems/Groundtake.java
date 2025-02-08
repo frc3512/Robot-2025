@@ -5,9 +5,10 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.reduxrobotics.sensors.canandmag.Canandmag;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Groundtake extends SubsystemBase{
     
@@ -15,11 +16,12 @@ public class Groundtake extends SubsystemBase{
     private final TalonFX floorAlgaePivotMotor;
 
     private Canandmag encoder;
-
     
-  private ProfiledPIDController pivotPID =
-      new ProfiledPIDController(
-          9, 0, 0, new Constraints(Units.degreesToRadians(700), Units.degreesToRadians(700)));
+    private ProfiledPIDController pivotPID = new ProfiledPIDController(
+            0.6,
+            0,
+            0,
+        new TrapezoidProfile.Constraints(1, 1));
 
     public Groundtake() {
 
@@ -49,6 +51,20 @@ public class Groundtake extends SubsystemBase{
     
         floorAlgaeRollerMotor.set(0);
         
+    }
+
+    public void retractPivot() {
+
+        floorAlgaePivotMotor.set(pivotPID.calculate(encoder.getAbsPosition(), Constants.IntakeConstants.pivotIn));
+
+    }
+
+    @Override
+    public void periodic() {
+
+        SmartDashboard.putNumber(
+            "Groundtake/Pos", encoder.getAbsPosition());
+
     }
 
 }

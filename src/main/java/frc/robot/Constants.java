@@ -35,9 +35,7 @@ public class Constants {
         public static final int reefAlgaePivotMotor = 17;
         public static final int coralRollerMotor = 18;
 
-        public static final double kP = 1;
-        public static final double kI = 0;
-        public static final double kD = 0;
+        public static final double pivotIn = 0.2;
 
     }
 

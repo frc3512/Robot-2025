@@ -6,7 +6,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Reektake extends SubsystemBase{
+public class Reeftake extends SubsystemBase{
 
     private final TalonFX reefAlgaePivotMotor;
     private final TalonFX intakeMotor;
@@ -16,7 +16,7 @@ public class Reektake extends SubsystemBase{
     boolean coralIn = false;
     boolean shouldScoreCoral = false;
 
-    public Reektake() {
+    public Reeftake() {
         
         //Reef algae
         reefAlgaePivotMotor = new TalonFX(17);

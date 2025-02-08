@@ -29,7 +29,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Groundtake;
-import frc.robot.subsystems.Reektake;
+import frc.robot.subsystems.Reeftake;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Elevator;
 // import frc.robot.subsystems.Vision;
@@ -53,7 +53,7 @@ public class RobotContainer {
   // Subsystem Objects
   public final Climber climber = new Climber();
   public final Elevator elevator = new Elevator();
-  public final Reektake reektake = new Reektake();
+  public final Reeftake reektake = new Reeftake();
   public final Groundtake groundtake = new Groundtake();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
   // public final Vision vision = new Vision();
@@ -124,6 +124,8 @@ public class RobotContainer {
     
     controller.rightTrigger().onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()));    
     controller.rightTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
+
+    controller.y().onTrue(new InstantCommand(() -> groundtake.retractPivot()));
     
     appendageJoystick.button(5).onTrue(new InstantCommand(() -> reektake.reefAlgaeIntake()));
     appendageJoystick.button(5).onFalse(new InstantCommand(() -> reektake.reefAlgaeStop()));
@@ -172,7 +174,7 @@ public class RobotContainer {
 
   public AutoRoutine testAuto(AutoFactory autoFactory2) {
   
-      final AutoRoutine routine = autoFactory2.newRoutine("Forward");
+    final AutoRoutine routine = autoFactory2.newRoutine("Forward");
 
     final AutoTrajectory trajectory = routine.trajectory("Forward");
     routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
