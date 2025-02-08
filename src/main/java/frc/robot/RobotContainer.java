@@ -76,11 +76,8 @@ public class RobotContainer<DriveSubsystem> {
 
   //Auton
   private final AutoFactory autoFactory;
-  public double distance;
-      
 
-
-    public RobotContainer() {
+        public RobotContainer() {
 
       headingController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -95,6 +92,7 @@ public class RobotContainer<DriveSubsystem> {
       configureBindings();
       configureAxisActions();
 
+    }
   }
 
   private void configureBindings() {
