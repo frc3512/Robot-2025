@@ -29,29 +29,19 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.subsystems.Climber;
-// import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Groundtake;
+import frc.robot.subsystems.Reektake;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Elevator;
 // import frc.robot.subsystems.Vision;
+import frc.robot.util.*;
 
 @SuppressWarnings("unused")
 public class RobotContainer<DriveSubsystem> {
     
   private double MaxSpeed = DriveConstants.MaxSpeed; 
   private double MaxAngularRate = DriveConstants.MaxAngularRate;
-  
-  public boolean isRed() {
-
-    if (DriverStation.getAlliance().isPresent()) {
-
-      return DriverStation.getAlliance().get() ==  Alliance.Red;
-
-    }
-
-    return false;
-
-    }
   
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
     .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.07) // Add a 7% deadband
@@ -65,7 +55,8 @@ public class RobotContainer<DriveSubsystem> {
   // Subsystem Objects
   public final Climber climber = new Climber();
   public final Elevator elevator = new Elevator();
-  public final Intake intake = new Intake();
+  public final Reektake reektake = new Reektake();
+  public final Groundtake groundtake = new Groundtake();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
   // public final Vision vision = new Vision();
 
@@ -132,28 +123,26 @@ public class RobotContainer<DriveSubsystem> {
     appendageJoystick.button(4).onTrue(new InstantCommand(() -> elevator.elevatorDown()));
     appendageJoystick.button(4).onFalse(new InstantCommand(() -> elevator.elevatorStop()));
 
-    // appendageJoystick.button(2).onTrue(new InstantCommand(() -> elevator.l1()));
-
     // Climber control
     appendageJoystick.button(10).onTrue(new InstantCommand(() -> climber.climbUp()));
     appendageJoystick.button(10).onFalse(new InstantCommand(() -> climber.climbStop()));
 
     appendageJoystick.button(11).onTrue(new InstantCommand(() -> climber.climbDown()));
     appendageJoystick.button(11).onFalse(new InstantCommand(() -> climber.climbStop()));
-
-    // Intake control
-    appendageJoystick.button(2).onTrue(new InstantCommand(() -> intake.floorAlgaeIntake()));
-    appendageJoystick.button(2).onFalse(new InstantCommand(() -> intake.floorAlgaeStop()));
-
-    appendageJoystick.button(3).onTrue(new InstantCommand(() -> intake.floorAlgaeOuttake()));
-    appendageJoystick.button(3).onFalse(new InstantCommand(() -> intake.floorAlgaeStop()));
     
-    appendageJoystick.button(5).onTrue(new InstantCommand(() -> intake.reefAlgaeIntake()));
-    appendageJoystick.button(5).onFalse(new InstantCommand(() -> intake.reefAlgaeStop()));
-
-    appendageJoystick.button(6).onTrue(new InstantCommand(() -> intake.reefAlgaeOuttake()));
-    appendageJoystick.button(6).onFalse(new InstantCommand(() -> intake.reefAlgaeStop()));    
-
+    // Intake control
+    controller.leftTrigger().onTrue(new InstantCommand(() -> groundtake.floorAlgaeIntake()));
+    controller.leftTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
+    
+    controller.rightTrigger().onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()));    
+    controller.rightTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
+    
+    appendageJoystick.button(5).onTrue(new InstantCommand(() -> reektake.reefAlgaeIntake()));
+    appendageJoystick.button(5).onFalse(new InstantCommand(() -> reektake.reefAlgaeStop()));
+    
+    appendageJoystick.button(6).onTrue(new InstantCommand(() -> reektake.reefAlgaeOuttake()));
+    appendageJoystick.button(6).onFalse(new InstantCommand(() -> reektake.reefAlgaeStop()));    
+    
     drivetrain.registerTelemetry(logger::telemeterize);
 
   }
