@@ -6,10 +6,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Intake extends SubsystemBase{
+public class Reektake extends SubsystemBase{
 
-    private final TalonFX floorAlgaeRollerMotor;
-    private final TalonFX floorAlgaePivotMotor;
     private final TalonFX reefAlgaePivotMotor;
     private final TalonFX intakeMotor;
 
@@ -18,14 +16,7 @@ public class Intake extends SubsystemBase{
     boolean coralIn = false;
     boolean shouldScoreCoral = false;
 
-    public Intake() {
-
-        // Floor algae
-        floorAlgaeRollerMotor = new TalonFX(15);
-        floorAlgaePivotMotor = new TalonFX(16);
-
-        floorAlgaeRollerMotor.setNeutralMode(NeutralModeValue.Brake);
-        floorAlgaePivotMotor.setNeutralMode(NeutralModeValue.Brake);
+    public Reektake() {
         
         //Reef algae
         reefAlgaePivotMotor = new TalonFX(17);
@@ -40,24 +31,6 @@ public class Intake extends SubsystemBase{
         //Beam Break
         hasCoral = new DigitalInput(0);
 
-    }
-
-    public void floorAlgaeIntake() {
-    
-        floorAlgaeRollerMotor.set(0.3);
-        
-    }
-    
-    public void floorAlgaeOuttake() {
-    
-        floorAlgaeRollerMotor.set(-0.5);
-        
-    }
-
-    public void floorAlgaeStop() {
-    
-        floorAlgaeRollerMotor.set(0);
-        
     }
 
     public void coralLogic() {

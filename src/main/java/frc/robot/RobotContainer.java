@@ -5,12 +5,18 @@ import org.photonvision.PhotonCamera;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import choreo.auto.AutoFactory;
+import choreo.auto.AutoRoutine;
+import choreo.auto.AutoTrajectory;
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -21,11 +27,13 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.subsystems.Climber;
-// import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Groundtake;
+import frc.robot.subsystems.Reektake;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Elevator;
 // import frc.robot.subsystems.Vision;
+import frc.robot.util.*;
 
 @SuppressWarnings("unused")
 public class RobotContainer {
@@ -45,7 +53,8 @@ public class RobotContainer {
   // Subsystem Objects
   public final Climber climber = new Climber();
   public final Elevator elevator = new Elevator();
-  public final Intake intake = new Intake();
+  public final Reektake reektake = new Reektake();
+  public final Groundtake groundtake = new Groundtake();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
   // public final Vision vision = new Vision();
 
@@ -58,8 +67,23 @@ public class RobotContainer {
   PIDController yPID = new PIDController(3, 0, 0);
   PIDController rPID = new PIDController(3, 0, 0);
 
+  PIDController xController = new PIDController(1, 0.0, 0.0);
+  PIDController yController = new PIDController(1, 0.0, 0.0);
+  PIDController headingController = new PIDController(0.75, 0.0, 0.0);
+
+  private final AutoFactory autoFactory;
 
   public RobotContainer() {
+
+    headingController.enableContinuousInput(-Math.PI, Math.PI);
+
+    autoFactory = new AutoFactory(
+            () -> drivetrain.getState().Pose,
+            drivetrain::resetPose,
+            this::followTrajectory,
+            true,
+            drivetrain
+    );
 
     configureBindings();
     configureAxisActions();
@@ -87,8 +111,6 @@ public class RobotContainer {
     appendageJoystick.button(4).onTrue(new InstantCommand(() -> elevator.elevatorDown()));
     appendageJoystick.button(4).onFalse(new InstantCommand(() -> elevator.elevatorStop()));
 
-    // appendageJoystick.button(2).onTrue(new InstantCommand(() -> elevator.l1()));
-
     // Climber control
     appendageJoystick.button(10).onTrue(new InstantCommand(() -> climber.climbUp()));
     appendageJoystick.button(10).onFalse(new InstantCommand(() -> climber.climbStop()));
@@ -97,17 +119,17 @@ public class RobotContainer {
     appendageJoystick.button(11).onFalse(new InstantCommand(() -> climber.climbStop()));
     
     // Intake control
-    controller.leftTrigger().onTrue(new InstantCommand(() -> intake.floorAlgaeIntake()));
-    controller.leftTrigger().onFalse(new InstantCommand(() -> intake.floorAlgaeStop()));
+    controller.leftTrigger().onTrue(new InstantCommand(() -> groundtake.floorAlgaeIntake()));
+    controller.leftTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
     
-    controller.rightTrigger().onTrue(new InstantCommand(() -> intake.floorAlgaeOuttake()));    
-    controller.rightTrigger().onFalse(new InstantCommand(() -> intake.floorAlgaeStop()));
+    controller.rightTrigger().onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()));    
+    controller.rightTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
     
-    appendageJoystick.button(5).onTrue(new InstantCommand(() -> intake.reefAlgaeIntake()));
-    appendageJoystick.button(5).onFalse(new InstantCommand(() -> intake.reefAlgaeStop()));
+    appendageJoystick.button(5).onTrue(new InstantCommand(() -> reektake.reefAlgaeIntake()));
+    appendageJoystick.button(5).onFalse(new InstantCommand(() -> reektake.reefAlgaeStop()));
     
-    appendageJoystick.button(6).onTrue(new InstantCommand(() -> intake.reefAlgaeOuttake()));
-    appendageJoystick.button(6).onFalse(new InstantCommand(() -> intake.reefAlgaeStop()));    
+    appendageJoystick.button(6).onTrue(new InstantCommand(() -> reektake.reefAlgaeOuttake()));
+    appendageJoystick.button(6).onFalse(new InstantCommand(() -> reektake.reefAlgaeStop()));    
     
     drivetrain.registerTelemetry(logger::telemeterize);
 
@@ -122,9 +144,40 @@ public class RobotContainer {
 
   }
 
-  public Command getAutonomousCommand() {
+   public void followTrajectory(SwerveSample sample) {
+        // Get the current pose of the robot
+        Pose2d pose = drivetrain.getState().Pose;
 
-    return null;
+        // Generate the next speeds for the robot
+        ChassisSpeeds speeds = new ChassisSpeeds(
+            sample.vx + xController.calculate(pose.getX(), sample.x),
+            sample.vy + yController.calculate(pose.getY(), sample.y),
+            sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
+        );
+ 
+        // Apply the generated speeds
+        drivetrain.applyRequest(
+            () ->
+                drive
+                  .withVelocityX(speeds.vxMetersPerSecond)
+                  .withVelocityY(speeds.vyMetersPerSecond)
+                  .withRotationalRate(speeds.omegaRadiansPerSecond));
+
+  }
+
+  public Command getAutonomousCommand() {
+    Command myTrajectory = autoFactory.trajectoryCmd("Test");
+    return myTrajectory;
+  }
+
+  public AutoRoutine testAuto(AutoFactory autoFactory2) {
+  
+      final AutoRoutine routine = autoFactory2.newRoutine("Forward");
+
+    final AutoTrajectory trajectory = routine.trajectory("Forward");
+    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+
+    return routine;
 
   }
 
