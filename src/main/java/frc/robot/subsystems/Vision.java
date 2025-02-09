@@ -17,11 +17,12 @@
 
 // public class Vision extends SubsystemBase {
 
-//   private static PhotonCamera photonCamera = new PhotonCamera(Constants.VisionConstants.leftCamera);
+//   private static PhotonCamera photonCamera = new
+// PhotonCamera(Constants.VisionConstants.leftCamera);
 //   private Thread m_driverCamThread;
 
 //   private boolean targetVisible = false;
-  
+
 //   private double targetYaw = 0;
 //   private final double visionYawOffset = 0;
 
@@ -61,7 +62,6 @@
 //     PhotonCamera.setVersionCheckEnabled(false);
 
 //   }
-
 
 //   public static PhotonCamera returnCamera() {
 

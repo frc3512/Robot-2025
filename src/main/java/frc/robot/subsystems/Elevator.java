@@ -1,65 +1,58 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import frc.robot.Constants;
 
 public class Elevator extends SubsystemBase {
 
-    // Declare motors
-    private final TalonFX elevatorMotorRt;
-    private final TalonFX elevatorMotorLt;
+  // Declare motors
+  private final TalonFX elevatorMotorRt;
+  private final TalonFX elevatorMotorLt;
 
-    private MotionMagicVoltage request = new MotionMagicVoltage(0);
+  private MotionMagicVoltage request = new MotionMagicVoltage(0);
 
-    boolean bypassStop = false;
-    
-        public Elevator() { 
-            
-            // Set parameters for elevator motors
-            elevatorMotorRt = new TalonFX(Constants.ElevatorConstants.elevatorMotorRt);
-            elevatorMotorLt = new TalonFX(Constants.ElevatorConstants.elevatorMotorLt);
+  boolean bypassStop = false;
 
-            elevatorMotorRt.setControl(new Follower(elevatorMotorLt.getDeviceID(), false));
+  public Elevator() {
 
-            elevatorMotorRt.setNeutralMode(NeutralModeValue.Brake);
-            elevatorMotorLt.setNeutralMode(NeutralModeValue.Brake);
+    // Set parameters for elevator motors
+    elevatorMotorRt = new TalonFX(Constants.ElevatorConstants.elevatorMotorRt);
+    elevatorMotorLt = new TalonFX(Constants.ElevatorConstants.elevatorMotorLt);
 
-        }
+    elevatorMotorRt.setControl(new Follower(elevatorMotorLt.getDeviceID(), false));
 
-    
-        public void elevatorUp() {
+    elevatorMotorRt.setNeutralMode(NeutralModeValue.Brake);
+    elevatorMotorLt.setNeutralMode(NeutralModeValue.Brake);
+  }
 
-            elevatorMotorLt.set(0.5);
-            elevatorMotorRt.set(0.5);
+  public void elevatorUp() {
 
-        }
+    elevatorMotorLt.set(0.5);
+    elevatorMotorRt.set(0.5);
+  }
 
-        public void elevatorDown() {
+  public void elevatorDown() {
 
-            elevatorMotorLt.set(-0.5);
-            elevatorMotorRt.set(-0.5);
+    elevatorMotorLt.set(-0.5);
+    elevatorMotorRt.set(-0.5);
+  }
 
-        }
+  public void elevatorStop() {
 
-        public void elevatorStop() {
+    elevatorMotorLt.set(0.0);
+    elevatorMotorRt.set(0.0);
+  }
 
-            elevatorMotorLt.set(0.0);
-            elevatorMotorRt.set(0.0);
+  @Override
+  public void periodic() {
 
-        }
-    
-        @Override
-        public void periodic() {
-
-            elevatorMotorRt.setControl(request.withPosition(9));
-            SmartDashboard.putNumber("Elevator/ElevatorPos", elevatorMotorRt.getRotorPosition().getValueAsDouble());
-
-        }
+    elevatorMotorRt.setControl(request.withPosition(9));
+    SmartDashboard.putNumber(
+        "Elevator/ElevatorPos", elevatorMotorRt.getRotorPosition().getValueAsDouble());
+  }
 }

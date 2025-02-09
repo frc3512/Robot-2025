@@ -2,100 +2,90 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Reeftake extends SubsystemBase{
+public class Reeftake extends SubsystemBase {
 
-    private final TalonFX reefAlgaePivotMotor;
-    private final TalonFX intakeMotor;
+  private final TalonFX reefAlgaePivotMotor;
+  private final TalonFX intakeMotor;
 
-    private final DigitalInput hasCoral;
+  private final DigitalInput hasCoral;
 
-    boolean coralIn = false;
-    boolean shouldScoreCoral = false;
+  boolean coralIn = false;
+  boolean shouldScoreCoral = false;
 
-    public Reeftake() {
-        
-        //Reef algae
-        reefAlgaePivotMotor = new TalonFX(17);
+  public Reeftake() {
 
-        reefAlgaePivotMotor.setNeutralMode(NeutralModeValue.Brake);
+    // Reef algae
+    reefAlgaePivotMotor = new TalonFX(17);
 
-        //Intake
-        intakeMotor = new TalonFX(18);
+    reefAlgaePivotMotor.setNeutralMode(NeutralModeValue.Brake);
 
-        intakeMotor.setNeutralMode(NeutralModeValue.Brake);
+    // Intake
+    intakeMotor = new TalonFX(18);
 
-        //Beam Break
-        hasCoral = new DigitalInput(0);
+    intakeMotor.setNeutralMode(NeutralModeValue.Brake);
 
+    // Beam Break
+    hasCoral = new DigitalInput(0);
+  }
+
+  public void coralLogic() {
+
+    if (hasCoral.get()) {
+
+      coralIn = true;
+
+    } else {
+
+      coralIn = false;
     }
+  }
 
-    public void coralLogic() {
+  public void coralIntake() {
 
-        if (hasCoral.get()) {
+    if (!coralIn) {
 
-            coralIn = true;
-            
-        } else {
-            
-            coralIn = false;
-            
-        }
+      intakeMotor.set(0.5);
 
+    } else {
+
+      intakeMotor.set(0);
     }
+  }
 
-    public void coralIntake() {
+  public void coralShoot() {
 
-        if (!coralIn) {
+    intakeMotor.set(0.8);
+    // check if coral is in before shooting
+    // something like this
+    /*
+    if (coralIn) {
 
-            intakeMotor.set(0.5);
-
-        } else {
-
-            intakeMotor.set(0);
-
-        }
-
-    }
-
-    public void coralShoot() {
-        
         intakeMotor.set(0.8);
-        //check if coral is in before shooting
-        //something like this
-        /*
-        if (coralIn) {
 
-            intakeMotor.set(0.8);
-
-        } else {
-
-            intakeMotor.set(0);
-
-        }
-        */
-    
-    }
-
-    public void reefAlgaeIntake() {
-
-        intakeMotor.set(0.5);
-
-    }
-
-    public void reefAlgaeOuttake() {
-
-        intakeMotor.set(-0.5);
-
-    }
-    
-    public void reefAlgaeStop() {
+    } else {
 
         intakeMotor.set(0);
 
     }
+    */
 
+  }
+
+  public void reefAlgaeIntake() {
+
+    intakeMotor.set(0.5);
+  }
+
+  public void reefAlgaeOuttake() {
+
+    intakeMotor.set(-0.5);
+  }
+
+  public void reefAlgaeStop() {
+
+    intakeMotor.set(0);
+  }
 }

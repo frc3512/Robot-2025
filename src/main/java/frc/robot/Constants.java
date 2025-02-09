@@ -9,37 +9,34 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 
 public class Constants {
-    
-    public static class ElevatorConstants {
-        
-        public static final int elevatorMotorRt = 13;
-        public static final int elevatorMotorLt = 14;
 
-        public static final double kP = 1;
-        public static final double kI = 0;
-        public static final double kD = 0;
-        
-    }
+  public static class ElevatorConstants {
 
-    public static class ClimberConstants {
-        
-        public static final int climbMotor1 = 10;
-        public static final int climbMotor2 = 11;
-        
-    }
-    
-    public static class IntakeConstants {
+    public static final int elevatorMotorRt = 13;
+    public static final int elevatorMotorLt = 14;
 
-        public static final int floorAlgaeRollerMotor = 15;
-        public static final int floorAlgaePivotMotor = 16;
-        public static final int reefAlgaePivotMotor = 17;
-        public static final int coralRollerMotor = 18;
+    public static final double kP = 1;
+    public static final double kI = 0;
+    public static final double kD = 0;
+  }
 
-        public static final double pivotIn = 0.2;
+  public static class ClimberConstants {
 
-    }
+    public static final int climbMotor1 = 10;
+    public static final int climbMotor2 = 11;
+  }
 
-    public static class VisionConstants {
+  public static class IntakeConstants {
+
+    public static final int floorAlgaeRollerMotor = 15;
+    public static final int floorAlgaePivotMotor = 16;
+    public static final int reefAlgaePivotMotor = 17;
+    public static final int coralRollerMotor = 18;
+
+    public static final double pivotIn = 0.2;
+  }
+
+  public static class VisionConstants {
 
     public static final String leftCamera = "Arducam OV9281 3512 left";
     public static final String rightCamera = "Arducam OV9281 3512 right";
@@ -55,8 +52,6 @@ public class Constants {
     public static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(0.9, 0.9, 0.9);
     public static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.9, 0.9, 0.9);
 
-    public static final double visionTurnP = 1; // TUNE THIS VALUE 
-
-    }
-
+    public static final double visionTurnP = 1; // TUNE THIS VALUE
+  }
 }

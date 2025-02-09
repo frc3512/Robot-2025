@@ -2,88 +2,71 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import com.reduxrobotics.sensors.canandmag.Canandmag;
-
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Groundtake extends SubsystemBase{
-    
-    private final TalonFX floorAlgaeRollerMotor;
-    private final TalonFX floorAlgaePivotMotor;
+public class Groundtake extends SubsystemBase {
 
-    private Canandmag encoder;
+  private final TalonFX floorAlgaeRollerMotor;
+  private final TalonFX floorAlgaePivotMotor;
 
-    private double setpoint;
-    
-    private ProfiledPIDController pivotPID = new ProfiledPIDController(
-            0.13,
-            0.01,
-            0,
-        new TrapezoidProfile.Constraints(0.5, 0.2));
+  private Canandmag encoder;
 
-    public Groundtake() {
+  private double setpoint;
 
-        floorAlgaeRollerMotor = new TalonFX(15);
-        floorAlgaePivotMotor = new TalonFX(16);
+  private ProfiledPIDController pivotPID =
+      new ProfiledPIDController(0.13, 0.01, 0, new TrapezoidProfile.Constraints(0.5, 0.2));
 
-        encoder = new Canandmag(30);
+  public Groundtake() {
 
-        floorAlgaeRollerMotor.setNeutralMode(NeutralModeValue.Brake);
-        floorAlgaePivotMotor.setNeutralMode(NeutralModeValue.Brake);
+    floorAlgaeRollerMotor = new TalonFX(15);
+    floorAlgaePivotMotor = new TalonFX(16);
 
-        pivotPID.setTolerance(0.075);
+    encoder = new Canandmag(30);
 
-    }
+    floorAlgaeRollerMotor.setNeutralMode(NeutralModeValue.Brake);
+    floorAlgaePivotMotor.setNeutralMode(NeutralModeValue.Brake);
 
-    public void floorAlgaeIntake() {
-    
-        floorAlgaeRollerMotor.set(0.65);
-        
-    }
-    
-    public void floorAlgaeOuttake() {
-    
-        floorAlgaeRollerMotor.set(-0.5);
-        
-    }
+    pivotPID.setTolerance(0.075);
+  }
 
-    public void floorAlgaeStop() {
-    
-        floorAlgaeRollerMotor.set(0);
-        
-    }
+  public void floorAlgaeIntake() {
 
-    public void retractPivot() {
+    floorAlgaeRollerMotor.set(0.65);
+  }
 
-       setpoint = 0.0;
+  public void floorAlgaeOuttake() {
 
-    }
+    floorAlgaeRollerMotor.set(-0.5);
+  }
 
-    public void extendPivot() {
+  public void floorAlgaeStop() {
 
-        setpoint = 0.5;
+    floorAlgaeRollerMotor.set(0);
+  }
 
-    }
+  public void retractPivot() {
 
-    @Override
-    public void periodic() {
+    setpoint = 0.0;
+  }
 
-        floorAlgaePivotMotor.set(pivotPID.calculate(
-            encoder.getAbsPosition(), 
-            setpoint));
+  public void extendPivot() {
 
-        SmartDashboard.putNumber(
-            "Groundtake/Pos", encoder.getAbsPosition());
-        SmartDashboard.putNumber(
-            "Groundtake/MotorPos", floorAlgaePivotMotor.getRotorPosition().getValueAsDouble());
+    setpoint = 0.5;
+  }
 
-        SmartDashboard.putNumber(
-            "Groundtake/Goal", pivotPID.getGoal().position);
+  @Override
+  public void periodic() {
 
-    }
+    floorAlgaePivotMotor.set(pivotPID.calculate(encoder.getAbsPosition(), setpoint));
 
+    SmartDashboard.putNumber("Groundtake/Pos", encoder.getAbsPosition());
+    SmartDashboard.putNumber(
+        "Groundtake/MotorPos", floorAlgaePivotMotor.getRotorPosition().getValueAsDouble());
+
+    SmartDashboard.putNumber("Groundtake/Goal", pivotPID.getGoal().position);
+  }
 }
