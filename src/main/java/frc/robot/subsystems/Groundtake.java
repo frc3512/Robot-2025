@@ -2,13 +2,13 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import com.reduxrobotics.sensors.canandmag.Canandmag;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 
 public class Groundtake extends SubsystemBase{
     
@@ -16,12 +16,14 @@ public class Groundtake extends SubsystemBase{
     private final TalonFX floorAlgaePivotMotor;
 
     private Canandmag encoder;
+
+    private double setpoint;
     
     private ProfiledPIDController pivotPID = new ProfiledPIDController(
-            0.6,
+            0.13,
+            0.01,
             0,
-            0,
-        new TrapezoidProfile.Constraints(1, 1));
+        new TrapezoidProfile.Constraints(0.5, 0.2));
 
     public Groundtake() {
 
@@ -32,6 +34,8 @@ public class Groundtake extends SubsystemBase{
 
         floorAlgaeRollerMotor.setNeutralMode(NeutralModeValue.Brake);
         floorAlgaePivotMotor.setNeutralMode(NeutralModeValue.Brake);
+
+        pivotPID.setTolerance(0.075);
 
     }
 
@@ -55,15 +59,30 @@ public class Groundtake extends SubsystemBase{
 
     public void retractPivot() {
 
-        floorAlgaePivotMotor.set(pivotPID.calculate(encoder.getAbsPosition(), Constants.IntakeConstants.pivotIn));
+       setpoint = 0.0;
+
+    }
+
+    public void extendPivot() {
+
+        setpoint = 0.5;
 
     }
 
     @Override
     public void periodic() {
 
+        floorAlgaePivotMotor.set(pivotPID.calculate(
+            encoder.getAbsPosition(), 
+            setpoint));
+
         SmartDashboard.putNumber(
             "Groundtake/Pos", encoder.getAbsPosition());
+        SmartDashboard.putNumber(
+            "Groundtake/MotorPos", floorAlgaePivotMotor.getRotorPosition().getValueAsDouble());
+
+        SmartDashboard.putNumber(
+            "Groundtake/Goal", pivotPID.getGoal().position);
 
     }
 

@@ -93,7 +93,7 @@ public class RobotContainer<DriveSubsystem> {
       configureAxisActions();
 
     }
-  }
+
 
   private void configureBindings() {
 
@@ -131,6 +131,7 @@ public class RobotContainer<DriveSubsystem> {
     controller.rightTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
 
     controller.y().onTrue(new InstantCommand(() -> groundtake.retractPivot()));
+    controller.b().onTrue(new InstantCommand(() -> groundtake.extendPivot()));
     
     appendageJoystick.button(5).onTrue(new InstantCommand(() -> reektake.reefAlgaeIntake()));
     appendageJoystick.button(5).onFalse(new InstantCommand(() -> reektake.reefAlgaeStop()));
