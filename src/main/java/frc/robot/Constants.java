@@ -6,38 +6,76 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
 public class Constants {
-
   public static class ElevatorConstants {
+    public static final int elevatorMotorRtID = 13;
+    public static final int elevatorMotorLtID = 14;
 
-    public static final int elevatorMotorRt = 13;
-    public static final int elevatorMotorLt = 14;
+    public static final double kP = 1.0;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
 
-    public static final double kP = 1;
-    public static final double kI = 0;
-    public static final double kD = 0;
+    public static final double tolerance = 0.002;
+
+    public static final double elevatorGearRatio = 11.0 / 50.0;
+    public static final double elevatorDrumRadiusMeters = 0.023;
+
+    public static final TrapezoidProfile.Constraints constraints =
+        new TrapezoidProfile.Constraints(7.0, 5.0);
   }
 
   public static class ClimberConstants {
+    public static final int climbMotor1ID = 10;
+    public static final int climbMotor2ID = 11;
 
-    public static final int climbMotor1 = 10;
-    public static final int climbMotor2 = 11;
+    public static final double kP = 1.0;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
+
+    public static final double tolerance = 0.002;
+
+    public static final TrapezoidProfile.Constraints constraints =
+        new TrapezoidProfile.Constraints(7.0, 5.0);
   }
 
-  public static class IntakeConstants {
+  public static class ReeftakeConstants {
+    public static final int pivotMotorID = 17;
+    public static final int intakeMotorID = 18;
 
-    public static final int floorAlgaeRollerMotor = 15;
-    public static final int floorAlgaePivotMotor = 16;
-    public static final int reefAlgaePivotMotor = 17;
-    public static final int coralRollerMotor = 18;
+    public static final int digialInputChannel = 0;
+
+    public static final double kP = 1.0;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
+
+    public static final double tolerance = 0.002;
+
+    public static final TrapezoidProfile.Constraints constraints =
+        new TrapezoidProfile.Constraints(7.0, 5.0);
+  }
+
+  public static class GroundtakeConstants {
+    public static final int floorAlgaeRollerMotorID = 15;
+    public static final int floorAlgaePivotMotorID = 16;
+
+    public static final int encoderID = 30;
+
+    public static final double kP = 0.13;
+    public static final double kI = 0.01;
+    public static final double kD = 0.0;
+
+    public static final double tolerance = 0.075;
+
+    public static final TrapezoidProfile.Constraints constraints =
+        new TrapezoidProfile.Constraints(0.5, 0.2);
 
     public static final double pivotIn = 0.2;
   }
 
   public static class VisionConstants {
-
     public static final String leftCamera = "Arducam OV9281 3512 left";
     public static final String rightCamera = "Arducam OV9281 3512 right";
 

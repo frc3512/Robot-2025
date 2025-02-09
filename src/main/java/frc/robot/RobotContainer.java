@@ -14,12 +14,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.lib.util.Telemetry;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Groundtake;
 import frc.robot.subsystems.Reeftake;
 import frc.robot.subsystems.Swerve;
-import frc.robot.util.*;
 
 @SuppressWarnings("unused")
 public class RobotContainer<DriveSubsystem> {
@@ -63,7 +63,6 @@ public class RobotContainer<DriveSubsystem> {
   private final AutoFactory autoFactory;
 
   public RobotContainer() {
-
     headingController.enableContinuousInput(-Math.PI, Math.PI);
 
     autoFactory =
@@ -164,7 +163,6 @@ public class RobotContainer<DriveSubsystem> {
   }
 
   public AutoRoutine testAuto(AutoFactory autoFactory2) {
-
     final AutoRoutine routine = autoFactory2.newRoutine("Forward");
 
     final AutoTrajectory trajectory = routine.trajectory("Forward");
