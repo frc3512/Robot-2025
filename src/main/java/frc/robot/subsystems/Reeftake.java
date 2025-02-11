@@ -12,6 +12,7 @@ public class Reeftake extends ProfiledPIDSubsystem {
 
   private final TalonFX reefAlgaePivotMotor = new TalonFX(Constants.ReeftakeConstants.pivotMotorID);
   private final TalonFX intakeMotor = new TalonFX(Constants.ReeftakeConstants.intakeMotorID);
+  
   private final DigitalInput hasCoral =
       new DigitalInput(Constants.ReeftakeConstants.digialInputChannel);
 

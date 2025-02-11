@@ -48,6 +48,26 @@ public class Elevator extends ProfiledPIDSubsystem {
     elevatorMotorRt.set(0.0);
   }
 
+  public void l1() {
+    setElevatorGoal(0.5);
+  }
+
+  public void l2() {
+    setElevatorGoal(1.0);
+  }
+
+  public void l3() {
+    setElevatorGoal(1.5);
+  }
+
+  public void l4() {
+    setElevatorGoal(2.0);
+  }
+
+  public void stow() {
+    setElevatorGoal(0.2);
+  }
+
   public void setElevatorGoal(double targetGoalMeters) {
     setGoal(
         Utility.metersToRotations(

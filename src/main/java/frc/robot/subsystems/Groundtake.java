@@ -10,10 +10,12 @@ import frc.lib.command.ProfiledPIDSubsystem;
 import frc.robot.Constants;
 
 public class Groundtake extends ProfiledPIDSubsystem {
+  
   private final TalonFX floorAlgaeRollerMotor =
       new TalonFX(Constants.GroundtakeConstants.floorAlgaeRollerMotorID);
   private final TalonFX floorAlgaePivotMotor =
       new TalonFX(Constants.GroundtakeConstants.floorAlgaePivotMotorID);
+
   private Canandmag encoder = new Canandmag(Constants.GroundtakeConstants.encoderID);
 
   public Groundtake() {
@@ -23,7 +25,7 @@ public class Groundtake extends ProfiledPIDSubsystem {
             Constants.GroundtakeConstants.kI,
             Constants.GroundtakeConstants.kD,
             Constants.GroundtakeConstants.constraints));
-    getController().setTolerance(0.075);
+    getController().setTolerance(Constants.GroundtakeConstants.tolerance);
 
     floorAlgaeRollerMotor.setNeutralMode(NeutralModeValue.Brake);
     floorAlgaePivotMotor.setNeutralMode(NeutralModeValue.Brake);
@@ -43,10 +45,12 @@ public class Groundtake extends ProfiledPIDSubsystem {
 
   public void retractPivot() {
     setGoal(0.0);
+    enable();
   }
 
   public void extendPivot() {
-    setGoal(0.5);
+    setGoal(0.35);
+    enable();
   }
 
   @Override

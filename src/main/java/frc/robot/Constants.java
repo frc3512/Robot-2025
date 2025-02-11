@@ -24,7 +24,7 @@ public class Constants {
     public static final double elevatorDrumRadiusMeters = 0.023;
 
     public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(7.0, 5.0);
+        new TrapezoidProfile.Constraints(7, 5);
   }
 
   public static class ClimberConstants {
@@ -38,7 +38,7 @@ public class Constants {
     public static final double tolerance = 0.002;
 
     public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(7.0, 5.0);
+        new TrapezoidProfile.Constraints(7, 5);
   }
 
   public static class ReeftakeConstants {
@@ -54,7 +54,7 @@ public class Constants {
     public static final double tolerance = 0.002;
 
     public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(7.0, 5.0);
+        new TrapezoidProfile.Constraints(7, 5);
   }
 
   public static class GroundtakeConstants {
@@ -63,16 +63,15 @@ public class Constants {
 
     public static final int encoderID = 30;
 
-    public static final double kP = 0.13;
-    public static final double kI = 0.01;
-    public static final double kD = 0.0;
+    public static final double kP = 1.6;
+    public static final double kI = 0.0;
+    public static final double kD = 0.005;
 
-    public static final double tolerance = 0.075;
+    public static final double tolerance = 0.005;
 
     public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(0.5, 0.2);
+        new TrapezoidProfile.Constraints(7, 5);
 
-    public static final double pivotIn = 0.2;
   }
 
   public static class VisionConstants {

@@ -11,8 +11,10 @@ import frc.robot.Constants;
 @SuppressWarnings("unused")
 public class Climber extends ProfiledPIDSubsystem {
 
-  private final TalonFX climbMotor1 = new TalonFX(Constants.ClimberConstants.climbMotor1ID);
-  private final TalonFX climbMotor2 = new TalonFX(Constants.ClimberConstants.climbMotor2ID);
+  private final TalonFX climbMotor1 = 
+    new TalonFX(Constants.ClimberConstants.climbMotor1ID);
+  private final TalonFX climbMotor2 = 
+    new TalonFX(Constants.ClimberConstants.climbMotor2ID);
 
   private boolean canClimbUp = false;
   private boolean wantClimbUp = false;

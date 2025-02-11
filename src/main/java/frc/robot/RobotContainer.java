@@ -20,6 +20,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Groundtake;
 import frc.robot.subsystems.Reeftake;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Vision;
 
 @SuppressWarnings("unused")
 public class RobotContainer<DriveSubsystem> {
@@ -44,17 +45,13 @@ public class RobotContainer<DriveSubsystem> {
   public final Reeftake reektake = new Reeftake();
   public final Groundtake groundtake = new Groundtake();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
-  // public final Vision vision = new Vision();
+  public final Vision vision = new Vision();
 
   // Controller Objects
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandJoystick appendageJoystick = new CommandJoystick(1);
 
   // PID Controllers ( auton )
-  PIDController xPID = new PIDController(3, 0, 0);
-  PIDController yPID = new PIDController(3, 0, 0);
-  PIDController rPID = new PIDController(3, 0, 0);
-
   PIDController xController = new PIDController(1, 0.0, 0.0);
   PIDController yController = new PIDController(1, 0.0, 0.0);
   PIDController headingController = new PIDController(0.75, 0.0, 0.0);
@@ -75,6 +72,7 @@ public class RobotContainer<DriveSubsystem> {
 
     configureBindings();
     configureAxisActions();
+    configureVision();
   }
 
   private void configureBindings() {
@@ -83,15 +81,7 @@ public class RobotContainer<DriveSubsystem> {
     controller.a().whileTrue(drivetrain.applyRequest(() -> brake));
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-    // Vison alignment drive command
-    // controller.leftBumper().whileTrue(drivetrain.applyRequest(() ->
-    // drive.withVelocityX(DriveConstants.forward)
-    // .withVelocityY(DriveConstants.strafe)
-    // .withRotationalRate((vision.getYawOffset() - vision.getTargetYaw()) *
-    // Constants.VisionConstants.visionTurnP * MaxAngularRate)));
-
-    // Bindings for the appendage joystick
-
+    // Bindings for the button box
     // Elevator control
     appendageJoystick.button(1).onTrue(new InstantCommand(() -> elevator.elevatorUp()));
     appendageJoystick.button(1).onFalse(new InstantCommand(() -> elevator.elevatorStop()));
@@ -134,6 +124,20 @@ public class RobotContainer<DriveSubsystem> {
                     .withVelocityX(-controller.getLeftY() * MaxSpeed)
                     .withVelocityY(-controller.getLeftX() * MaxSpeed)
                     .withRotationalRate(-controller.getRightX() * MaxAngularRate)));
+  }
+
+  private void configureVision() {
+
+    // Vison alignment drive command
+    controller.leftBumper().whileTrue(
+      drivetrain.applyRequest(
+        () ->
+            drive
+                .withVelocityX(DriveConstants.forward)
+                .withVelocityY(DriveConstants.strafe)
+                .withRotationalRate((vision.getYawOffset() - vision.getTargetYaw()) * 
+                Constants.VisionConstants.visionTurnP * MaxAngularRate)));
+
   }
 
   public void followTrajectory(SwerveSample sample) {
