@@ -73,6 +73,11 @@ public class RobotContainer<DriveSubsystem> {
     configureBindings();
     configureAxisActions();
     configureVision();
+
+    Command Test = autoFactory.trajectoryCmd("Forward");
+    Command Trajectory1 = autoFactory.trajectoryCmd("Score 3pt go H");
+    Command Trajectory2 = autoFactory.trajectoryCmd("Score pt go H");
+
   }
 
   private void configureBindings() {
@@ -162,8 +167,8 @@ public class RobotContainer<DriveSubsystem> {
   }
 
   public Command getAutonomousCommand() {
-    Command myTrajectory = autoFactory.trajectoryCmd("Test");
-    return myTrajectory;
+    Command Test = autoFactory.trajectoryCmd("Test");
+    return Test;
   }
 
   public AutoRoutine testAuto(AutoFactory autoFactory2) {
