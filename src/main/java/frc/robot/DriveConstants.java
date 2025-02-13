@@ -18,17 +18,13 @@ import frc.robot.subsystems.Swerve;
 public class DriveConstants {
 
   private static final Slot0Configs steerGains =
-      new Slot0Configs()
-          .withKP(100)
-          .withKI(0)
-          .withKD(0.2)
-          .withKS(0)
-          .withKV(1.5)
-          .withKA(0)
-          .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
+      new Slot0Configs().withKP(100).withKI(0).withKD(0.2)
+                        .withKS(0).withKV(1.5).withKA(0)
+                        .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
 
   private static final Slot0Configs driveGains =
-      new Slot0Configs().withKP(0.2).withKI(0).withKD(0).withKS(0).withKV(0.125).withKA(0);
+      new Slot0Configs().withKP(0.2).withKI(0).withKD(0)
+                        .withKS(0).withKV(0.125).withKA(0);
 
   private static final ClosedLoopOutputType kSteerClosedLoopOutput = ClosedLoopOutputType.Voltage;
   private static final ClosedLoopOutputType kDriveClosedLoopOutput = ClosedLoopOutputType.Voltage;

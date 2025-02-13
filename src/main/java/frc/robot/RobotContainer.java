@@ -102,14 +102,12 @@ public class RobotContainer<DriveSubsystem> {
     appendageJoystick.button(11).onFalse(new InstantCommand(() -> climber.climbStop()));
 
     // Intake control
-    controller.leftTrigger().onTrue(new InstantCommand(() -> groundtake.floorAlgaeIntake()));
-    controller.leftTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
+    controller.leftTrigger().onTrue(new InstantCommand(() -> groundtake.extendPivot())
+      .andThen(new InstantCommand(() -> groundtake.floorAlgaeIntake())));
+    controller.leftTrigger().onFalse(new InstantCommand(() -> groundtake.retractPivot()));
 
     controller.rightTrigger().onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()));
     controller.rightTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
-
-    controller.y().onTrue(new InstantCommand(() -> groundtake.retractPivot()));
-    controller.b().onTrue(new InstantCommand(() -> groundtake.extendPivot()));
 
     appendageJoystick.button(5).onTrue(new InstantCommand(() -> reektake.reefAlgaeIntake()));
     appendageJoystick.button(5).onFalse(new InstantCommand(() -> reektake.reefAlgaeStop()));
