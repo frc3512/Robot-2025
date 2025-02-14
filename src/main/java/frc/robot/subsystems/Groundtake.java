@@ -30,7 +30,6 @@ public class Groundtake extends ProfiledPIDSubsystem {
     floorAlgaeRollerMotor.setNeutralMode(NeutralModeValue.Brake);
     floorAlgaePivotMotor.setNeutralMode(NeutralModeValue.Brake);
 
-    setGoal(0.350);
     enable();
   }
 

@@ -87,19 +87,6 @@ public class RobotContainer<DriveSubsystem> {
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     // Bindings for the button box
-    // Elevator control
-    appendageJoystick.button(1).onTrue(new InstantCommand(() -> elevator.elevatorUp()));
-    appendageJoystick.button(1).onFalse(new InstantCommand(() -> elevator.elevatorStop()));
-
-    appendageJoystick.button(4).onTrue(new InstantCommand(() -> elevator.elevatorDown()));
-    appendageJoystick.button(4).onFalse(new InstantCommand(() -> elevator.elevatorStop()));
-
-    // Climber control
-    appendageJoystick.button(10).onTrue(new InstantCommand(() -> climber.climbUp()));
-    appendageJoystick.button(10).onFalse(new InstantCommand(() -> climber.climbStop()));
-
-    appendageJoystick.button(11).onTrue(new InstantCommand(() -> climber.climbDown()));
-    appendageJoystick.button(11).onFalse(new InstantCommand(() -> climber.climbStop()));
 
     // Intake control
     controller.leftTrigger().onTrue(new InstantCommand(() -> groundtake.extendPivot())
@@ -109,13 +96,20 @@ public class RobotContainer<DriveSubsystem> {
     controller.rightTrigger().onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()));
     controller.rightTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
 
-    appendageJoystick.button(5).onTrue(new InstantCommand(() -> reektake.reefAlgaeIntake()));
-    appendageJoystick.button(5).onFalse(new InstantCommand(() -> reektake.reefAlgaeStop()));
-
-    appendageJoystick.button(6).onTrue(new InstantCommand(() -> reektake.reefAlgaeOuttake()));
-    appendageJoystick.button(6).onFalse(new InstantCommand(() -> reektake.reefAlgaeStop()));
-
     drivetrain.registerTelemetry(logger::telemeterize);
+
+    // Elevator controls
+    appendageJoystick.button(6).onTrue(new InstantCommand(() -> elevator.l1()));
+
+    appendageJoystick.button(5).onTrue(new InstantCommand(() -> elevator.l2()));
+
+    appendageJoystick.button(4).onTrue(new InstantCommand(() -> elevator.l3()));
+
+    appendageJoystick.button(3).onTrue(new InstantCommand(() -> elevator.l4()));
+
+    appendageJoystick.button(8).onTrue(new InstantCommand(() -> elevator.a1()));
+
+    appendageJoystick.button(7).onTrue(new InstantCommand(() -> elevator.a2()));
   }
 
   private void configureAxisActions() {
