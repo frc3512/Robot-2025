@@ -6,14 +6,12 @@ import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import frc.robot.Constants;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.photonvision.PhotonCamera;
-
-import frc.robot.Constants;
 
 public class Vision extends SubsystemBase {
 
@@ -21,7 +19,7 @@ public class Vision extends SubsystemBase {
   private Thread m_driverCamThread;
 
   private boolean targetVisible = false;
-  
+
   private double targetYaw = 0;
   private final double visionYawOffset = 0;
 
@@ -45,46 +43,38 @@ public class Vision extends SubsystemBase {
 
                   outputStream.notifyError(cvSink.getError());
                   continue;
-
                 }
 
                 Imgproc.rectangle(
                     mat, new Point(100, 100), new Point(400, 400), new Scalar(255, 255, 255), 5);
                 outputStream.putFrame(mat);
               }
-
             });
 
     m_driverCamThread.setDaemon(true);
     m_driverCamThread.start();
 
     PhotonCamera.setVersionCheckEnabled(false);
-
   }
-
 
   public static PhotonCamera returnCamera() {
 
     return photonCamera;
-
   }
 
   public boolean isTargetVisible() {
 
     return targetVisible;
-
   }
 
   public double getTargetYaw() {
 
     return targetYaw;
-
   }
 
   public double getYawOffset() {
 
     return visionYawOffset;
-
   }
 
   @Override
@@ -110,15 +100,9 @@ public class Vision extends SubsystemBase {
             targetYaw = target.getYaw();
 
             targetVisible = true;
-
           }
-
         }
-
       }
-
     }
-
   }
-
 }

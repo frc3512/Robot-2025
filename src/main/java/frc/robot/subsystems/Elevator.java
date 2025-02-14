@@ -1,108 +1,100 @@
-// package frc.robot.subsystems;
+package frc.robot.subsystems;
 
-// import static edu.wpi.first.units.Units.*;
+import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.lib.command.ProfiledPIDSubsystem;
+import frc.lib.util.Utility;
+import frc.robot.Constants;
 
-// import com.ctre.phoenix6.hardware.TalonFX;
-// import com.ctre.phoenix6.signals.NeutralModeValue;
-// import com.ctre.phoenix6.configs.Slot0Configs;
-// import com.ctre.phoenix6.configs.FeedbackConfigs;
-// import com.ctre.phoenix6.configs.TalonFXConfiguration;
-// import com.ctre.phoenix6.controls.DutyCycleOut;
-// import com.ctre.phoenix6.controls.Follower;
-// import com.ctre.phoenix6.controls.MotionMagicVoltage;
+public class Elevator extends ProfiledPIDSubsystem {
+  private final TalonFX elevatorMotorRt =
+      new TalonFX(Constants.ElevatorConstants.elevatorMotorRtID);
+  private final TalonFX elevatorMotorLt =
+      new TalonFX(Constants.ElevatorConstants.elevatorMotorLtID);
 
-// import edu.wpi.first.math.trajectory.TrapezoidProfile;
-// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-// import edu.wpi.first.wpilibj2.command.SubsystemBase;
+  boolean bypassStop = false;
 
-// import frc.robot.Constants;
-// import frc.robot.Constants.*;
+  public Elevator() {
+    super(
+        new ProfiledPIDController(
+            Constants.ElevatorConstants.kP,
+            Constants.ElevatorConstants.kI,
+            Constants.ElevatorConstants.kD,
+            Constants.ElevatorConstants.constraints));
+    getController().setTolerance(Constants.ElevatorConstants.tolerance);
 
-// public class Elevator extends SubsystemBase {
+    elevatorMotorLt.setControl(new Follower(elevatorMotorRt.getDeviceID(), false));
 
-//     // Declare motors
-//     private final TalonFX elevatorMotorRt;
-//     private final TalonFX elevatorMotorLt;
+    elevatorMotorRt.setNeutralMode(NeutralModeValue.Brake);
+    elevatorMotorLt.setNeutralMode(NeutralModeValue.Brake);
+  }
 
-//     private MotionMagicVoltage request = new MotionMagicVoltage(0);
+  public void elevatorUp() {
+    elevatorMotorLt.set(0.5);
+    elevatorMotorRt.set(0.5);
+  }
 
-//     boolean bypassStop = false;
-    
-//         public Elevator() { 
-            
-//             // Set parameters for elevator motors
-//             elevatorMotorRt = new TalonFX(Constants.ElevatorConstants.elevatorMotorRt);
-//             elevatorMotorLt = new TalonFX(Constants.ElevatorConstants.elevatorMotorLt);
+  public void elevatorDown() {
+    elevatorMotorLt.set(-0.5);
+    elevatorMotorRt.set(-0.5);
+  }
 
-//             elevatorMotorRt.setControl(new Follower(elevatorMotorLt.getDeviceID(), false));
+  public void elevatorStop() {
+    elevatorMotorLt.set(0.0);
+    elevatorMotorRt.set(0.0);
+  }
 
-//             elevatorMotorRt.setNeutralMode(NeutralModeValue.Brake);
-//             elevatorMotorLt.setNeutralMode(NeutralModeValue.Brake);
+  public void l1() {
+    setElevatorGoal(0.5);
+  }
 
-//             elevatorMotorRt.setControl(new DutyCycleOut(0.0));
+  public void l2() {
+    setElevatorGoal(1.0);
+  }
 
-//             var motorConfig = new TalonFXConfiguration();
+  public void l3() {
+    setElevatorGoal(1.5);
+  }
 
-//             FeedbackConfigs feedbackConfigs = motorConfig.Feedback;
-//             feedbackConfigs.SensorToMechanismRatio = 11 / 50; // Gear ratio
+  public void l4() {
+    setElevatorGoal(2.0);
+  }
 
-//             var slot0Configs = motorConfig.Slot0;
-            
-//             slot0Configs.kP = ElevatorConstants.kP;
-//             slot0Configs.kI = ElevatorConstants.kI;
-//             slot0Configs.kD = ElevatorConstants.kD;
-//             slot0Configs.kS = 0.0;
-//             slot0Configs.kV = 0.0;
+  public void stow() {
+    setElevatorGoal(0.2);
+  }
 
-//             var motionMagicConfigs = motorConfig.MotionMagic;
+  public void setElevatorGoal(double targetGoalMeters) {
+    setGoal(
+        Utility.metersToRotations(
+            targetGoalMeters,
+            Constants.ElevatorConstants.elevatorDrumRadiusMeters,
+            Constants.ElevatorConstants.elevatorGearRatio));
+  }
 
-//             motionMagicConfigs.withMotionMagicCruiseVelocity(RotationsPerSecond.of(5)) // 5 (mechanism) rotations per second cruise
-//                 .withMotionMagicAcceleration(RotationsPerSecondSquared.of(10)) // Take approximately 0.5 seconds to reach max vel
-//                 .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100)); // Take approximately 0.1 seconds to reach max accel 
-            
-//             elevatorMotorRt.getConfigurator().apply(slot0Configs);
+  @Override
+  public void periodic() {
+    super.periodic();
 
-//         }
+    SmartDashboard.putNumber(
+        "Elevator/ElevatorPos",
+        Utility.rotationsToMeters(
+            getMeasurement(),
+            Constants.ElevatorConstants.elevatorDrumRadiusMeters,
+            Constants.ElevatorConstants.elevatorGearRatio));
+  }
 
-    
-//         public void elevatorUp() {
+  @Override
+  protected void useOutput(double output, State setpoint) {
+    elevatorMotorRt.setVoltage(output);
+  }
 
-//             elevatorMotorLt.set(0.5);
-//             elevatorMotorRt.set(0.5);
-
-//         }
-
-//         public void elevatorDown() {
-
-//             elevatorMotorLt.set(-0.5);
-//             elevatorMotorRt.set(-0.5);
-
-//         }
-
-//         public void elevatorStop() {
-
-//             elevatorMotorLt.set(0.0);
-//             elevatorMotorRt.set(0.0);
-
-//         }
-
-//         public void l1() {
-
-//             TrapezoidProfile.State goal = new TrapezoidProfile.State(1.0, 0.0);
-
-//             elevatorSetpoint = elevatorConstraints.calculate(0.020, elevatorSetpoint, goal);
-
-//             request.Position = elevatorSetpoint.position;
-//             request.Velocity = elevatorSetpoint.velocity;
-
-//         }
-    
-//         @Override
-//         public void periodic() {
-
-//             elevatorMotorRt.setControl(request.withPosition());
-
-//             SmartDashboard.putNumber("Elevator/ElevatorPos", elevatorMotorRt.getRotorPosition().getValueAsDouble());
-
-//         }
-// }
+  @Override
+  protected double getMeasurement() {
+    return elevatorMotorRt.getPosition().getValueAsDouble();
+  }
+}
