@@ -46,26 +46,47 @@ public class Elevator extends ProfiledPIDSubsystem {
   public void elevatorStop() {
     elevatorMotorLt.set(0.0);
     elevatorMotorRt.set(0.0);
-  }
-
-  public void l1() {
-    setElevatorGoal(0.5);
-  }
-
-  public void l2() {
-    setElevatorGoal(1.0);
-  }
-
-  public void l3() {
-    setElevatorGoal(1.5);
-  }
-
-  public void l4() {
-    setElevatorGoal(2.0);
+    disable();
   }
 
   public void stow() {
-    setElevatorGoal(0.2);
+    setElevatorGoal(0.0);
+    enable();
+  }
+
+  public void hp() {
+    setElevatorGoal(0.2768);
+    enable();
+  }
+
+  public void l1() {
+    setElevatorGoal(0.2895);
+    enable();
+  }
+
+  public void l2() {
+    setElevatorGoal(0.5752);
+    enable();
+  }
+
+  public void l3() {
+    setElevatorGoal(0.9499);
+    enable();
+  }
+
+  public void l4() {
+    setElevatorGoal(1.5214);
+    enable();
+  }
+
+  public void a1() {
+    setElevatorGoal(0.2895);
+    enable();
+  }
+
+  public void a2() {
+    setElevatorGoal(0.7403);
+    enable();
   }
 
   public void setElevatorGoal(double targetGoalMeters) {
