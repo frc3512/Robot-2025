@@ -34,8 +34,6 @@ public class Robot extends TimedRobot {
 
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
-  private final Telemetry logger = new Telemetry(MaxSpeed);
-
   // Subsystem Objects
   public final Climber climber = new Climber();
   public final Elevator elevator = new Elevator();
@@ -48,19 +46,12 @@ public class Robot extends TimedRobot {
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandJoystick appendageJoystick = new CommandJoystick(1);
 
-  // PID Controllers ( auton )
-  PIDController xController = new PIDController(10, 0.0, 0.0);
-  PIDController yController = new PIDController(10, 0.0, 0.0);
-  PIDController headingController = new PIDController(7.5, 0.0, 0.0);
-
   // Auton
   private final AutoFactory autoFactory;
 
   public Robot() {
 
     // Create Choreo 
-    headingController.enableContinuousInput(-Math.PI, Math.PI);
-
     autoFactory =
         new AutoFactory(
             () -> drivetrain.getState().Pose,
@@ -95,8 +86,6 @@ public class Robot extends TimedRobot {
 
     controller.rightTrigger().onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()));
     controller.rightTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
-
-    drivetrain.registerTelemetry(logger::telemeterize);
 
     // Elevator controls
     appendageJoystick.button(6).onTrue(new InstantCommand(() -> elevator.l1()));

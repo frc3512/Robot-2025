@@ -6,6 +6,7 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import choreo.trajectory.SwerveSample;
+import dev.doglog.DogLog;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -34,6 +35,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
   public Swerve(
       SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
     super(drivetrainConstants, modules);
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
     if (Utils.isSimulation()) {
       startSimThread();
     }
@@ -44,6 +46,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
       double odometryUpdateFrequency,
       SwerveModuleConstants<?, ?, ?>... modules) {
     super(drivetrainConstants, odometryUpdateFrequency, modules);
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
     if (Utils.isSimulation()) {
       startSimThread();
     }
@@ -61,6 +64,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
         odometryStandardDeviation,
         visionStandardDeviation,
         modules);
+      thetaController.enableContinuousInput(-Math.PI, Math.PI);
     if (Utils.isSimulation()) {
       startSimThread();
     }
@@ -113,6 +117,59 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
                         : kBlueAlliancePerspectiveRotation);
                 m_hasAppliedOperatorPerspective = true;
               });
+    }
+
+    // Log General Swerve Information
+    DogLog.log("Swerve/ModuleStates", getState().ModuleStates);
+    DogLog.log("Swerve/ModuleStateSetpoints", getState().ModuleTargets);
+    DogLog.log("Swerve/OdometryPose", getState().Pose);
+    DogLog.log("Swerve/ChassisSpeeds", getState().Speeds);
+    // Module Name Keys
+    String[] moduleNames = new String[] {"FrontLeft", "FrontRight", "BackLeft", "BackRight"};
+    // Log Module Data
+    for (int i = 0; i < 4; i++) {
+      DogLog.log(
+          "Swerve/Modules/" + moduleNames[i] + "/EncoderAbsolutePosition",
+          getModule(i).getEncoder().getAbsolutePosition().getValueAsDouble());
+      DogLog.log(
+          "Swerve/Modules/" + moduleNames[i] + "/EncoderPosition",
+          getModule(i).getEncoder().getPosition().getValueAsDouble());
+      DogLog.log(
+          "Swerve/Modules/" + moduleNames[i] + "/DriveVelocity",
+          getModule(i).getCurrentState().speedMetersPerSecond);
+      DogLog.log(
+          "Swerve/Modules/" + moduleNames[i] + "/DriveVelocitySetpoint",
+          getModule(i).getTargetState().speedMetersPerSecond);
+      DogLog.log(
+          "Swerve/Modules/" + moduleNames[i] + "/DriveSupplyCurrent",
+          getModule(i).getDriveMotor().getSupplyCurrent().getValueAsDouble());
+      DogLog.log(
+          "Swerve/Modules/" + moduleNames[i] + "/DriveStatorCurrent",
+          getModule(i).getDriveMotor().getStatorCurrent().getValueAsDouble());
+      DogLog.log(
+          "Swerve/Modules/" + moduleNames[i] + "/DriveVoltage",
+          getModule(i).getDriveMotor().get() * RobotController.getBatteryVoltage());
+      DogLog.log(
+          "Swerve/Modules/" + moduleNames[i] + "/DriveTemperature",
+          getModule(i).getDriveMotor().getDeviceTemp().getValueAsDouble());
+      DogLog.log(
+          "Swerve/Modules/" + moduleNames[i] + "/TurnPosition",
+          getModule(i).getCurrentState().angle.getRadians());
+      DogLog.log(
+          "Swerve/Modules/" + moduleNames[i] + "/TurnPositionSetpoint",
+          getModule(i).getTargetState().angle.getRadians());
+      DogLog.log(
+          "Swerve/Modules/" + moduleNames[i] + "/TurnSupplyCurrent",
+          getModule(i).getSteerMotor().getSupplyCurrent().getValueAsDouble());
+      DogLog.log(
+          "Swerve/Modules/" + moduleNames[i] + "/TurnStatorCurrent",
+          getModule(i).getSteerMotor().getStatorCurrent().getValueAsDouble());
+      DogLog.log(
+          "Swerve/Modules/" + moduleNames[i] + "/TurnVoltage",
+          getModule(i).getSteerMotor().get() * RobotController.getBatteryVoltage());
+      DogLog.log(
+          "Swerve/Modules/" + moduleNames[i] + "/TurnTemperature",
+          getModule(i).getSteerMotor().getDeviceTemp().getValueAsDouble());
     }
   }
 
