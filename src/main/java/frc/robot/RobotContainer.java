@@ -156,7 +156,6 @@ public class RobotContainer<DriveSubsystem> {
 
     // Apply the generated speeds
     drivetrain.applyRequest(
-        () ->
             drive
                 .withVelocityX(speeds.vxMetersPerSecond)
                 .withVelocityY(speeds.vyMetersPerSecond)
@@ -164,14 +163,13 @@ public class RobotContainer<DriveSubsystem> {
   }
 
   public Command getAutonomousCommand() {
-    Command Test = autoFactory.trajectoryCmd("Test");
+    Command Test = testAuto(autoFactory).cmd();
     return Test;
   }
 
   public AutoRoutine testAuto(AutoFactory autoFactory2) {
     final AutoRoutine routine = autoFactory2.newRoutine("Forward");
-
-    final AutoTrajectory trajectory = routine.trajectory("Forward");
+    final AutoTrajectory trajectory = routine.trajectory("Test");
     routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
 
     return routine;

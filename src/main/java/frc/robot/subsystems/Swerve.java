@@ -182,6 +182,12 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     return run(() -> this.setControl(requestSupplier.get()));
   }
 
+  public void applyRequest(SwerveRequest request) {
+
+    this.setControl(request);
+
+  }
+
   /**
    * Runs the SysId Quasistatic test in the given direction for the routine specified by {@link
    * #m_sysIdRoutineToApply}.
