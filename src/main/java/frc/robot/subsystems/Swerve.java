@@ -107,17 +107,28 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
   @Override
   public void periodic() {
 
-    if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
-      DriverStation.getAlliance()
-          .ifPresent(
-              allianceColor -> {
-                setOperatorPerspectiveForward(
-                    allianceColor == Alliance.Red
-                        ? kRedAlliancePerspectiveRotation
-                        : kBlueAlliancePerspectiveRotation);
-                m_hasAppliedOperatorPerspective = true;
-              });
-    }
+    // if ((!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) && DriverStation.isTeleopEnabled()) {
+    //   DriverStation.getAlliance()
+    //       .ifPresent(
+    //           allianceColor -> {
+    //             setOperatorPerspectiveForward(
+    //                 allianceColor == Alliance.Red
+    //                     ? kRedAlliancePerspectiveRotation
+    //                     : kBlueAlliancePerspectiveRotation);
+    //             m_hasAppliedOperatorPerspective = true;
+    //           });
+
+    // if(DriverStation.isAutonomousEnabled()){
+    //   DriverStation.getAlliance()
+    //   .ifPresent(
+    //     allianceColor -> {
+
+    //       setOperatorPerspectiveForward(kBlueAlliancePerspectiveRotation);
+    //         m_hasAppliedOperatorPerspective=false;
+    //     });
+    // }
+
+    // }
 
     // Log General Swerve Information
     DogLog.log("Swerve/ModuleStates", getState().ModuleStates);

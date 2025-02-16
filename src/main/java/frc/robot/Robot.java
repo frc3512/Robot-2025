@@ -3,28 +3,33 @@ package frc.robot;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.Telemetry;
-import frc.robot.subsystems.Climber;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Groundtake;
-import frc.robot.subsystems.Reeftake;
+// import frc.robot.subsystems.Climber;
+// import frc.robot.subsystems.Elevator;
+// import frc.robot.subsystems.Groundtake;
+// import frc.robot.subsystems.Reeftake;
 import frc.robot.subsystems.Swerve;
-import frc.robot.subsystems.Vision;
+// import frc.robot.subsystems.Vision;
 
 public class Robot extends TimedRobot {
 
   private double MaxSpeed = DriveConstants.MaxSpeed;
   private double MaxAngularRate = DriveConstants.MaxAngularRate;
+  private SendableChooser<AutoRoutine> autoChooser = new SendableChooser<>();
+  
 
   private final SwerveRequest.FieldCentric drive =
       new SwerveRequest.FieldCentric()
@@ -35,12 +40,12 @@ public class Robot extends TimedRobot {
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
   // Subsystem Objects
-  public final Climber climber = new Climber();
-  public final Elevator elevator = new Elevator();
-  public final Reeftake reeftake = new Reeftake();
-  public final Groundtake groundtake = new Groundtake();
+  // public final Climber climber = new Climber();
+  // public final Elevator elevator = new Elevator();
+  // public final Reeftake reeftake = new Reeftake();
+  // public final Groundtake groundtake = new Groundtake();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
-  public final Vision vision = new Vision();
+  // public final Vision vision = new Vision();
 
   // Controller Objects
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -60,6 +65,9 @@ public class Robot extends TimedRobot {
             true,
             drivetrain);
 
+            autoChooser.addOption("Forward", testAuto());
+            autoChooser.addOption("Orbit Reef", testAuto());
+
   // Controler Bindings 
   drivetrain.setDefaultCommand(
     drivetrain.applyRequest(
@@ -74,42 +82,47 @@ public class Robot extends TimedRobot {
     controller.a().whileTrue(drivetrain.applyRequest(() -> brake));
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-    // Bindings for the button box
+    // // Bindings for the button box
 
-    // Intake control
-    controller
-        .leftTrigger()
-        .onTrue(
-            new InstantCommand(() -> groundtake.extendPivot())
-                .andThen(new InstantCommand(() -> groundtake.floorAlgaeIntake())));
-    controller.leftTrigger().onFalse(new InstantCommand(() -> groundtake.retractPivot()));
+    // // Intake control
+    // controller
+    //     .leftTrigger()
+    //     .onTrue(
+    //         new InstantCommand(() -> groundtake.extendPivot())
+    //             .andThen(new InstantCommand(() -> groundtake.floorAlgaeIntake())));
+    // controller.leftTrigger().onFalse(new InstantCommand(() -> groundtake.retractPivot()));
 
-    controller.rightTrigger().onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()));
-    controller.rightTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
+    // controller.rightTrigger().onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()));
+    // controller.rightTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
 
-    // Elevator controls
-    appendageJoystick.button(6).onTrue(new InstantCommand(() -> elevator.l1()));
+    // // Elevator controls
+    // appendageJoystick.button(6).onTrue(new InstantCommand(() -> elevator.l1()));
 
-    appendageJoystick.button(5).onTrue(new InstantCommand(() -> elevator.l2()));
+    // appendageJoystick.button(5).onTrue(new InstantCommand(() -> elevator.l2()));
 
-    appendageJoystick.button(4).onTrue(new InstantCommand(() -> elevator.l3()));
+    // appendageJoystick.button(4).onTrue(new InstantCommand(() -> elevator.l3()));
 
-    appendageJoystick.button(3).onTrue(new InstantCommand(() -> elevator.l4()));
+    // appendageJoystick.button(3).onTrue(new InstantCommand(() -> elevator.l4()));
 
-    appendageJoystick.button(8).onTrue(new InstantCommand(() -> elevator.a1()));
+    // appendageJoystick.button(8).onTrue(new InstantCommand(() -> elevator.a1()));
 
-    appendageJoystick.button(7).onTrue(new InstantCommand(() -> elevator.a2()));
+    // appendageJoystick.button(7).onTrue(new InstantCommand(() -> elevator.a2()));
+
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+    
 
   }
 
   @Override
   public void autonomousInit() {
     testAuto().cmd().schedule();
+    autoChooser.getSelected().cmd().schedule();
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    
   }
 
   @Override
@@ -117,14 +130,26 @@ public class Robot extends TimedRobot {
 
   public AutoRoutine testAuto() {
 
-    AutoRoutine testRoutine = autoFactory.newRoutine("Forward");
-    AutoTrajectory testTrajectory = testRoutine.trajectory("Forward");
+    AutoRoutine routine = autoFactory.newRoutine("Forward");
+    AutoTrajectory testTrajectory = routine.trajectory("Forward");
 
-    testRoutine
+    routine
       .active()
       .onTrue(Commands.sequence(testTrajectory.resetOdometry(), testTrajectory.cmd()));
 
-    return testRoutine;
+    return routine;
+  }
+
+  public AutoRoutine orbitReef() {
+
+    AutoRoutine routine = autoFactory.newRoutine("Orbit Reef");
+    AutoTrajectory testTrajectory = routine.trajectory("Orbit Reef");
+
+    routine
+      .active()
+      .onTrue(Commands.sequence(testTrajectory.resetOdometry(), testTrajectory.cmd()));
+
+    return routine;
   }
 
 }
