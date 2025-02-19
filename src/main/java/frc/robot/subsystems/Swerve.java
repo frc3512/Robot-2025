@@ -1,11 +1,10 @@
 package frc.robot.subsystems;
 
+import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
-import choreo.trajectory.SwerveSample;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
@@ -14,8 +13,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -64,7 +61,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
         odometryStandardDeviation,
         visionStandardDeviation,
         modules);
-      thetaController.enableContinuousInput(-Math.PI, Math.PI);
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
     if (Utils.isSimulation()) {
       startSimThread();
     }
@@ -93,7 +90,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
             .withRotationalRate(speeds.omegaRadiansPerSecond));
   }
 
-
   public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
     return run(() -> this.setControl(requestSupplier.get()));
   }
@@ -101,13 +97,13 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
   public void applyRequest(SwerveRequest request) {
 
     this.setControl(request);
-
   }
 
   @Override
   public void periodic() {
 
-    // if ((!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) && DriverStation.isTeleopEnabled()) {
+    // if ((!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) &&
+    // DriverStation.isTeleopEnabled()) {
     //   DriverStation.getAlliance()
     //       .ifPresent(
     //           allianceColor -> {

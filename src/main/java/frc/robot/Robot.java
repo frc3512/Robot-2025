@@ -1,13 +1,10 @@
 package frc.robot;
 
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.swerve.SwerveRequest;
-
-import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
-import edu.wpi.first.math.controller.PIDController;
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -16,12 +13,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.lib.util.Telemetry;
 // import frc.robot.subsystems.Climber;
 // import frc.robot.subsystems.Elevator;
 // import frc.robot.subsystems.Groundtake;
+import frc.robot.subsystems.LEDs;
 // import frc.robot.subsystems.Reeftake;
 import frc.robot.subsystems.Swerve;
+
 // import frc.robot.subsystems.Vision;
 
 public class Robot extends TimedRobot {
@@ -29,7 +27,6 @@ public class Robot extends TimedRobot {
   private double MaxSpeed = DriveConstants.MaxSpeed;
   private double MaxAngularRate = DriveConstants.MaxAngularRate;
   private SendableChooser<AutoRoutine> autoChooser = new SendableChooser<>();
-  
 
   private final SwerveRequest.FieldCentric drive =
       new SwerveRequest.FieldCentric()
@@ -42,8 +39,9 @@ public class Robot extends TimedRobot {
   // Subsystem Objects
   // public final Climber climber = new Climber();
   // public final Elevator elevator = new Elevator();
-  // public final Reeftake reeftake = new Reeftake();
   // public final Groundtake groundtake = new Groundtake();
+  public final LEDs leds = new LEDs();
+  // public final Reeftake reeftake = new Reeftake();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
   // public final Vision vision = new Vision();
 
@@ -56,7 +54,7 @@ public class Robot extends TimedRobot {
 
   public Robot() {
 
-    // Create Choreo 
+    // Create Choreo
     autoFactory =
         new AutoFactory(
             () -> drivetrain.getState().Pose,
@@ -65,22 +63,24 @@ public class Robot extends TimedRobot {
             true,
             drivetrain);
 
-            autoChooser.addOption("Forward", testAuto());
-            autoChooser.addOption("Orbit Reef", testAuto());
+    autoChooser.addOption("Forward", testAuto());
+    autoChooser.addOption("Orbit Reef", testAuto());
 
-  // Controler Bindings 
-  drivetrain.setDefaultCommand(
-    drivetrain.applyRequest(
-        () ->
-            drive
-                .withVelocityX(-controller.getLeftY() * MaxSpeed)
-                .withVelocityY(-controller.getLeftX() * MaxSpeed)
-                .withRotationalRate(-controller.getRightX() * MaxAngularRate)));
+    // Controler Bindings
+    drivetrain.setDefaultCommand(
+        drivetrain.applyRequest(
+            () ->
+                drive
+                    .withVelocityX(-controller.getLeftY() * MaxSpeed)
+                    .withVelocityY(-controller.getLeftX() * MaxSpeed)
+                    .withRotationalRate(-controller.getRightX() * MaxAngularRate)));
 
-    
-        // Bindings for the controller
+    // Bindings for the controller
     controller.a().whileTrue(drivetrain.applyRequest(() -> brake));
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
+    controller.y().onTrue(new InstantCommand(() -> leds.blue()));
+    controller.b().onTrue(new InstantCommand(() -> leds.rainbow()));
 
     // // Bindings for the button box
 
@@ -109,8 +109,6 @@ public class Robot extends TimedRobot {
     // appendageJoystick.button(7).onTrue(new InstantCommand(() -> elevator.a2()));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
-    
-
   }
 
   @Override
@@ -122,7 +120,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    
   }
 
   @Override
@@ -134,8 +131,8 @@ public class Robot extends TimedRobot {
     AutoTrajectory testTrajectory = routine.trajectory("Forward");
 
     routine
-      .active()
-      .onTrue(Commands.sequence(testTrajectory.resetOdometry(), testTrajectory.cmd()));
+        .active()
+        .onTrue(Commands.sequence(testTrajectory.resetOdometry(), testTrajectory.cmd()));
 
     return routine;
   }
@@ -146,10 +143,9 @@ public class Robot extends TimedRobot {
     AutoTrajectory testTrajectory = routine.trajectory("Orbit Reef");
 
     routine
-      .active()
-      .onTrue(Commands.sequence(testTrajectory.resetOdometry(), testTrajectory.cmd()));
+        .active()
+        .onTrue(Commands.sequence(testTrajectory.resetOdometry(), testTrajectory.cmd()));
 
     return routine;
   }
-
 }
