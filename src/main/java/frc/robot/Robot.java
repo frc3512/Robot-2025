@@ -63,8 +63,9 @@ public class Robot extends TimedRobot {
             true,
             drivetrain);
 
-    autoChooser.addOption("Forward", testAuto());
-    autoChooser.addOption("Orbit Reef", testAuto());
+    autoChooser.addOption("Forward", forward());
+    autoChooser.addOption("Orbit Reef", orbitReef());
+    autoChooser.addOption("Score l4 go HP Score l4", doubleL4());
 
     // Controler Bindings
     drivetrain.setDefaultCommand(
@@ -85,7 +86,7 @@ public class Robot extends TimedRobot {
     // // Bindings for the button box
 
     // // Intake control
-    // controller
+    // controller 
     //     .leftTrigger()
     //     .onTrue(
     //         new InstantCommand(() -> groundtake.extendPivot())
@@ -113,7 +114,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    testAuto().cmd().schedule();
+    forward().cmd().schedule();
+    orbitReef().cmd().schedule();
+    doubleL4().cmd().schedule();
+
     autoChooser.getSelected().cmd().schedule();
   }
 
@@ -125,14 +129,14 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {}
 
-  public AutoRoutine testAuto() {
+  public AutoRoutine forward() {
 
     AutoRoutine routine = autoFactory.newRoutine("Forward");
-    AutoTrajectory testTrajectory = routine.trajectory("Forward");
+    AutoTrajectory trajectory = routine.trajectory("Forward");
 
     routine
         .active()
-        .onTrue(Commands.sequence(testTrajectory.resetOdometry(), testTrajectory.cmd()));
+        .onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
 
     return routine;
   }
@@ -140,11 +144,22 @@ public class Robot extends TimedRobot {
   public AutoRoutine orbitReef() {
 
     AutoRoutine routine = autoFactory.newRoutine("Orbit Reef");
-    AutoTrajectory testTrajectory = routine.trajectory("Orbit Reef");
+    AutoTrajectory trajectory = routine.trajectory("Orbit Reef");
+    routine
+        .active()
+        .onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+
+    return routine;
+  }
+
+  public AutoRoutine doubleL4() {
+
+    AutoRoutine routine = autoFactory.newRoutine("Score l4 go HP Score l4");
+    AutoTrajectory trajectory = routine.trajectory("Score l4 go HP Score l4");
 
     routine
         .active()
-        .onTrue(Commands.sequence(testTrajectory.resetOdometry(), testTrajectory.cmd()));
+        .onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
 
     return routine;
   }
