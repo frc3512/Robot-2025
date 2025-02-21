@@ -11,8 +11,8 @@ import edu.wpi.first.math.util.Units;
 
 public class Constants {
   public static class ElevatorConstants {
-    public static final int elevatorMotorRtID = 13;
-    public static final int elevatorMotorLtID = 14;
+    public static final int frontMotorID = 13;
+    public static final int backMotorID = 14;
 
     public static final double kP = 1.0;
     public static final double kI = 0.0;
@@ -28,8 +28,7 @@ public class Constants {
   }
 
   public static class ClimberConstants {
-    public static final int climbMotor1ID = 10;
-    public static final int climbMotor2ID = 11;
+    public static final int climbMotor1ID = 11;
 
     public static final double kP = 1.0;
     public static final double kI = 0.0;
@@ -70,7 +69,7 @@ public class Constants {
     public static final double tolerance = 0.005;
 
     public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(5, 1);
+        new TrapezoidProfile.Constraints(5, 3);
   }
 
   public static class VisionConstants {
