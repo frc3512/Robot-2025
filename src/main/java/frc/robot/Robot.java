@@ -8,6 +8,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -66,6 +67,7 @@ public class Robot extends TimedRobot {
     autoChooser.addOption("Forward", forward());
     autoChooser.addOption("Orbit Reef", orbitReef());
     autoChooser.addOption("Score l4 go HP Score l4", doubleL4());
+    autoChooser.addOption("Score L4 C take A from S go P", scoreL4TakeAGoP());
 
     // Controler Bindings
     drivetrain.setDefaultCommand(
@@ -150,6 +152,18 @@ public class Robot extends TimedRobot {
         .onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
 
     return routine;
+  }
+
+  public AutoRoutine scoreL4TakeAGoP() {
+
+    AutoRoutine routine = autoFactory.newRoutine("Score L4 C take A from S go P");
+    AutoTrajectory trajectory = routine.trajectory("Score L4 take A from S go P");
+    routine
+      .active()
+      .onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+
+      return routine;
+
   }
 
   public AutoRoutine doubleL4() {
