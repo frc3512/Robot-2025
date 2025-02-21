@@ -10,14 +10,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 // import frc.robot.subsystems.Climber;
 // import frc.robot.subsystems.Elevator;
 // import frc.robot.subsystems.Groundtake;
+import frc.robot.subsystems.LEDs;
 // import frc.robot.subsystems.Reeftake;
 import frc.robot.subsystems.Swerve;
-
 // import frc.robot.subsystems.Vision;
 
 public class Robot extends TimedRobot {
@@ -37,8 +38,9 @@ public class Robot extends TimedRobot {
   // Subsystem Objects
   // public final Climber climber = new Climber();
   // public final Elevator elevator = new Elevator();
-  // public final Reeftake reeftake = new Reeftake();
   // public final Groundtake groundtake = new Groundtake();
+  public final LEDs leds = new LEDs();
+  // public final Reeftake reeftake = new Reeftake();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
   // public final Vision vision = new Vision();
 
@@ -61,7 +63,7 @@ public class Robot extends TimedRobot {
             drivetrain);
 
     autoChooser.addOption("Forward", testAuto());
-    autoChooser.addOption("Orbit Reef", testAuto());
+    autoChooser.addOption("Orbit Reef", orbitReef());
 
     // Controler Bindings
     drivetrain.setDefaultCommand(
@@ -75,6 +77,9 @@ public class Robot extends TimedRobot {
     // Bindings for the controller
     controller.a().whileTrue(drivetrain.applyRequest(() -> brake));
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
+    controller.b().onTrue(leds.runPattern(leds.blue));
+    controller.y().onTrue(leds.runPattern(leds.scrollngRainbow));
 
     // // Bindings for the button box
 
