@@ -17,7 +17,7 @@ import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Groundtake;
 import frc.robot.subsystems.LEDs;
-// import frc.robot.subsystems.Reeftake;
+import frc.robot.subsystems.Reeftake;
 import frc.robot.subsystems.Swerve;
 // import frc.robot.subsystems.Vision;
 
@@ -40,7 +40,7 @@ public class Robot extends TimedRobot {
   public final Elevator elevator = new Elevator();
   public final Groundtake groundtake = new Groundtake();
   public final LEDs leds = new LEDs();
-  // public final Reeftake reeftake = new Reeftake();
+  public final Reeftake reeftake = new Reeftake();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
   // public final Vision vision = new Vision();
 
@@ -97,19 +97,23 @@ public class Robot extends TimedRobot {
 
     controller.rightTrigger().onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()));
     controller.rightTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
+    
+    // Reeftake Stuff
+    appendageJoystick.button(10).onTrue(new InstantCommand(() -> reeftake.coralIntake()));
+    appendageJoystick.button(10).onFalse(new InstantCommand(() -> reeftake.coralStop()));
 
     // // Elevator controls
-    // appendageJoystick.button(6).onTrue(new InstantCommand(() -> elevator.l1()));
+    appendageJoystick.button(6).onTrue(new InstantCommand(() -> elevator.l1()));
 
-    // appendageJoystick.button(5).onTrue(new InstantCommand(() -> elevator.l2()));
+    appendageJoystick.button(5).onTrue(new InstantCommand(() -> elevator.l2()));
 
-    // appendageJoystick.button(4).onTrue(new InstantCommand(() -> elevator.l3()));
+    appendageJoystick.button(4).onTrue(new InstantCommand(() -> elevator.l3()));
 
-    // appendageJoystick.button(3).onTrue(new InstantCommand(() -> elevator.l4()));
+    appendageJoystick.button(3).onTrue(new InstantCommand(() -> elevator.l4()));
 
-    // appendageJoystick.button(8).onTrue(new InstantCommand(() -> elevator.a1()));
+    appendageJoystick.button(8).onTrue(new InstantCommand(() -> elevator.a1()));
 
-    // appendageJoystick.button(7).onTrue(new InstantCommand(() -> elevator.a2()));
+    appendageJoystick.button(7).onTrue(new InstantCommand(() -> elevator.a2()));
 
     // Manual control, COMMENT OUT WHEN NOT IN USE
     // appendageJoystick.button(7).onTrue(new InstantCommand(() -> elevator.elevatorUp()));

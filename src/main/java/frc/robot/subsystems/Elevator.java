@@ -1,11 +1,16 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.*;
+
+import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.lib.command.ProfiledPIDSubsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.Utility;
 import frc.robot.Constants;
 
@@ -15,28 +20,47 @@ import frc.robot.Constants;
 // fm down is red
 // bm down is green
 
-// INVERT FRONT MOTOR
-
-public class Elevator extends ProfiledPIDSubsystem {
+public class Elevator extends SubsystemBase {
 
   private final TalonFX frontMotor =
       new TalonFX(Constants.ElevatorConstants.frontMotorID);
   private final TalonFX backMotor =
       new TalonFX(Constants.ElevatorConstants.backMotorID);
+  private MotionMagicVoltage request = new MotionMagicVoltage(0);
 
   boolean bypassStop = false;
+  double goal = 0.0;
 
   public Elevator() {
-    super(
-        new ProfiledPIDController(
-            Constants.ElevatorConstants.kP,
-            Constants.ElevatorConstants.kI,
-            Constants.ElevatorConstants.kD,
-            Constants.ElevatorConstants.constraints));
-    getController().setTolerance(Constants.ElevatorConstants.tolerance);
-
     frontMotor.setNeutralMode(NeutralModeValue.Brake);
     backMotor.setNeutralMode(NeutralModeValue.Brake);
+
+    backMotor.setControl(new Follower(frontMotor.getDeviceID(), true));
+
+    var motorConfig = new TalonFXConfiguration();
+
+    FeedbackConfigs feedbackConfigs = motorConfig.Feedback;
+    feedbackConfigs.SensorToMechanismRatio = 50 / 11; // gear ratio
+
+    var slot0Configs = motorConfig.Slot0;
+    slot0Configs.kP = 0.0;
+    slot0Configs.kI = 0.0;
+    slot0Configs.kD = 0.0;
+    slot0Configs.kS = 0.0;
+    slot0Configs.kV = 0.5;
+    slot0Configs.kG = 0.0;
+
+    var motionMagicConfigs = motorConfig.MotionMagic;
+    motionMagicConfigs
+        .withMotionMagicCruiseVelocity(
+            RotationsPerSecond.of(5)) // 5 (mechanism) rotations per second cruise
+        .withMotionMagicAcceleration(
+            RotationsPerSecondPerSecond.of(10)) // Take approximately 0.5 seconds to reach max vel
+        .withMotionMagicJerk(
+            RotationsPerSecondPerSecond.per(Second)
+                .of(100)); // Take approximately 0.1 seconds to reach max accel
+
+    frontMotor.getConfigurator().apply(slot0Configs);
   }
 
   public void elevatorUp() {
@@ -52,76 +76,54 @@ public class Elevator extends ProfiledPIDSubsystem {
   public void elevatorStop() {
     frontMotor.set(0.0);
     backMotor.set(0.0);
-    disable();
   }
 
   public void stow() {
     setElevatorGoal(0.0);
-    enable();
   }
 
   public void hp() {
     setElevatorGoal(0.2768);
-    enable();
   }
 
   public void l1() {
     setElevatorGoal(0.2895);
-    enable();
   }
 
   public void l2() {
     setElevatorGoal(0.5752);
-    enable();
   }
 
   public void l3() {
     setElevatorGoal(0.9499);
-    enable();
   }
 
   public void l4() {
     setElevatorGoal(1.5214);
-    enable();
   }
 
   public void a1() {
     setElevatorGoal(0.2895);
-    enable();
   }
 
   public void a2() {
     setElevatorGoal(0.7403);
-    enable();
   }
 
   public void setElevatorGoal(double targetGoalMeters) {
-    setGoal(
-        Utility.metersToRotations(
-            targetGoalMeters,
-            Constants.ElevatorConstants.elevatorDrumRadiusMeters,
-            Constants.ElevatorConstants.elevatorGearRatio));
+    goal =
+      Utility.metersToRotations(targetGoalMeters, 
+        Constants.ElevatorConstants.elevatorDrumRadiusMeters,  
+        Constants.ElevatorConstants.elevatorGearRatio);
   }
 
   @Override
   public void periodic() {
-    super.periodic();
+    frontMotor.setControl(request.withPosition(goal).withSlot(0));
 
-    SmartDashboard.putNumber(
-        "Elevator/ElevatorPos",
-        Utility.rotationsToMeters(
-            getMeasurement(),
-            Constants.ElevatorConstants.elevatorDrumRadiusMeters,
-            Constants.ElevatorConstants.elevatorGearRatio));
-  }
-
-  @Override
-  protected void useOutput(double output, State setpoint) {
-    frontMotor.setVoltage(output);
-  }
-
-  @Override
-  protected double getMeasurement() {
-    return backMotor.getPosition().getValueAsDouble();
+    SmartDashboard.putNumber("ElevatorFrontMotorEncoder", 
+      Utility.rotationsToMeters(frontMotor.getPosition().getValueAsDouble(), 
+        Constants.ElevatorConstants.elevatorDrumRadiusMeters,  
+        Constants.ElevatorConstants.elevatorGearRatio));
   }
 }
