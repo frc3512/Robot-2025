@@ -8,7 +8,6 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -64,10 +63,15 @@ public class Robot extends TimedRobot {
             true,
             drivetrain);
 
-    autoChooser.addOption("Forward", forward());
-    autoChooser.addOption("Orbit Reef", orbitReef());
-    autoChooser.addOption("Score l4 go HP Score l4", doubleL4());
-    autoChooser.addOption("Score L4 C take A from S go P", scoreL4TakeAGoP());
+    autoChooser.addOption("Forward(Center)", forward1());
+    autoChooser.addOption("Forward(Top)", forward2());
+    autoChooser.addOption("Forward(Bottom)", forward3());
+    autoChooser.addOption("Orbit Reef(Test)", orbitReef());
+    autoChooser.addOption("HP(Bottom)", hPB());
+    autoChooser.addOption("HP(Top)", hPT());
+    // autoChooser.addOption("Score l4 3x", l4Threex());
+    autoChooser.addOption("Score L4 go S A go P", L4GoAToP());
+    autoChooser.addOption("Score L4 go HP Score l4 Finish S", L4HP2xFinS());
 
     // Controler Bindings
     drivetrain.setDefaultCommand(
@@ -88,7 +92,7 @@ public class Robot extends TimedRobot {
     // // Bindings for the button box
 
     // // Intake control
-    // controller 
+    // controller
     //     .leftTrigger()
     //     .onTrue(
     //         new InstantCommand(() -> groundtake.extendPivot())
@@ -116,9 +120,14 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    forward().cmd().schedule();
+    forward1().cmd().schedule();
+    forward2().cmd().schedule();
     orbitReef().cmd().schedule();
-    doubleL4().cmd().schedule();
+    hPB().cmd().schedule();
+    hPT().cmd().schedule();
+    // l4Threex().cmd().schedule();
+    L4GoAToP().cmd().schedule();
+    L4HP2xFinS().cmd().schedule();
 
     autoChooser.getSelected().cmd().schedule();
   }
@@ -131,50 +140,73 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {}
 
-  public AutoRoutine forward() {
+  public AutoRoutine forward1() {
 
-    AutoRoutine routine = autoFactory.newRoutine("Forward");
-    AutoTrajectory trajectory = routine.trajectory("Forward");
+    AutoRoutine routine = autoFactory.newRoutine("Forward(Center)");
+    AutoTrajectory trajectory = routine.trajectory("Forward(Center)");
 
-    routine
-        .active()
-        .onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
 
+    return routine;
+  }
+
+  public AutoRoutine forward2() {
+    AutoRoutine routine = autoFactory.newRoutine("Forward(Top)");
+    AutoTrajectory trajectory = routine.trajectory("Foward(Top)");
+    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+    return routine;
+  }
+
+  public AutoRoutine forward3() {
+    AutoRoutine routine = autoFactory.newRoutine("Forward(Bottom)");
+    AutoTrajectory trajectory = routine.trajectory("Foward(Bottom)");
+    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+    return routine;
+  }
+
+  public AutoRoutine hPB() {
+    AutoRoutine routine = autoFactory.newRoutine("Hp(Bottom)");
+    AutoTrajectory trajectory = routine.trajectory("hp(Bottom)");
+    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+    return routine;
+  }
+
+  public AutoRoutine hPT() {
+    AutoRoutine routine = autoFactory.newRoutine("HP(Top)");
+    AutoTrajectory trajectory = routine.trajectory("HP(Top)");
+    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
     return routine;
   }
 
   public AutoRoutine orbitReef() {
 
-    AutoRoutine routine = autoFactory.newRoutine("Orbit Reef");
-    AutoTrajectory trajectory = routine.trajectory("Orbit Reef");
-    routine
-        .active()
-        .onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+    AutoRoutine routine = autoFactory.newRoutine("Orbit Reef(Test)");
+    AutoTrajectory trajectory = routine.trajectory("Orbit Reef(Test)");
+    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
 
     return routine;
   }
 
-  public AutoRoutine scoreL4TakeAGoP() {
+  // public AutoRoutine l4Threex() {
+  //   AutoRoutine routine = autoFactory.newRoutine("Score L4 3x");
+  //   AutoTrajectory trajectory = routine.trajectory("Score L4 3x");
+  //   routine
+  //     .active()
+  //     .onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+  //     return routine;
+  // }
 
-    AutoRoutine routine = autoFactory.newRoutine("Score L4 C take A from S go P");
-    AutoTrajectory trajectory = routine.trajectory("Score L4 take A from S go P");
-    routine
-      .active()
-      .onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
-
-      return routine;
-
+  public AutoRoutine L4GoAToP() {
+    AutoRoutine routine = autoFactory.newRoutine("Score L4 C go S A go P");
+    AutoTrajectory trajectory = routine.trajectory("Score L4 go S A go P");
+    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+    return routine;
   }
 
-  public AutoRoutine doubleL4() {
-
-    AutoRoutine routine = autoFactory.newRoutine("Score l4 go HP Score l4");
-    AutoTrajectory trajectory = routine.trajectory("Score l4 go HP Score l4");
-
-    routine
-        .active()
-        .onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
-
+  public AutoRoutine L4HP2xFinS() {
+    AutoRoutine routine = autoFactory.newRoutine("Score L4 go HP Score l4 Finish S");
+    AutoTrajectory trajectory = routine.trajectory("Score L4 go HP Score l4 Finish S");
+    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
     return routine;
   }
 }

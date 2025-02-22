@@ -41,4 +41,4 @@ public class LEDs extends SubsystemBase {
   public void periodic() {
     leds.setData(buffer);
   }
-  }
+}
