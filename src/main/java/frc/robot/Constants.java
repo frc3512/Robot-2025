@@ -14,17 +14,17 @@ public class Constants {
     public static final int frontMotorID = 13;
     public static final int backMotorID = 14;
 
-    public static final double kP = 0.0001;
+    public static final double kP = 0.75;
     public static final double kI = 0.0;
-    public static final double kD = 0.0;
+    public static final double kD = 0.0005;
+    public static final double kV = 0.15;
+    public static final double kG = 0.43;
+    public static final double kS = 0.0;
 
     public static final double tolerance = 0.002;
 
-    public static final double elevatorGearRatio = 11.0 / 50.0;
-    public static final double elevatorDrumRadiusMeters = 0.023;
-
     public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(7, 5);
+        new TrapezoidProfile.Constraints(20, 30);
   }
 
   public static class ClimberConstants {

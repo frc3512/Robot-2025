@@ -31,7 +31,7 @@ public class Reeftake extends ProfiledPIDSubsystem {
   }
 
   public void coralIntake() {
-      intakeMotor.set(0.5);
+      intakeMotor.set(0.2);
   }
 
   public void coralStop() {

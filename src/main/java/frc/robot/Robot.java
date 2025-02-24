@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Climber;
@@ -114,6 +116,10 @@ public class Robot extends TimedRobot {
     appendageJoystick.button(8).onTrue(new InstantCommand(() -> elevator.a1()));
 
     appendageJoystick.button(7).onTrue(new InstantCommand(() -> elevator.a2()));
+
+    appendageJoystick.button(9).onTrue(new InstantCommand(() -> elevator.stow()));
+
+    appendageJoystick.button(12).onTrue(new InstantCommand(() -> elevator.hp()));
 
     // Manual control, COMMENT OUT WHEN NOT IN USE
     // appendageJoystick.button(7).onTrue(new InstantCommand(() -> elevator.elevatorUp()));
