@@ -11,8 +11,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Climber;
@@ -64,7 +62,6 @@ public class Robot extends TimedRobot {
             true,
             drivetrain);
 
-    // autoChooser.addOption("Forward", testAuto());
     autoChooser.addOption("Orbit Reef", orbitReef());
 
     // Controler Bindings
@@ -82,9 +79,9 @@ public class Robot extends TimedRobot {
     controller.b().onTrue(leds.runPattern(leds.blue));
     controller.y().onTrue(leds.runPattern(leds.scrollngRainbow));
 
-    // // Bindings for the button box
+    // Bindings for the button box
 
-    // Intake control
+    // Intake control for Groundtake
     controller
         .leftTrigger()
         .onTrue(
@@ -100,11 +97,11 @@ public class Robot extends TimedRobot {
     controller.rightTrigger().onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()));
     controller.rightTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
     
-    // Reeftake Stuff
+    // Reeftake controls
     appendageJoystick.button(10).onTrue(new InstantCommand(() -> reeftake.coralIntake()));
     appendageJoystick.button(10).onFalse(new InstantCommand(() -> reeftake.coralStop()));
 
-    // // Elevator controls
+    // Elevator controls
     appendageJoystick.button(6).onTrue(new InstantCommand(() -> elevator.l1()));
 
     appendageJoystick.button(5).onTrue(new InstantCommand(() -> elevator.l2()));
@@ -122,12 +119,14 @@ public class Robot extends TimedRobot {
     appendageJoystick.button(12).onTrue(new InstantCommand(() -> elevator.hp()));
 
     // Manual control, COMMENT OUT WHEN NOT IN USE
-    // appendageJoystick.button(7).onTrue(new InstantCommand(() -> elevator.elevatorUp()));
-    // appendageJoystick.button(7).onFalse(new InstantCommand(() -> elevator.elevatorStop()));
+    // DISABLE PID IN ELEVATOR CLASS!!!
+    // appendageJoystick.button(7).onTrue(elevator.manualElevator(0.2));
+    // appendageJoystick.button(7).onFalse(elevator.manualElevator(0.0));
 
-    // appendageJoystick.button(8).onTrue(new InstantCommand(() -> elevator.elevatorDown()));
-    // appendageJoystick.button(8).onFalse(new InstantCommand(() -> elevator.elevatorStop()));
+    // appendageJoystick.button(8).onTrue(elevator.manualElevator(-0.1));
+    // appendageJoystick.button(8).onFalse(elevator.manualElevator(0.0));
 
+    // appendageJoystick.button(11).onTrue(new InstantCommand(() -> elevator.zeroMotor()));
 
     // Climber controls
     appendageJoystick.button(1).onTrue(climber.setClimber(0.8));
@@ -145,6 +144,12 @@ public class Robot extends TimedRobot {
   }
 
   @Override
+  public void teleopInit() {}
+
+  @Override 
+  public void disabledInit() {}
+
+  @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
   }
@@ -152,17 +157,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {}
 
-  // public AutoRoutine testAuto() {
-
-  //   AutoRoutine routine = autoFactory.newRoutine("Forward");
-  //   AutoTrajectory testTrajectory = routine.trajectory("Forward");
-
-  //   routine
-  //       .active()
-  //       .onTrue(Commands.sequence(testTrajectory.resetOdometry(), testTrajectory.cmd()));
-
-  //   return routine;
-  // }
+  // Make sequencial commands for the elevator here once reeftake pivot it made. 
 
   public AutoRoutine orbitReef() {
 

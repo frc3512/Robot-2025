@@ -14,9 +14,9 @@ public class Constants {
     public static final int frontMotorID = 13;
     public static final int backMotorID = 14;
 
-    public static final double kP = 0.75;
+    public static final double kP = 0.1;
     public static final double kI = 0.0;
-    public static final double kD = 0.0005;
+    public static final double kD = 0.0;
     public static final double kV = 0.15;
     public static final double kG = 0.43;
     public static final double kS = 0.0;
@@ -25,6 +25,16 @@ public class Constants {
 
     public static final TrapezoidProfile.Constraints constraints =
         new TrapezoidProfile.Constraints(20, 30);
+
+    public static final double stowPos = 1.0;
+    public static final double hpPos = 7.0;
+    public static final double l1Pos = 8.7;
+    public static final double l2Pos = 15.8;
+    public static final double l3Pos = 26.7;
+    public static final double l4Pos = 44.0;
+    public static final double a1Pos = 12.55;
+    public static final double a2Pos = 24.04;
+    
   }
 
   public static class ClimberConstants {
@@ -66,7 +76,7 @@ public class Constants {
     public static final double kI = 0.0;
     public static final double kD = 0.005;
 
-    public static final double tolerance = 0.005;
+    public static final double tolerance = 0.002;
 
     public static final TrapezoidProfile.Constraints constraints =
         new TrapezoidProfile.Constraints(5, 3);

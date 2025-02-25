@@ -9,14 +9,17 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.command.ProfiledPIDSubsystem;
 import frc.robot.Constants;
 
 public class Elevator extends ProfiledPIDSubsystem {
+
   private final TalonFX frontMotor =
       new TalonFX(Constants.ElevatorConstants.frontMotorID);
   private final TalonFX backMotor =
       new TalonFX(Constants.ElevatorConstants.backMotorID);
+
   private final ElevatorFeedforward feedforward = new ElevatorFeedforward(
     Constants.ElevatorConstants.kS, 
     Constants.ElevatorConstants.kG, 
@@ -37,67 +40,60 @@ public class Elevator extends ProfiledPIDSubsystem {
     frontMotor.setNeutralMode(NeutralModeValue.Brake);
     backMotor.setNeutralMode(NeutralModeValue.Brake);
 
-    frontMotor.setPosition(0.000000000000000);
+    frontMotor.setPosition(0.000);
 
     backMotor.setControl(new Follower(frontMotor.getDeviceID(), false));
 
-    setClampedGoal(0.0);
+    // Be sure to remove this function when usning manual control
     enable();
+
   }
 
-  public void elevatorUp() {
-    frontMotor.set(-0.25);
-    backMotor.set(0.25);
-  }
-
-  public void elevatorDown() {
-    frontMotor.set(0.1);
-    backMotor.set(-0.1);
-  }
-
-  public void elevatorStop() {
-    frontMotor.set(0.0);
-    backMotor.set(0.0);
+  public Command manualElevator(double speed) {
+    return run( () -> {
+        frontMotor.set(speed);
+        backMotor.set(speed);
+    });
   }
 
   public void stow() {
-    setClampedGoal(0.0);
+    setClampedGoal(Constants.ElevatorConstants.stowPos);
   }
 
   public void hp() {
-    setClampedGoal(7.0);
+    setClampedGoal(Constants.ElevatorConstants.hpPos);
   }
 
   public void l1() {
-    setClampedGoal(8.7);
+    setClampedGoal(Constants.ElevatorConstants.l1Pos);
   }
 
   public void l2() {
-    setClampedGoal(15.8);
+    setClampedGoal(Constants.ElevatorConstants.l2Pos);
   }
 
   public void l3() {
-    setClampedGoal(26.7);
+    setClampedGoal(Constants.ElevatorConstants.l3Pos);
   }
 
   public void l4() {
-    setClampedGoal(42.0);
+    setClampedGoal(Constants.ElevatorConstants.l4Pos);
   }
 
   public void a1() {
-    setClampedGoal(12.55);
+    setClampedGoal(Constants.ElevatorConstants.a1Pos);
   }
 
   public void a2() {
-    setClampedGoal(25.04);
+    setClampedGoal(Constants.ElevatorConstants.a2Pos);
   }
 
   public void zeroMotor() {
-    frontMotor.setPosition(0.000000);
+    frontMotor.setPosition(0.000);
   }
 
   public void setClampedGoal(double goal) {
-    setGoal(MathUtil.clamp(goal, 0.0, 42.0));
+    setGoal(MathUtil.clamp(goal, 0.5, 45));
   }
 
   @Override

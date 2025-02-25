@@ -29,6 +29,8 @@ public class Groundtake extends ProfiledPIDSubsystem {
 
     floorAlgaeRollerMotor.setNeutralMode(NeutralModeValue.Brake);
     floorAlgaePivotMotor.setNeutralMode(NeutralModeValue.Brake);
+
+    enable();
   }
 
   public void floorAlgaeIntake() {
@@ -36,7 +38,7 @@ public class Groundtake extends ProfiledPIDSubsystem {
   }
 
   public void keepAlgae() {
-    floorAlgaeRollerMotor.set(0.2);
+    floorAlgaeRollerMotor.set(0.3);
   }
 
   public void floorAlgaeOuttake() {
@@ -49,12 +51,10 @@ public class Groundtake extends ProfiledPIDSubsystem {
 
   public void retractPivot() {
     setGoal(0.297);
-    enable();
   }
 
   public void extendPivot() {
     setGoal(0.146);
-    enable();
   }
 
   @Override

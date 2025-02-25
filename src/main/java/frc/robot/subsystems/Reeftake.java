@@ -2,8 +2,10 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.command.ProfiledPIDSubsystem;
 import frc.robot.Constants;
 
@@ -38,6 +40,11 @@ public class Reeftake extends ProfiledPIDSubsystem {
     intakeMotor.set(0.0);
   }
 
+  public void setClampedGoal(double goal) {
+    setGoal(MathUtil.clamp(goal, 2.0, 4.0));
+  }
+
+
   @Override
   protected void useOutput(double output, State setpoint) {
     reefAlgaePivotMotor.setVoltage(output);
@@ -47,4 +54,9 @@ public class Reeftake extends ProfiledPIDSubsystem {
   protected double getMeasurement() {
     return reefAlgaePivotMotor.getPosition().getValueAsDouble();
   }
+
+  @Override
+  public void periodic() {
+    SmartDashboard.putNumber("Reeftake/Reeftake Motor Position", reefAlgaePivotMotor.getPosition().getValueAsDouble());
+  } 
 }
