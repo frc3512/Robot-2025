@@ -122,6 +122,14 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
 autoChooser.getSelected().cmd().schedule();
   }
+  
+  @Override
+  public void teleopInit() {}
+
+  @Override
+  public void disabledInit() {
+    
+  }
 
   @Override
   public void robotPeriodic() {
