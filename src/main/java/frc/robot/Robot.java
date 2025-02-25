@@ -1,5 +1,6 @@
 package frc.robot;
 
+import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
@@ -19,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.LEDs;
 // import frc.robot.subsystems.Reeftake;
 import frc.robot.subsystems.Swerve;
-
 // import frc.robot.subsystems.Vision;
 
 public class Robot extends TimedRobot {
@@ -67,11 +67,11 @@ public class Robot extends TimedRobot {
     autoChooser.addOption("Forward(Top)", forward2());
     autoChooser.addOption("Forward(Bottom)", forward3());
     autoChooser.addOption("Orbit Reef(Test)", orbitReef());
-    autoChooser.addOption("HP(Bottom)", hPB());
-    autoChooser.addOption("HP(Top)", hPT());
+    autoChooser.addOption("Hp(Bottom)", hPB());
+    autoChooser.addOption("Hp(Top)", hPT());
     // autoChooser.addOption("Score l4 3x", l4Threex());
-    autoChooser.addOption("Score L4 go S A go P", L4GoAToP());
-    autoChooser.addOption("Score L4 go HP Score l4 Finish S", L4HP2xFinS());
+    autoChooser.addOption("Score L4 go S AP", L4GoSAP());
+    autoChooser.addOption("Score l4 go HP Score l4 Finish S", L4HP2xFinS());
 
     // Controler Bindings
     drivetrain.setDefaultCommand(
@@ -120,16 +120,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    forward1().cmd().schedule();
-    forward2().cmd().schedule();
-    orbitReef().cmd().schedule();
-    hPB().cmd().schedule();
-    hPT().cmd().schedule();
-    // l4Threex().cmd().schedule();
-    L4GoAToP().cmd().schedule();
-    L4HP2xFinS().cmd().schedule();
-
-    autoChooser.getSelected().cmd().schedule();
+autoChooser.getSelected().cmd().schedule();
   }
 
   @Override
@@ -144,37 +135,45 @@ public class Robot extends TimedRobot {
 
     AutoRoutine routine = autoFactory.newRoutine("Forward(Center)");
     AutoTrajectory trajectory = routine.trajectory("Forward(Center)");
-
-    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
-
+    routine
+      .active()
+      .onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
     return routine;
   }
 
   public AutoRoutine forward2() {
     AutoRoutine routine = autoFactory.newRoutine("Forward(Top)");
     AutoTrajectory trajectory = routine.trajectory("Foward(Top)");
-    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+    routine
+      .active()
+      .onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
     return routine;
   }
 
   public AutoRoutine forward3() {
     AutoRoutine routine = autoFactory.newRoutine("Forward(Bottom)");
     AutoTrajectory trajectory = routine.trajectory("Foward(Bottom)");
-    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+    routine
+      .active()
+      .onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
     return routine;
   }
 
   public AutoRoutine hPB() {
     AutoRoutine routine = autoFactory.newRoutine("Hp(Bottom)");
-    AutoTrajectory trajectory = routine.trajectory("hp(Bottom)");
-    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+    AutoTrajectory trajectory = routine.trajectory("Hp(Bottom)");
+    routine
+      .active()
+      .onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
     return routine;
   }
 
   public AutoRoutine hPT() {
-    AutoRoutine routine = autoFactory.newRoutine("HP(Top)");
-    AutoTrajectory trajectory = routine.trajectory("HP(Top)");
-    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+    AutoRoutine routine = autoFactory.newRoutine("Hp(Top)");
+    AutoTrajectory trajectory = routine.trajectory("Hp(Top)");
+    routine
+      .active()
+      .onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
     return routine;
   }
 
@@ -182,7 +181,9 @@ public class Robot extends TimedRobot {
 
     AutoRoutine routine = autoFactory.newRoutine("Orbit Reef(Test)");
     AutoTrajectory trajectory = routine.trajectory("Orbit Reef(Test)");
-    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+    routine
+      .active()
+      .onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
 
     return routine;
   }
@@ -196,17 +197,22 @@ public class Robot extends TimedRobot {
   //     return routine;
   // }
 
-  public AutoRoutine L4GoAToP() {
-    AutoRoutine routine = autoFactory.newRoutine("Score L4 C go S A go P");
-    AutoTrajectory trajectory = routine.trajectory("Score L4 go S A go P");
-    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+  public AutoRoutine L4GoSAP() {
+    AutoRoutine routine = autoFactory.newRoutine("Score L4 go S AP");
+    AutoTrajectory trajectory = routine.trajectory("Score L4 go S AP");
+    routine
+      .active()
+      .onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
     return routine;
   }
 
   public AutoRoutine L4HP2xFinS() {
-    AutoRoutine routine = autoFactory.newRoutine("Score L4 go HP Score l4 Finish S");
-    AutoTrajectory trajectory = routine.trajectory("Score L4 go HP Score l4 Finish S");
-    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+    AutoRoutine routine = autoFactory.newRoutine("Score l4 go HP Score l4 Finish S");
+    AutoTrajectory trajectory = routine.trajectory("Score l4 go HP Score l4 Finish S");
+    routine
+      .active()
+      .onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
     return routine;
   }
+
 }

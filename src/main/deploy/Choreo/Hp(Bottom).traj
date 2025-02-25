@@ -135,5 +135,5 @@
   "splits":[0]
  },
  "events":[
-   {"name":"Outtake ", "from":{"target":2, "targetTimestamp":null, "offset":{"exp":"2 s", "val":2.0}}, "event":{"type":"named", "data":{"name":"Outtake"}}}]
+   {"name":"Outtake ", "from":{"target":2, "targetTimestamp":1.25114, "offset":{"exp":"2 s", "val":2.0}}, "event":{"type":"named", "data":{"name":"Outtake"}}}]
 }
