@@ -8,9 +8,12 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Climber;
@@ -101,14 +104,20 @@ public class Robot extends TimedRobot {
     appendageJoystick.button(10).onTrue(new InstantCommand(() -> reeftake.coralIntake()));
     appendageJoystick.button(10).onFalse(new InstantCommand(() -> reeftake.coralStop()));
 
+    appendageJoystick.button(11).onTrue(new InstantCommand(() -> reeftake.algaeOuttake()));
+    appendageJoystick.button(11).onFalse(new InstantCommand(() -> reeftake.coralStop()));
+
     // Elevator controls
     appendageJoystick.button(6).onTrue(new InstantCommand(() -> elevator.l1()));
 
     appendageJoystick.button(5).onTrue(new InstantCommand(() -> elevator.l2()));
+    appendageJoystick.button(5).onFalse(scoreSequence());
 
     appendageJoystick.button(4).onTrue(new InstantCommand(() -> elevator.l3()));
+    appendageJoystick.button(4).onFalse(scoreSequence());
 
     appendageJoystick.button(3).onTrue(new InstantCommand(() -> elevator.l4()));
+    appendageJoystick.button(3).onFalse(scoreSequence());
 
     appendageJoystick.button(8).onTrue(new InstantCommand(() -> elevator.a1()));
 
@@ -116,7 +125,8 @@ public class Robot extends TimedRobot {
 
     appendageJoystick.button(9).onTrue(new InstantCommand(() -> elevator.stow()));
 
-    appendageJoystick.button(12).onTrue(new InstantCommand(() -> elevator.hp()));
+    appendageJoystick.button(12).onTrue(new InstantCommand(() -> elevator.hp())
+        .andThen(reeftakeIntake()));
 
     // Manual control, COMMENT OUT WHEN NOT IN USE
     // DISABLE PID IN ELEVATOR CLASS!!!
@@ -158,6 +168,45 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {}
 
   // Make sequencial commands for the elevator here once reeftake pivot it made. 
+  
+  public Command reeftakeIntake() {
+      return Commands.sequence(
+        reeftake.runCoralIntake(0.2),
+        Commands.waitUntil(reeftake::coralDetected),
+        reeftake.runCoralIntake(0.0));
+  } 
+
+  public SequentialCommandGroup scoreSequence() {
+    return new InstantCommand(() ->  reeftake.coralIntake())
+        .andThen(new WaitCommand(0.75))
+        .andThen(new InstantCommand(() -> elevator.stow()))
+        .andThen(new InstantCommand(() -> reeftake.coralStop()));
+  }
+
+  public SequentialCommandGroup l2() {
+      return new InstantCommand(() -> elevator.l2())
+          .andThen(new WaitCommand(1))
+          .andThen(new InstantCommand(() -> reeftake.coralIntake()))
+          .andThen(new WaitCommand(0.75))
+          .andThen(new InstantCommand(() -> elevator.stow()));
+  }
+
+  public SequentialCommandGroup l3() {
+    return new InstantCommand(() -> elevator.l3())
+        .andThen(new WaitCommand(1.75))
+        .andThen(new InstantCommand(() -> reeftake.coralIntake()))
+        .andThen(new WaitCommand(0.75))
+        .andThen(new InstantCommand(() -> elevator.stow()));
+  }
+
+  public SequentialCommandGroup l4() {
+    return new InstantCommand(() -> elevator.l4())
+        .andThen(new WaitCommand(2.5))
+        .andThen(new InstantCommand(() -> reeftake.coralIntake()))
+        .andThen(new WaitCommand(0.75))
+        .andThen(new InstantCommand(() -> elevator.stow()));
+  }
+
 
   public AutoRoutine orbitReef() {
 

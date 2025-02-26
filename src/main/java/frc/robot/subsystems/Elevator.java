@@ -23,7 +23,8 @@ public class Elevator extends ProfiledPIDSubsystem {
   private final ElevatorFeedforward feedforward = new ElevatorFeedforward(
     Constants.ElevatorConstants.kS, 
     Constants.ElevatorConstants.kG, 
-    Constants.ElevatorConstants.kV);
+    Constants.ElevatorConstants.kV,
+    Constants.ElevatorConstants.kA);
 
   boolean bypassStop = false;
   double goal = 0.0;
@@ -46,7 +47,6 @@ public class Elevator extends ProfiledPIDSubsystem {
 
     // Be sure to remove this function when usning manual control
     enable();
-
   }
 
   public Command manualElevator(double speed) {
@@ -93,7 +93,7 @@ public class Elevator extends ProfiledPIDSubsystem {
   }
 
   public void setClampedGoal(double goal) {
-    setGoal(MathUtil.clamp(goal, 0.5, 45));
+    setGoal(MathUtil.clamp(goal, 0.5, 47));
   }
 
   @Override
