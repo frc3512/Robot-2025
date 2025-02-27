@@ -1,5 +1,8 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -20,22 +23,21 @@ public class Constants {
     public static final double kV = 0.15;
     public static final double kG = 0.4;
     public static final double kS = 0.0;
-    public static final double kA = 0.1;
+    public static final double kA = 0.13;
 
     public static final double tolerance = 0.0002;
 
     public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(20, 20);
+        new TrapezoidProfile.Constraints(20, 30);
 
     public static final double stowPos = 1.0;
-    public static final double hpPos = 7.0;
+    public static final double hpPos = 4.0;
     public static final double l1Pos = 8.7;
     public static final double l2Pos = 14.2;
     public static final double l3Pos = 25.6;
     public static final double l4Pos = 45.5;
     public static final double a1Pos = 6.55;
     public static final double a2Pos = 18.84;
-    
   }
 
   public static class ClimberConstants {
@@ -49,6 +51,7 @@ public class Constants {
 
     public static final TrapezoidProfile.Constraints constraints =
         new TrapezoidProfile.Constraints(7, 5);
+
   }
 
   public static class ReeftakeConstants {
@@ -57,14 +60,16 @@ public class Constants {
 
     public static final int digitalInputChannel = 0;
 
-    public static final double kP = 1.0;
+    public static final double kP = 0.01;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
-
     public static final double tolerance = 0.002;
 
     public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(7, 5);
+        new TrapezoidProfile.Constraints(1, 1);
+      
+        public static final double extendPivot = 2.97;
+        public static final double retractPivot = 3.66;
   }
 
   public static class GroundtakeConstants {
@@ -83,6 +88,7 @@ public class Constants {
         new TrapezoidProfile.Constraints(5, 3);
   }
 
+  
   public static class VisionConstants {
     public static final String leftCamera = "Arducam OV9281 3512 left";
     public static final String rightCamera = "Arducam OV9281 3512 right";
@@ -100,4 +106,5 @@ public class Constants {
 
     public static final double visionTurnP = 1; // TUNE THIS VALUE
   }
+
 }

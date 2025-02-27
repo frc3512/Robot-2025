@@ -1,9 +1,8 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -15,16 +14,15 @@ import frc.robot.Constants;
 
 public class Elevator extends ProfiledPIDSubsystem {
 
-  private final TalonFX frontMotor =
-      new TalonFX(Constants.ElevatorConstants.frontMotorID);
-  private final TalonFX backMotor =
-      new TalonFX(Constants.ElevatorConstants.backMotorID);
+  private final TalonFX frontMotor = new TalonFX(Constants.ElevatorConstants.frontMotorID);
+  private final TalonFX backMotor = new TalonFX(Constants.ElevatorConstants.backMotorID);
 
-  private final ElevatorFeedforward feedforward = new ElevatorFeedforward(
-    Constants.ElevatorConstants.kS, 
-    Constants.ElevatorConstants.kG, 
-    Constants.ElevatorConstants.kV,
-    Constants.ElevatorConstants.kA);
+  private final ElevatorFeedforward feedforward =
+      new ElevatorFeedforward(
+          Constants.ElevatorConstants.kS,
+          Constants.ElevatorConstants.kG,
+          Constants.ElevatorConstants.kV,
+          Constants.ElevatorConstants.kA);
 
   boolean bypassStop = false;
   double goal = 0.0;
@@ -50,10 +48,11 @@ public class Elevator extends ProfiledPIDSubsystem {
   }
 
   public Command manualElevator(double speed) {
-    return run( () -> {
-        frontMotor.set(speed);
-        backMotor.set(speed);
-    });
+    return run(
+        () -> {
+          frontMotor.set(speed);
+          backMotor.set(speed);
+        });
   }
 
   public void stow() {
@@ -100,10 +99,12 @@ public class Elevator extends ProfiledPIDSubsystem {
   public void periodic() {
     super.periodic();
 
-    SmartDashboard.putNumber("Elevator/ElevatorFrontMotorEncoder", frontMotor.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber(
+        "Elevator/ElevatorFrontMotorEncoder", frontMotor.getPosition().getValueAsDouble());
     SmartDashboard.putNumber("Elevator/Elevator Goal", getController().getSetpoint().position);
 
-    SmartDashboard.putNumber("Elevator/Elevator Voltage", frontMotor.getMotorVoltage().getValueAsDouble());
+    SmartDashboard.putNumber(
+        "Elevator/Elevator Voltage", frontMotor.getMotorVoltage().getValueAsDouble());
   }
 
   @Override

@@ -14,23 +14,19 @@ import frc.robot.Constants;
 
 public class Reeftake extends ProfiledPIDSubsystem {
 
-  private final TalonFX reefAlgaePivotMotor = 
-      new TalonFX(Constants.ReeftakeConstants.pivotMotorID);
-  private final TalonFX intakeMotor = 
-      new TalonFX(Constants.ReeftakeConstants.intakeMotorID);
+  private final TalonFX reefAlgaePivotMotor = new TalonFX(Constants.ReeftakeConstants.pivotMotorID);
+  private final TalonFX intakeMotor = new TalonFX(Constants.ReeftakeConstants.intakeMotorID);
 
-  public final DigitalInput coralIn = 
+  public final DigitalInput coralIn =
       new DigitalInput(Constants.ReeftakeConstants.digitalInputChannel);
 
   public boolean coralDetected() {
     return coralIn.get();
   }
 
-
   boolean shouldScoreCoral = false;
   boolean shouldIntakeCoral = false;
   boolean canInakeCoral = false;
-
 
   public Reeftake() {
     super(
@@ -43,14 +39,17 @@ public class Reeftake extends ProfiledPIDSubsystem {
 
     reefAlgaePivotMotor.setNeutralMode(NeutralModeValue.Brake);
     intakeMotor.setNeutralMode(NeutralModeValue.Brake);
+  
+    setClampedGoal(Constants.ReeftakeConstants.retractPivot);
+
   }
 
   public void coralIntake() {
-      intakeMotor.set(0.2);
+    intakeMotor.set(0.2);
   }
 
   public void algaeOuttake() {
-      intakeMotor.set(-0.8);
+    intakeMotor.set(-0.8);
   }
 
   public void coralStop() {
@@ -58,12 +57,27 @@ public class Reeftake extends ProfiledPIDSubsystem {
   }
 
   public Command runCoralIntake(Double speed) {
-    return run (() -> intakeMotor.set(speed));
+    return run(() -> intakeMotor.set(speed));
+  }
+
+  public void extendPivot() {
+    setClampedGoal(Constants.ReeftakeConstants.extendPivot);
+  }
+
+  public void retractPivot() {
+    setClampedGoal(Constants.ReeftakeConstants.retractPivot);
   }
 
   public void setClampedGoal(double goal) {
-    setGoal(MathUtil.clamp(goal, 2.0, 4.0));
+    setGoal(MathUtil.clamp(goal, 0.0, 4.0));
   }
+
+  public Command reeftakeIntake() {
+      return Commands.sequence(
+      Commands.runOnce(() -> intakeMotor.set(0.2)),
+      Commands.waitUntil(() -> !coralIn.get()),
+      Commands.runOnce(() -> intakeMotor.set(0.0)));
+  } 
 
   @Override
   protected void useOutput(double output, State setpoint) {
@@ -77,6 +91,7 @@ public class Reeftake extends ProfiledPIDSubsystem {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Reeftake/Reeftake Motor Position", reefAlgaePivotMotor.getPosition().getValueAsDouble());
-  } 
+    SmartDashboard.putNumber(
+        "Reeftake/Reeftake Motor Position", reefAlgaePivotMotor.getPosition().getValueAsDouble());
+  }
 }
