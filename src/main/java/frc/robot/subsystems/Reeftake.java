@@ -2,7 +2,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.MathUtil;
+
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -20,9 +21,12 @@ public class Reeftake extends ProfiledPIDSubsystem {
   public final DigitalInput coralIn =
       new DigitalInput(Constants.ReeftakeConstants.digitalInputChannel);
 
-  public boolean coralDetected() {
-    return coralIn.get();
-  }
+  private final ElevatorFeedforward feedforward =
+      new ElevatorFeedforward(
+          Constants.ReeftakeConstants.kS,
+          Constants.ReeftakeConstants.kG,
+          Constants.ReeftakeConstants.kV);
+
 
   boolean shouldScoreCoral = false;
   boolean shouldIntakeCoral = false;
@@ -40,12 +44,15 @@ public class Reeftake extends ProfiledPIDSubsystem {
     reefAlgaePivotMotor.setNeutralMode(NeutralModeValue.Brake);
     intakeMotor.setNeutralMode(NeutralModeValue.Brake);
   
-    setClampedGoal(Constants.ReeftakeConstants.retractPivot);
-
+    setGoal(Constants.ReeftakeConstants.retractPivot);
   }
 
   public void coralIntake() {
     intakeMotor.set(0.2);
+  }
+
+  public void algaeIntake() {
+    intakeMotor.set(0.5);
   }
 
   public void algaeOuttake() {
@@ -61,15 +68,13 @@ public class Reeftake extends ProfiledPIDSubsystem {
   }
 
   public void extendPivot() {
-    setClampedGoal(Constants.ReeftakeConstants.extendPivot);
+    setGoal(Constants.ReeftakeConstants.extendPivot);
+    enable();
   }
 
   public void retractPivot() {
-    setClampedGoal(Constants.ReeftakeConstants.retractPivot);
-  }
-
-  public void setClampedGoal(double goal) {
-    setGoal(MathUtil.clamp(goal, 0.0, 4.0));
+    setGoal(Constants.ReeftakeConstants.retractPivot);
+    enable();
   }
 
   public Command reeftakeIntake() {
@@ -81,7 +86,7 @@ public class Reeftake extends ProfiledPIDSubsystem {
 
   @Override
   protected void useOutput(double output, State setpoint) {
-    reefAlgaePivotMotor.setVoltage(output);
+    reefAlgaePivotMotor.setVoltage(output + feedforward.calculate(getController().getSetpoint().velocity));
   }
 
   @Override
@@ -91,6 +96,9 @@ public class Reeftake extends ProfiledPIDSubsystem {
 
   @Override
   public void periodic() {
+    super.periodic();
+
+    SmartDashboard.putNumber("Reeftake/Pivot Goal", getController().getSetpoint().position);
     SmartDashboard.putNumber(
         "Reeftake/Reeftake Motor Position", reefAlgaePivotMotor.getPosition().getValueAsDouble());
   }

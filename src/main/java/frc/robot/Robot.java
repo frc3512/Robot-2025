@@ -8,7 +8,6 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -23,6 +22,7 @@ import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Reeftake;
 import frc.robot.subsystems.Swerve;
 // import frc.robot.subsystems.Vision;
+import pabeles.concurrency.ConcurrencyOps.NewInstance;
 
 public class Robot extends TimedRobot {
 
@@ -36,7 +36,7 @@ public class Robot extends TimedRobot {
           .withRotationalDeadband(MaxAngularRate * 0.07) // Add a 7% deadband
           .withDriveRequestType(DriveRequestType.Velocity);
 
-  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+  // private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
   // Subsystem Objects
   public final Climber climber = new Climber();
@@ -97,11 +97,8 @@ public class Robot extends TimedRobot {
     controller.rightTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
     
     // Reeftake controls
-    appendageJoystick.button(10).onTrue(new InstantCommand(() -> reeftake.coralIntake()));
+    appendageJoystick.button(10).onTrue(new InstantCommand(() -> reeftake.algaeOuttake()));
     appendageJoystick.button(10).onFalse(new InstantCommand(() -> reeftake.coralStop()));
-
-    appendageJoystick.button(11).onTrue(new InstantCommand(() -> reeftake.algaeOuttake()));
-    appendageJoystick.button(11).onFalse(new InstantCommand(() -> reeftake.coralStop()));
 
     // Elevator controls
     appendageJoystick.button(6).onTrue(new InstantCommand(() -> elevator.l1()));
@@ -124,9 +121,11 @@ public class Robot extends TimedRobot {
     appendageJoystick.button(3).onFalse(score());
     appendageJoystick.button(3).onFalse(leds.runPattern(leds.red));
 
-    appendageJoystick.button(8).onTrue(new InstantCommand(() -> elevator.a1()));
+    appendageJoystick.button(8).onTrue(a1());
+    appendageJoystick.button(8).onFalse(rectractAlgae());
 
-    appendageJoystick.button(7).onTrue(new InstantCommand(() -> elevator.a2()));
+    appendageJoystick.button(7).onTrue(a2());
+    appendageJoystick.button(7).onFalse(rectractAlgae());
 
     appendageJoystick.button(9).onTrue(new InstantCommand(() -> elevator.stow()));
 
@@ -175,6 +174,23 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {}
 
   // Make sequencial commands for the elevator here once reeftake pivot it made. 
+  public SequentialCommandGroup a1() {
+    return new InstantCommand(() -> elevator.a1())
+      .andThen(new InstantCommand(() -> reeftake.extendPivot()))
+      .andThen(new InstantCommand(() -> reeftake.algaeIntake()));
+  }
+
+  public SequentialCommandGroup a2() {
+    return new InstantCommand(() -> elevator.a2())
+      .andThen(new InstantCommand(() -> reeftake.extendPivot()))
+      .andThen(new InstantCommand(() -> reeftake.algaeIntake()));
+  }
+
+  public SequentialCommandGroup rectractAlgae() {
+      return new InstantCommand(() -> reeftake.retractPivot())
+        .andThen(new InstantCommand(() -> elevator.stow()));
+  }
+
   public SequentialCommandGroup score() {
     return new InstantCommand(() ->  reeftake.coralIntake())
         .andThen(new WaitCommand(0.5))
