@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
@@ -27,7 +26,6 @@ public class Reeftake extends ProfiledPIDSubsystem {
           Constants.ReeftakeConstants.kG,
           Constants.ReeftakeConstants.kV);
 
-
   boolean shouldScoreCoral = false;
   boolean shouldIntakeCoral = false;
   boolean canInakeCoral = false;
@@ -43,16 +41,16 @@ public class Reeftake extends ProfiledPIDSubsystem {
 
     reefAlgaePivotMotor.setNeutralMode(NeutralModeValue.Brake);
     intakeMotor.setNeutralMode(NeutralModeValue.Brake);
-  
+
     setGoal(Constants.ReeftakeConstants.retractPivot);
   }
 
   public void coralIntake() {
-    intakeMotor.set(0.2);
+    intakeMotor.set(0.175);
   }
 
   public void algaeIntake() {
-    intakeMotor.set(0.5);
+    intakeMotor.set(0.85);
   }
 
   public void algaeOuttake() {
@@ -77,16 +75,22 @@ public class Reeftake extends ProfiledPIDSubsystem {
     enable();
   }
 
+  public void prossecer() {
+    setGoal(0.8);
+    enable();
+  }
+
   public Command reeftakeIntake() {
-      return Commands.sequence(
-      Commands.runOnce(() -> intakeMotor.set(0.2)),
-      Commands.waitUntil(() -> !coralIn.get()),
-      Commands.runOnce(() -> intakeMotor.set(0.0)));
-  } 
+    return Commands.sequence(
+        Commands.runOnce(() -> intakeMotor.set(0.2)),
+        Commands.waitUntil(() -> !coralIn.get()),
+        Commands.runOnce(() -> intakeMotor.set(0.0)));
+  }
 
   @Override
   protected void useOutput(double output, State setpoint) {
-    reefAlgaePivotMotor.setVoltage(output + feedforward.calculate(getController().getSetpoint().velocity));
+    reefAlgaePivotMotor.setVoltage(
+        output + feedforward.calculate(getController().getSetpoint().velocity));
   }
 
   @Override
@@ -101,5 +105,7 @@ public class Reeftake extends ProfiledPIDSubsystem {
     SmartDashboard.putNumber("Reeftake/Pivot Goal", getController().getSetpoint().position);
     SmartDashboard.putNumber(
         "Reeftake/Reeftake Motor Position", reefAlgaePivotMotor.getPosition().getValueAsDouble());
+
+    SmartDashboard.putNumber("Reeftake/Motor Temp", intakeMotor.getDeviceTemp().getValueAsDouble());
   }
 }

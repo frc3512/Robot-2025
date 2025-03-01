@@ -48,7 +48,6 @@ public class Constants {
 
     public static final TrapezoidProfile.Constraints constraints =
         new TrapezoidProfile.Constraints(7, 5);
-
   }
 
   public static class ReeftakeConstants {
@@ -61,15 +60,15 @@ public class Constants {
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double kV = 0.05;
-    public static final double kG = 0.1;
-    public static final double kS = 0.0; 
+    public static final double kG = 0.2;
+    public static final double kS = 0.0;
     public static final double tolerance = 0.002;
 
     public static final TrapezoidProfile.Constraints constraints =
         new TrapezoidProfile.Constraints(1, 1);
-      
-        public static final double extendPivot = 1.3;
-        public static final double retractPivot = 0.0;
+
+    public static final double extendPivot = 1.3;
+    public static final double retractPivot = 0.0;
   }
 
   public static class GroundtakeConstants {
@@ -88,7 +87,6 @@ public class Constants {
         new TrapezoidProfile.Constraints(5, 3);
   }
 
-  
   public static class VisionConstants {
     public static final String leftCamera = "Arducam OV9281 3512 left";
     public static final String rightCamera = "Arducam OV9281 3512 right";
@@ -106,5 +104,4 @@ public class Constants {
 
     public static final double visionTurnP = 1; // TUNE THIS VALUE
   }
-
 }

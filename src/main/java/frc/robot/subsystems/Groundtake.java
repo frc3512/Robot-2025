@@ -53,7 +53,7 @@ public class Groundtake extends ProfiledPIDSubsystem {
   }
 
   public void extendPivot() {
-    setGoal(0.146);
+    setGoal(0.115);
     enable();
   }
 

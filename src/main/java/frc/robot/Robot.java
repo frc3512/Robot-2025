@@ -21,6 +21,7 @@ import frc.robot.subsystems.Groundtake;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Reeftake;
 import frc.robot.subsystems.Swerve;
+
 // import frc.robot.subsystems.Vision;
 
 public class Robot extends TimedRobot {
@@ -88,16 +89,20 @@ public class Robot extends TimedRobot {
     controller
         .leftTrigger()
         .onFalse(
-          new InstantCommand(() -> groundtake.retractPivot())
-            .andThen(new InstantCommand(() -> groundtake.keepAlgae())));
-
+            new InstantCommand(() -> groundtake.retractPivot())
+                .andThen(new InstantCommand(() -> groundtake.keepAlgae())));
 
     controller.rightTrigger().onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()));
     controller.rightTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
-    
+
     // Reeftake controls
-    appendageJoystick.button(10).onTrue(new InstantCommand(() -> reeftake.algaeOuttake()));
-    appendageJoystick.button(10).onFalse(new InstantCommand(() -> reeftake.coralStop()));
+    appendageJoystick.button(10).onTrue(new InstantCommand(() -> reeftake.prossecer()));
+    appendageJoystick
+        .button(10)
+        .onFalse(
+            new InstantCommand(() -> reeftake.algaeOuttake())
+                .andThen(new InstantCommand(() -> reeftake.retractPivot()))
+                .andThen(new InstantCommand(() -> reeftake.coralStop())));
 
     // Elevator controls
     appendageJoystick.button(6).onTrue(new InstantCommand(() -> elevator.l1()));
@@ -128,10 +133,13 @@ public class Robot extends TimedRobot {
 
     appendageJoystick.button(9).onTrue(new InstantCommand(() -> elevator.stow()));
 
-    appendageJoystick.button(12).onTrue(new InstantCommand(() -> elevator.hp())
-        .andThen(reeftake.reeftakeIntake())
-        .andThen(leds.runPattern(leds.scrollngRainbow))
-        .andThen(new InstantCommand(() -> elevator.stow())));
+    appendageJoystick
+        .button(12)
+        .onTrue(
+            new InstantCommand(() -> elevator.hp())
+                .andThen(reeftake.reeftakeIntake())
+                .andThen(leds.runPattern(leds.scrollngRainbow))
+                .andThen(new InstantCommand(() -> elevator.stow())));
 
     // Manual control, COMMENT OUT WHEN NOT IN USE
     // DISABLE PID IN ELEVATOR CLASS!!!
@@ -159,9 +167,11 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    leds.runPattern(leds.red);
+  }
 
-  @Override 
+  @Override
   public void disabledInit() {}
 
   @Override
@@ -172,68 +182,37 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {}
 
-  // Make sequencial commands for the elevator here once reeftake pivot it made. 
+  // Make sequencial commands for the elevator here once reeftake pivot it made.
   public SequentialCommandGroup a1() {
     return new InstantCommand(() -> elevator.a1())
-      .andThen(new InstantCommand(() -> reeftake.extendPivot()))
-      .andThen(new InstantCommand(() -> reeftake.algaeIntake()));
+        .andThen(new InstantCommand(() -> reeftake.extendPivot()))
+        .andThen(new InstantCommand(() -> reeftake.algaeIntake()));
   }
 
   public SequentialCommandGroup a2() {
     return new InstantCommand(() -> elevator.a2())
-      .andThen(new InstantCommand(() -> reeftake.extendPivot()))
-      .andThen(new InstantCommand(() -> reeftake.algaeIntake()));
+        .andThen(new InstantCommand(() -> reeftake.extendPivot()))
+        .andThen(new InstantCommand(() -> reeftake.algaeIntake()));
   }
 
   public SequentialCommandGroup rectractAlgae() {
-      return new InstantCommand(() -> reeftake.retractPivot())
+    return new InstantCommand(() -> reeftake.retractPivot())
         .andThen(new InstantCommand(() -> elevator.stow()));
   }
 
   public SequentialCommandGroup score() {
-    return new InstantCommand(() ->  reeftake.coralIntake())
+    return new InstantCommand(() -> reeftake.coralIntake())
         .andThen(new WaitCommand(0.5))
         .andThen(new InstantCommand(() -> elevator.stow()))
         .andThen(new InstantCommand(() -> reeftake.coralStop()));
   }
-
-  public SequentialCommandGroup scorel2() {
-      return new InstantCommand(() -> elevator.l2())
-          .andThen(new WaitCommand(1))
-          .andThen(new InstantCommand(() -> reeftake.coralIntake()))
-          .andThen(new WaitCommand(0.75))
-          .andThen(new InstantCommand(() -> reeftake.coralStop())
-          .andThen(new InstantCommand(() -> elevator.stow())));
-  }
-
-  public SequentialCommandGroup scorel3() {
-    return new InstantCommand(() -> elevator.l3())
-        .andThen(new WaitCommand(2))
-        .andThen(new InstantCommand(() -> reeftake.coralIntake()))
-        .andThen(new WaitCommand(0.75))
-        .andThen(new InstantCommand(() -> reeftake.coralStop())
-        .andThen(new InstantCommand(() -> elevator.stow())));
-  }
-
-  public SequentialCommandGroup scorel4() {
-    return new InstantCommand(() -> elevator.l4())
-        .andThen(new WaitCommand(2.5))
-        .andThen(new InstantCommand(() -> reeftake.coralIntake()))
-        .andThen(new WaitCommand(0.75))
-        .andThen(new InstantCommand(() -> reeftake.coralStop())
-        .andThen(new InstantCommand(() -> elevator.stow())));
-  }
-
 
   public AutoRoutine orbitReef() {
 
     AutoRoutine routine = autoFactory.newRoutine("Orbit Reef");
     AutoTrajectory trajectory = routine.trajectory("Orbit Reef");
 
-    routine
-        .active()
-        .onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
-
+    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
     return routine;
   }
 }

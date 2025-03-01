@@ -58,8 +58,8 @@ public class DriveConstants {
 
   private static final CommandXboxController controller = new CommandXboxController(0);
 
-  public static double MaxSpeed = 5.2 * 0.65; // Drive velocity in meters per second
-  public static double MaxAngularRate = 2.85; // Controls how fast the robot quick turns
+  public static double MaxSpeed = 5.2 * 0.80; // Drive velocity in meters per second
+  public static double MaxAngularRate = 3; // Controls how fast the robot quick turns
 
   public static final double forward = -controller.getLeftY() * MaxSpeed; // Drives robot forward
   public static final double strafe = -controller.getLeftX() * MaxSpeed; // Drives robot sideways

@@ -23,7 +23,7 @@ public class LED extends SubsystemBase {
   public final LEDPattern green = LEDPattern.solid(Color.kGreen);
   public final LEDPattern rainbow = LEDPattern.rainbow(255, 128);
   public final LEDPattern scrollngRainbow =
-      rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), ledSpacing);     
+      rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), ledSpacing);
 
   public LED() {
 
