@@ -6,7 +6,9 @@ import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+
+import java.io.OutputStream;
+
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
@@ -16,43 +18,17 @@ import org.photonvision.PhotonCamera;
 public class Vision extends SubsystemBase {
 
     // private static PhotonCamera photonCamera = new PhotonCamera(Constants.VisionConstants.leftCamera);
-    private final UsbCamera driverCamera = new UsbCamera("Driver Cam", "ElevatorCam");
 
-    private Thread m_driverCamThread;
     private boolean targetVisible = false;
 
     private double targetYaw = 0;
     private final double visionYawOffset = 0;
 
     public Vision() {
+        CameraServer.startAutomaticCapture();
 
-    m_driverCamThread =
-        new Thread(
-            () -> {
-              UsbCamera driverCamera = CameraServer.startAutomaticCapture();
-
-              driverCamera.setResolution(320, 200);
-
-              CvSink cvSink = CameraServer.getVideo();
-              CvSource outputStream = CameraServer.putVideo("Rectangle", 640, 400);
-
-              Mat mat = new Mat();
-
-              while (!Thread.interrupted()) {
-
-                if (cvSink.grabFrame(mat) == 0) {
-
-                  outputStream.notifyError(cvSink.getError());
-                  continue;
-                }
-              }
-            });
-
-    m_driverCamThread.setDaemon(true);
-    m_driverCamThread.start();
-
-    PhotonCamera.setVersionCheckEnabled(false);
-  }
+        PhotonCamera.setVersionCheckEnabled(false);
+    }
 
 //   public static PhotonCamera returnCamera() {
 

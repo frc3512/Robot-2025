@@ -3,8 +3,19 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.CvSink;
+import edu.wpi.first.cscore.CvSource;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -51,10 +62,47 @@ public class Robot extends TimedRobot {
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandJoystick appendageJoystick = new CommandJoystick(1);
 
+  // Camera
+  private final Thread m_visionThread;
+
   // Auton
   private final AutoFactory autoFactory;
 
   public Robot() {
+
+    CameraServer.startAutomaticCapture();
+
+     m_visionThread =
+        new Thread(
+            () -> {
+              // Get the UsbCamera from CameraServer
+              UsbCamera camera = CameraServer.startAutomaticCapture();
+              // Set the resolution
+              camera.setResolution(640, 480);
+
+              CvSink cvSink = CameraServer.getVideo();
+              CvSource outputStream = CameraServer.putVideo("Drive Cam", 640, 480);
+
+              Mat mat = new Mat();
+              Point pt1 = new Point(0, 60);
+              Point pt2 = new Point(400, 60);
+              Scalar color = new Scalar(28, 239, 84);
+
+              while (!Thread.interrupted()) {
+
+                if (cvSink.grabFrame(mat) == 0) {
+                  outputStream.notifyError(cvSink.getError());
+                  continue;
+                }
+
+                Imgproc.line(mat, pt1, pt2, color, 3);
+                outputStream.putFrame(mat);
+
+              }
+            });
+
+        m_visionThread.setDaemon(true);
+        m_visionThread.start();
 
     // Create Choreo
     autoFactory =
@@ -62,10 +110,13 @@ public class Robot extends TimedRobot {
             () -> drivetrain.getState().Pose,
             drivetrain::resetPose,
             drivetrain::followTrajectory,
-            true,
+            false,
             drivetrain);
 
-    autoChooser.addOption("Orbit Reef", orbitReef());
+    autoFactory
+      .bind("Score l4", scorel4());
+
+    autoChooser.addOption("Mid l4", midl4());
 
     // Controler Bindings
     drivetrain.setDefaultCommand(
@@ -207,10 +258,18 @@ public class Robot extends TimedRobot {
         .andThen(new InstantCommand(() -> reeftake.coralStop()));
   }
 
-  public AutoRoutine orbitReef() {
+  // Commands for auto modes
+  public SequentialCommandGroup scorel4() {
+    return new InstantCommand(() -> elevator.l4())
+     .andThen(new WaitCommand(3.5))
+     .andThen(score());
+  }
+  
 
-    AutoRoutine routine = autoFactory.newRoutine("Orbit Reef");
-    AutoTrajectory trajectory = routine.trajectory("Orbit Reef");
+  public AutoRoutine midl4() {
+
+    AutoRoutine routine = autoFactory.newRoutine("Mid l4");
+    AutoTrajectory trajectory = routine.trajectory("Mid l4");
 
     routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
     return routine;
