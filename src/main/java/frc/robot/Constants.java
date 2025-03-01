@@ -77,11 +77,11 @@ public class Constants {
 
     public static final int encoderID = 30;
 
-    public static final double kP = 9;
+    public static final double kP = 1;
     public static final double kI = 0.0;
-    public static final double kD = 0.005;
+    public static final double kD = 0.0;
 
-    public static final double tolerance = 0.002;
+    public static final double tolerance = 0.02;
 
     public static final TrapezoidProfile.Constraints constraints =
         new TrapezoidProfile.Constraints(5, 3);

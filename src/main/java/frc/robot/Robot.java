@@ -3,15 +3,12 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
-
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
@@ -52,7 +49,7 @@ public class Robot extends TimedRobot {
   // Subsystem Objects
   public final Climber climber = new Climber();
   public final Elevator elevator = new Elevator();
-  public final Groundtake groundtake = new Groundtake();
+  // public final Groundtake groundtake = new Groundtake();
   public final LED leds = new LED();
   public final Reeftake reeftake = new Reeftake();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
@@ -63,46 +60,49 @@ public class Robot extends TimedRobot {
   private final CommandJoystick appendageJoystick = new CommandJoystick(1);
 
   // Camera
-  private final Thread m_visionThread;
+  // private final Thread m_visionThread;
 
   // Auton
   private final AutoFactory autoFactory;
 
   public Robot() {
 
-    CameraServer.startAutomaticCapture();
+    // CameraServer.startAutomaticCapture();
 
-     m_visionThread =
-        new Thread(
-            () -> {
-              // Get the UsbCamera from CameraServer
-              UsbCamera camera = CameraServer.startAutomaticCapture();
-              // Set the resolution
-              camera.setResolution(640, 480);
+    //  m_visionThread =
+    //     new Thread(
+    //         () -> {
+    //           // Get the UsbCamera from CameraServer
+    //           UsbCamera camera = CameraServer.startAutomaticCapture();
+    //           // Set the resolution
+    //           camera.setResolution(640, 480);
 
-              CvSink cvSink = CameraServer.getVideo();
-              CvSource outputStream = CameraServer.putVideo("Drive Cam", 640, 480);
+    //           CvSink cvSink = CameraServer.getVideo();
+    //           CvSource outputStream = CameraServer.putVideo("Drive Cam", 640, 480);
 
-              Mat mat = new Mat();
-              Point pt1 = new Point(0, 60);
-              Point pt2 = new Point(400, 60);
-              Scalar color = new Scalar(28, 239, 84);
+    //           Mat mat = new Mat();
+    //           Point pt1 = new Point(0, 60);
+    //           Point pt2 = new Point(400, 60);
+    //           Point pt3 = new Point(0, 55);
+    //           Point pt4 = new Point(400, 55);
+    //           Scalar color = new Scalar(28, 239, 84);
 
-              while (!Thread.interrupted()) {
+    //           while (!Thread.interrupted()) {
 
-                if (cvSink.grabFrame(mat) == 0) {
-                  outputStream.notifyError(cvSink.getError());
-                  continue;
-                }
+    //             if (cvSink.grabFrame(mat) == 0) {
+    //               outputStream.notifyError(cvSink.getError());
+    //               continue;
+    //             }
 
-                Imgproc.line(mat, pt1, pt2, color, 3);
-                outputStream.putFrame(mat);
+    //             Imgproc.line(mat, pt1, pt2, color, 3);
+    //             Imgproc.line(mat, pt3, pt4, color, 3);
+    //             outputStream.putFrame(mat);
 
-              }
-            });
+    //           }
+    //         });
 
-        m_visionThread.setDaemon(true);
-        m_visionThread.start();
+    //     m_visionThread.setDaemon(true);
+    //     m_visionThread.start();
 
     // Create Choreo
     autoFactory =
@@ -132,19 +132,19 @@ public class Robot extends TimedRobot {
     // Bindings for the button box
 
     // Intake control for Groundtake
-    controller
-        .leftTrigger()
-        .onTrue(
-            new InstantCommand(() -> groundtake.extendPivot())
-                .andThen(new InstantCommand(() -> groundtake.floorAlgaeIntake())));
-    controller
-        .leftTrigger()
-        .onFalse(
-            new InstantCommand(() -> groundtake.retractPivot())
-                .andThen(new InstantCommand(() -> groundtake.keepAlgae())));
+    // controller
+    //     .leftTrigger()
+    //     .onTrue(
+    //         new InstantCommand(() -> groundtake.extendPivot())
+    //             .andThen(new InstantCommand(() -> groundtake.floorAlgaeIntake())));
+    // controller
+    //     .leftTrigger()
+    //     .onFalse(
+    //         new InstantCommand(() -> groundtake.retractPivot())
+    //             .andThen(new InstantCommand(() -> groundtake.keepAlgae())));
 
-    controller.rightTrigger().onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()));
-    controller.rightTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
+    // controller.rightTrigger().onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()));
+    // controller.rightTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
 
     // Reeftake controls
     appendageJoystick.button(10).onTrue(new InstantCommand(() -> reeftake.prossecer()));
@@ -261,7 +261,7 @@ public class Robot extends TimedRobot {
   // Commands for auto modes
   public SequentialCommandGroup scorel4() {
     return new InstantCommand(() -> elevator.l4())
-     .andThen(new WaitCommand(3.5))
+     .andThen(new WaitCommand(4))
      .andThen(score());
   }
   
