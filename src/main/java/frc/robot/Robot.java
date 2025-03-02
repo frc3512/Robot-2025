@@ -60,49 +60,49 @@ public class Robot extends TimedRobot {
   private final CommandJoystick appendageJoystick = new CommandJoystick(1);
 
   // Camera
-  // private final Thread m_visionThread;
+  private final Thread m_visionThread;
 
   // Auton
   private final AutoFactory autoFactory;
 
   public Robot() {
 
-    // CameraServer.startAutomaticCapture();
+    CameraServer.startAutomaticCapture();
 
-    //  m_visionThread =
-    //     new Thread(
-    //         () -> {
-    //           // Get the UsbCamera from CameraServer
-    //           UsbCamera camera = CameraServer.startAutomaticCapture();
-    //           // Set the resolution
-    //           camera.setResolution(640, 480);
+     m_visionThread =
+        new Thread(
+            () -> {
+              // Get the UsbCamera from CameraServer
+              UsbCamera camera = CameraServer.startAutomaticCapture();
+              // Set the resolution
+              camera.setResolution(640, 480);
 
-    //           CvSink cvSink = CameraServer.getVideo();
-    //           CvSource outputStream = CameraServer.putVideo("Drive Cam", 640, 480);
+              CvSink cvSink = CameraServer.getVideo();
+              CvSource outputStream = CameraServer.putVideo("Drive Cam", 640, 480);
 
-    //           Mat mat = new Mat();
-    //           Point pt1 = new Point(0, 60);
-    //           Point pt2 = new Point(400, 60);
-    //           Point pt3 = new Point(0, 55);
-    //           Point pt4 = new Point(400, 55);
-    //           Scalar color = new Scalar(28, 239, 84);
+              Mat mat = new Mat();
+              Point pt1 = new Point(0, 65);
+              Point pt2 = new Point(400, 65);
+              Point pt3 = new Point(0, 55);
+              Point pt4 = new Point(400, 55);
+              Scalar color = new Scalar(28, 239, 84);
 
-    //           while (!Thread.interrupted()) {
+              while (!Thread.interrupted()) {
 
-    //             if (cvSink.grabFrame(mat) == 0) {
-    //               outputStream.notifyError(cvSink.getError());
-    //               continue;
-    //             }
+                if (cvSink.grabFrame(mat) == 0) {
+                  outputStream.notifyError(cvSink.getError());
+                  continue;
+                }
 
-    //             Imgproc.line(mat, pt1, pt2, color, 3);
-    //             Imgproc.line(mat, pt3, pt4, color, 3);
-    //             outputStream.putFrame(mat);
+                Imgproc.line(mat, pt1, pt2, color, 3);
+                Imgproc.line(mat, pt3, pt4, color, 3);
+                outputStream.putFrame(mat);
 
-    //           }
-    //         });
+              }
+            });
 
-    //     m_visionThread.setDaemon(true);
-    //     m_visionThread.start();
+        m_visionThread.setDaemon(true);
+        m_visionThread.start();
 
     // Create Choreo
     autoFactory =
