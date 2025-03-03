@@ -24,6 +24,20 @@ public class Elevator extends ProfiledPIDSubsystem {
           Constants.ElevatorConstants.kV,
           Constants.ElevatorConstants.kA);
 
+  public boolean isAtSetPoint() {
+      return (getMeasurement() > (getLastDesiredPosition() - Constants.ElevatorConstants.tolerance)) &&
+          (getElevatorPosition() < (getLastDesiredPosition() + Constants.ElevatorConstants.tolerance));
+  }
+
+  public Double getLastDesiredPosition() {
+    return getController().getSetpoint().position;
+  }
+
+  public double getElevatorPosition() {
+    return frontMotor.getPosition().getValueAsDouble();
+  }
+        
+
   boolean bypassStop = false;
   double goal = 0.0;
 

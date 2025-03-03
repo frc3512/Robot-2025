@@ -16,6 +16,7 @@ import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -176,6 +177,11 @@ public class Robot extends TimedRobot {
     appendageJoystick.button(3).onFalse(score());
     appendageJoystick.button(3).onFalse(leds.runPattern(leds.red));
 
+    // Auto Scoring, needs to be tested
+    // appendageJoystick.button(5).onTrue(scorel2());
+    // appendageJoystick.button(4).onTrue(scorel3());
+    // appendageJoystick.button(3).onTrue(scorel4());
+
     appendageJoystick.button(8).onTrue(a1());
     appendageJoystick.button(8).onFalse(rectractAlgae());
 
@@ -218,12 +224,14 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopInit() {
-    leds.runPattern(leds.red);
-  }
+  public void teleopInit() {}
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    elevator.stow();
+    reeftake.retractPivot();
+    groundtake.retractPivot();
+  }
 
   @Override
   public void robotPeriodic() {
@@ -251,15 +259,36 @@ public class Robot extends TimedRobot {
         .andThen(new InstantCommand(() -> elevator.stow()));
   }
 
+  public Command scorel4() {
+    return Commands.sequence(
+        Commands.runOnce(() -> elevator.l4()),
+        Commands.waitUntil(elevator::isAtSetPoint),
+        Commands.runOnce(() -> score()));
+  }
+
+  public Command scorel3() {
+    return Commands.sequence(
+        Commands.runOnce(() -> elevator.l3()),
+        Commands.waitUntil(elevator::isAtSetPoint),
+        Commands.runOnce(() -> score()));
+  }
+
+  public Command scorel2() {
+    return Commands.sequence(
+        Commands.runOnce(() -> elevator.l2()),
+        Commands.waitUntil(elevator::isAtSetPoint),
+        Commands.runOnce(() -> score()));
+  }
+
   public SequentialCommandGroup score() {
     return new InstantCommand(() -> reeftake.coralIntake())
         .andThen(new WaitCommand(0.5))
-        .andThen(new InstantCommand(() -> elevator.stow()))
+        .andThen(new InstantCommand(() -> elevator.hp()))
         .andThen(new InstantCommand(() -> reeftake.coralStop()));
   }
 
   // Commands for auto modes
-  public SequentialCommandGroup scorel4() {
+  public SequentialCommandGroup autoScorel4() {
     return new InstantCommand(() -> elevator.l4())
      .andThen(new WaitCommand(4))
      .andThen(score());
