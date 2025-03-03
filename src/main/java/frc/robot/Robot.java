@@ -288,11 +288,11 @@ public class Robot extends TimedRobot {
   }
 
   // Commands for auto modes
-  public SequentialCommandGroup autoScorel4() {
-    return new InstantCommand(() -> elevator.l4())
-     .andThen(new WaitCommand(4))
-     .andThen(score());
-  }
+  // public SequentialCommandGroup autoScorel4() {
+  //   return new InstantCommand(() -> elevator.l4())
+  //    .andThen(new WaitCommand(4))
+  //    .andThen(score());
+  // }
   
 
   public AutoRoutine midl4() {
