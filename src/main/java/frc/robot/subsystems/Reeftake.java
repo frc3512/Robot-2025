@@ -25,8 +25,7 @@ public class Reeftake extends ProfiledPIDSubsystem {
       new ArmFeedforward(
           Constants.ReeftakeConstants.kS,
           Constants.ReeftakeConstants.kG,
-          Constants.ReeftakeConstants.kV,
-          Constants.ReeftakeConstants.kA);
+          Constants.ReeftakeConstants.kV);
 
   boolean shouldScoreCoral = false;
   boolean shouldIntakeCoral = false;
@@ -44,7 +43,6 @@ public class Reeftake extends ProfiledPIDSubsystem {
     reefAlgaePivotMotor.setNeutralMode(NeutralModeValue.Brake);
     intakeMotor.setNeutralMode(NeutralModeValue.Brake);
 
-    setGoal(Constants.ReeftakeConstants.retractPivot);
   }
 
   public void coralIntake() {
