@@ -7,24 +7,25 @@ import org.photonvision.PhotonCamera;
 
 public class Vision extends SubsystemBase {
 
-    // private static PhotonCamera photonCamera = new PhotonCamera(Constants.VisionConstants.leftCamera);
+  // private static PhotonCamera photonCamera = new
+  // PhotonCamera(Constants.VisionConstants.leftCamera);
 
-    private boolean targetVisible = false;
+  private boolean targetVisible = false;
 
-    private double targetYaw = 0;
-    private final double visionYawOffset = 0;
+  private double targetYaw = 0;
+  private final double visionYawOffset = 0;
 
-    public Vision() {
-        CameraServer.startAutomaticCapture();
+  public Vision() {
+    CameraServer.startAutomaticCapture();
 
-        PhotonCamera.setVersionCheckEnabled(false);
-    }
+    PhotonCamera.setVersionCheckEnabled(false);
+  }
 
-//   public static PhotonCamera returnCamera() {
+  //   public static PhotonCamera returnCamera() {
 
-//     return photonCamera;
+  //     return photonCamera;
 
-//   }
+  //   }
 
   public boolean isTargetVisible() {
 

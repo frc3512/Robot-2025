@@ -3,10 +3,6 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.cameraserver.CameraServer;
@@ -30,6 +26,10 @@ import frc.robot.subsystems.Groundtake;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Reeftake;
 import frc.robot.subsystems.Swerve;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 
 // import frc.robot.subsystems.Vision;
 
@@ -70,7 +70,7 @@ public class Robot extends TimedRobot {
 
     CameraServer.startAutomaticCapture();
 
-     m_visionThread =
+    m_visionThread =
         new Thread(
             () -> {
               // Get the UsbCamera from CameraServer
@@ -98,12 +98,11 @@ public class Robot extends TimedRobot {
                 Imgproc.line(mat, pt1, pt2, color, 3);
                 Imgproc.line(mat, pt3, pt4, color, 3);
                 outputStream.putFrame(mat);
-
               }
             });
 
-        m_visionThread.setDaemon(true);
-        m_visionThread.start();
+    m_visionThread.setDaemon(true);
+    m_visionThread.start();
 
     // Create Choreo
     autoFactory =
@@ -114,8 +113,7 @@ public class Robot extends TimedRobot {
             false,
             drivetrain);
 
-    autoFactory
-      .bind("Score l4", scorel4());
+    autoFactory.bind("Score l4", scorel4());
 
     autoChooser.addOption("Mid l4", midl4());
 
@@ -288,12 +286,12 @@ public class Robot extends TimedRobot {
   }
 
   // Commands for auto modes
+
   // public SequentialCommandGroup autoScorel4() {
   //   return new InstantCommand(() -> elevator.l4())
   //    .andThen(new WaitCommand(4))
   //    .andThen(score());
   // }
-  
 
   public AutoRoutine midl4() {
 

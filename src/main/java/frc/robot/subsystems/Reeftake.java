@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
@@ -42,7 +41,6 @@ public class Reeftake extends ProfiledPIDSubsystem {
 
     reefAlgaePivotMotor.setNeutralMode(NeutralModeValue.Brake);
     intakeMotor.setNeutralMode(NeutralModeValue.Brake);
-
   }
 
   public void coralIntake() {
@@ -76,7 +74,7 @@ public class Reeftake extends ProfiledPIDSubsystem {
   }
 
   public void prossecer() {
-    setGoal(3.0);
+    setGoal(0.8);
     enable();
   }
 
@@ -88,9 +86,10 @@ public class Reeftake extends ProfiledPIDSubsystem {
   }
 
   @Override
-  protected void useOutput(double output, State setpoint) {
+  protected void useOutput(double output, State setpoint) {   
     double angleRadians = getController().getSetpoint().position * 2.0 * Math.PI;
-    reefAlgaePivotMotor.setVoltage(output + feedforward.calculate(angleRadians, getController().getSetpoint().velocity));
+    reefAlgaePivotMotor.setVoltage(
+        output + feedforward.calculate(angleRadians, getController().getSetpoint().velocity));
   }
 
   @Override
@@ -102,12 +101,11 @@ public class Reeftake extends ProfiledPIDSubsystem {
   public void periodic() {
     super.periodic();
 
+    SmartDashboard.putNumber("Reeftake/Pivot Goal", getController().getSetpoint().position);
     SmartDashboard.putNumber(
-      "Reeftake/Pivot Goal", getController().getSetpoint().position);
+        "Reeftake/Reeftake Motor Position", reefAlgaePivotMotor.getPosition().getValueAsDouble());
     SmartDashboard.putNumber(
-      "Reeftake/Reeftake Motor Position", reefAlgaePivotMotor.getPosition().getValueAsDouble());
-    SmartDashboard.putNumber(
-      "Reeftake/Pivot Voltage", reefAlgaePivotMotor.getMotorVoltage().getValueAsDouble());
+        "Reeftake/Pivot Voltage", reefAlgaePivotMotor.getMotorVoltage().getValueAsDouble());
 
     SmartDashboard.putNumber(
       "Reeftake/Motor Temp", intakeMotor.getDeviceTemp().getValueAsDouble());
