@@ -2,7 +2,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
+
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -20,8 +21,8 @@ public class Reeftake extends ProfiledPIDSubsystem {
   public final DigitalInput coralIn =
       new DigitalInput(Constants.ReeftakeConstants.digitalInputChannel);
 
-  private final ElevatorFeedforward feedforward =
-      new ElevatorFeedforward(
+  private final ArmFeedforward feedforward =
+      new ArmFeedforward(
           Constants.ReeftakeConstants.kS,
           Constants.ReeftakeConstants.kG,
           Constants.ReeftakeConstants.kV);
@@ -76,7 +77,7 @@ public class Reeftake extends ProfiledPIDSubsystem {
   }
 
   public void prossecer() {
-    setGoal(0.8);
+    setGoal(Constants.ReeftakeConstants.prossecer);
     enable();
   }
 
@@ -89,8 +90,9 @@ public class Reeftake extends ProfiledPIDSubsystem {
 
   @Override
   protected void useOutput(double output, State setpoint) {
+    double angleRadians = getController().getSetpoint().position * 2.0 * Math.PI;
     reefAlgaePivotMotor.setVoltage(
-        output + feedforward.calculate(getController().getSetpoint().velocity));
+        output + feedforward.calculate(angleRadians, getController().getSetpoint().velocity));
   }
 
   @Override
