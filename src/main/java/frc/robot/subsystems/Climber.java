@@ -4,14 +4,19 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.command.ProfiledPIDSubsystem;
 import frc.robot.Constants;
+import frc.robot.Constants.ClimberConstants;
 
 @SuppressWarnings("unused")
 public class Climber extends ProfiledPIDSubsystem {
 
   private final TalonFX climbMotor1 = new TalonFX(Constants.ClimberConstants.climbMotor1ID);
+  
+  DigitalInput topLimitSwitch = new DigitalInput(3);
+  DigitalInput bottomLimitSwitch = new DigitalInput(2);
 
   private boolean canClimbUp = false;
   private boolean wantClimbUp = false;
@@ -29,10 +34,6 @@ public class Climber extends ProfiledPIDSubsystem {
     climbMotor1.setNeutralMode(NeutralModeValue.Brake);
   }
 
-  public Command setClimber(Double speed) {
-    return run(() -> climbMotor1.set(speed));
-  }
-
   @Override
   protected void useOutput(double output, State setpoint) {
     climbMotor1.setVoltage(output);
@@ -41,5 +42,17 @@ public class Climber extends ProfiledPIDSubsystem {
   @Override
   protected double getMeasurement() {
     return climbMotor1.getPosition().getValueAsDouble();
+  }
+
+  public void setClimber(double speed){
+    if (speed > 0) {
+      if(topLimitSwitch.get()) {
+        climbMotor1.set(0);
+      } else  if(bottomLimitSwitch.get()){
+          climbMotor1.set(0);
+      } else {
+          climbMotor1.set(speed);
+      }
+    }
   }
 }

@@ -203,11 +203,11 @@ public class Robot extends TimedRobot {
     // appendageJoystick.button(11).onTrue(new InstantCommand(() -> elevator.zeroMotor()));
 
     // Climber controls
-    appendageJoystick.button(1).onTrue(climber.setClimber(0.8));
-    appendageJoystick.button(1).onFalse(climber.setClimber(0.0));
+    appendageJoystick.button(1).onTrue(new InstantCommand(() ->  climber.setClimber(0.8)));
+    appendageJoystick.button(1).onFalse(new InstantCommand(() -> climber.setClimber(0.0)));
 
-    appendageJoystick.button(2).onTrue(climber.setClimber(-0.8));
-    appendageJoystick.button(2).onFalse(climber.setClimber(0.0));
+    appendageJoystick.button(2).onTrue(new InstantCommand(() -> climber.setClimber(-0.8)));
+    appendageJoystick.button(2).onFalse(new InstantCommand(() -> climber.setClimber(0.0)));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
