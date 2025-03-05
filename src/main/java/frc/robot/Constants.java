@@ -69,8 +69,8 @@ public class Constants {
         new TrapezoidProfile.Constraints(1, 1);
 
     public static final double extendPivot = 1.3;
-    public static final double prossecer = 0.5;
-    public static final double retractPivot = 0.0;
+    public static final double prossecer = 1.0;
+    public static final double retractPivot = 0.4;
   }
 
   public static class GroundtakeConstants {

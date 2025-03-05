@@ -45,14 +45,6 @@ public class Climber extends ProfiledPIDSubsystem {
   }
 
   public void setClimber(double speed){
-    if (speed > 0) {
-      if(topLimitSwitch.get()) {
-        climbMotor1.set(0);
-      } else  if(bottomLimitSwitch.get()){
-          climbMotor1.set(0);
-      } else {
-          climbMotor1.set(speed);
-      }
-    }
+      climbMotor1.set(speed);
   }
 }
