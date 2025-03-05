@@ -3,19 +3,8 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
-
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.CvSink;
-import edu.wpi.first.cscore.CvSource;
-import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -62,47 +51,10 @@ public class Robot extends TimedRobot {
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandJoystick appendageJoystick = new CommandJoystick(1);
 
-  // Camera
-  private final Thread m_visionThread;
-
   // Auton
   private final AutoFactory autoFactory;
 
   public Robot() {
-
-    CameraServer.startAutomaticCapture();
-
-     m_visionThread =
-        new Thread(
-            () -> {
-              // Get the UsbCamera from CameraServer
-              UsbCamera camera = CameraServer.startAutomaticCapture();
-              // Set the resolution
-              camera.setResolution(640, 480);
-
-              CvSink cvSink = CameraServer.getVideo();
-              CvSource outputStream = CameraServer.putVideo("Drive Cam", 640, 480);
-
-              Mat mat = new Mat();
-              Point pt1 = new Point(0, 60);
-              Point pt2 = new Point(400, 60);
-              Scalar color = new Scalar(28, 239, 84);
-
-              while (!Thread.interrupted()) {
-
-                if (cvSink.grabFrame(mat) == 0) {
-                  outputStream.notifyError(cvSink.getError());
-                  continue;
-                }
-
-                Imgproc.line(mat, pt1, pt2, color, 3);
-                outputStream.putFrame(mat);
-
-              }
-            });
-
-        m_visionThread.setDaemon(true);
-        m_visionThread.start();
 
     // Create Choreo
     autoFactory =
@@ -110,13 +62,10 @@ public class Robot extends TimedRobot {
             () -> drivetrain.getState().Pose,
             drivetrain::resetPose,
             drivetrain::followTrajectory,
-            false,
+            true,
             drivetrain);
 
-    autoFactory
-      .bind("Score l4", scorel4());
-
-    autoChooser.addOption("Mid l4", midl4());
+    autoChooser.addOption("Orbit Reef", orbitReef());
 
     // Controler Bindings
     drivetrain.setDefaultCommand(
@@ -147,13 +96,8 @@ public class Robot extends TimedRobot {
     controller.rightTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
 
     // Reeftake controls
-    appendageJoystick.button(10).onTrue(new InstantCommand(() -> reeftake.prossecer()));
-    appendageJoystick
-        .button(10)
-        .onFalse(
-            new InstantCommand(() -> reeftake.algaeOuttake())
-                .andThen(new InstantCommand(() -> reeftake.retractPivot()))
-                .andThen(new InstantCommand(() -> reeftake.coralStop())));
+    appendageJoystick.button(10).onTrue(new InstantCommand(() -> reeftake.algaeOuttake()));
+    appendageJoystick.button(10).onFalse(new InstantCommand(() -> reeftake.coralStop()));
 
     // Elevator controls
     appendageJoystick.button(6).onTrue(new InstantCommand(() -> elevator.l1()));
@@ -203,7 +147,7 @@ public class Robot extends TimedRobot {
     // appendageJoystick.button(11).onTrue(new InstantCommand(() -> elevator.zeroMotor()));
 
     // Climber controls
-    appendageJoystick.button(1).onTrue(new InstantCommand(() ->  climber.setClimber(0.8)));
+    appendageJoystick.button(1).onTrue(new InstantCommand(() -> climber.setClimber(0.8)));
     appendageJoystick.button(1).onFalse(new InstantCommand(() -> climber.setClimber(0.0)));
 
     appendageJoystick.button(2).onTrue(new InstantCommand(() -> climber.setClimber(-0.8)));
@@ -218,12 +162,15 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopInit() {
-    leds.runPattern(leds.red);
+  public void teleopInit() {}
+
+  @Override
+  public void disabledInit() {
+    
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledExit() {}
 
   @Override
   public void robotPeriodic() {
@@ -254,24 +201,47 @@ public class Robot extends TimedRobot {
   public SequentialCommandGroup score() {
     return new InstantCommand(() -> reeftake.coralIntake())
         .andThen(new WaitCommand(0.5))
-        .andThen(new InstantCommand(() -> elevator.hp()))
+        .andThen(new InstantCommand(() -> elevator.stow()))
         .andThen(new InstantCommand(() -> reeftake.coralStop()));
   }
 
-  // Commands for auto modes
+  public SequentialCommandGroup scorel2() {
+    return new InstantCommand(() -> elevator.l2())
+        .andThen(new WaitCommand(1))
+        .andThen(new InstantCommand(() -> reeftake.coralIntake()))
+        .andThen(new WaitCommand(0.75))
+        .andThen(
+            new InstantCommand(() -> reeftake.coralStop())
+                .andThen(new InstantCommand(() -> elevator.stow())));
+  }
+
+  public SequentialCommandGroup scorel3() {
+    return new InstantCommand(() -> elevator.l3())
+        .andThen(new WaitCommand(2))
+        .andThen(new InstantCommand(() -> reeftake.coralIntake()))
+        .andThen(new WaitCommand(0.75))
+        .andThen(
+            new InstantCommand(() -> reeftake.coralStop())
+                .andThen(new InstantCommand(() -> elevator.stow())));
+  }
+
   public SequentialCommandGroup scorel4() {
     return new InstantCommand(() -> elevator.l4())
-     .andThen(new WaitCommand(3.5))
-     .andThen(score());
+        .andThen(new WaitCommand(2.5))
+        .andThen(new InstantCommand(() -> reeftake.coralIntake()))
+        .andThen(new WaitCommand(0.75))
+        .andThen(
+            new InstantCommand(() -> reeftake.coralStop())
+                .andThen(new InstantCommand(() -> elevator.stow())));
   }
-  
 
-  public AutoRoutine midl4() {
+  public AutoRoutine orbitReef() {
 
-    AutoRoutine routine = autoFactory.newRoutine("Mid l4");
-    AutoTrajectory trajectory = routine.trajectory("Mid l4");
+    AutoRoutine routine = autoFactory.newRoutine("Orbit Reef");
+    AutoTrajectory trajectory = routine.trajectory("Orbit Reef");
 
     routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+
     return routine;
   }
 }
