@@ -11,25 +11,34 @@ import edu.wpi.first.math.util.Units;
 
 public class Constants {
   public static class ElevatorConstants {
-    public static final int elevatorMotorRtID = 13;
-    public static final int elevatorMotorLtID = 14;
+    public static final int frontMotorID = 13;
+    public static final int backMotorID = 14;
 
-    public static final double kP = 1.0;
+    public static final double kP = 0.1;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
+    public static final double kV = 0.15;
+    public static final double kG = 0.4;
+    public static final double kS = 0.0;
+    public static final double kA = 0.13;
 
-    public static final double tolerance = 0.002;
-
-    public static final double elevatorGearRatio = 11.0 / 50.0;
-    public static final double elevatorDrumRadiusMeters = 0.023;
+    public static final double tolerance = 0.0002;
 
     public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(7, 5);
+        new TrapezoidProfile.Constraints(20, 30);
+
+    public static final double stowPos = 1.0;
+    public static final double hpPos = 4.0;
+    public static final double l1Pos = 8.7;
+    public static final double l2Pos = 14.2;
+    public static final double l3Pos = 25.6;
+    public static final double l4Pos = 45.5;
+    public static final double a1Pos = 9.5;
+    public static final double a2Pos = 21.84;
   }
 
   public static class ClimberConstants {
-    public static final int climbMotor1ID = 10;
-    public static final int climbMotor2ID = 11;
+    public static final int climbMotor1ID = 11;
 
     public static final double kP = 1.0;
     public static final double kI = 0.0;
@@ -45,16 +54,21 @@ public class Constants {
     public static final int pivotMotorID = 17;
     public static final int intakeMotorID = 18;
 
-    public static final int digialInputChannel = 0;
+    public static final int digitalInputChannel = 0;
 
-    public static final double kP = 1.0;
+    public static final double kP = 1;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
-
+    public static final double kV = 0.05;
+    public static final double kG = 0.1;
+    public static final double kS = 0.0;
     public static final double tolerance = 0.002;
 
     public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(7, 5);
+        new TrapezoidProfile.Constraints(1, 1);
+
+    public static final double extendPivot = 1.3;
+    public static final double retractPivot = 0.0;
   }
 
   public static class GroundtakeConstants {
@@ -67,10 +81,10 @@ public class Constants {
     public static final double kI = 0.0;
     public static final double kD = 0.005;
 
-    public static final double tolerance = 0.005;
+    public static final double tolerance = 0.002;
 
     public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(5, 1);
+        new TrapezoidProfile.Constraints(5, 3);
   }
 
   public static class VisionConstants {

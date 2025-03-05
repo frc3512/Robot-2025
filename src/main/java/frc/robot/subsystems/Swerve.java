@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.DriveConstants.TunerSwerveDrivetrain;
 import java.util.function.Supplier;
 
+@SuppressWarnings("unused")
 public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
   private static final double kSimLoopPeriod = 0.005; // 5 ms
   private Notifier m_simNotifier = null;

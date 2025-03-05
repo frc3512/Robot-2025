@@ -1,121 +1,120 @@
-// package frc.robot.subsystems;
+package frc.robot.subsystems;
 
-// import com.ctre.phoenix6.controls.Follower;
-// import com.ctre.phoenix6.hardware.TalonFX;
-// import com.ctre.phoenix6.signals.NeutralModeValue;
-// import edu.wpi.first.math.controller.ProfiledPIDController;
-// import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-// import frc.lib.command.ProfiledPIDSubsystem;
-// import frc.lib.util.Utility;
-// import frc.robot.Constants;
+import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.lib.command.ProfiledPIDSubsystem;
+import frc.robot.Constants;
 
-// public class Elevator extends ProfiledPIDSubsystem {
-//   private final TalonFX elevatorMotorRt =
-//       new TalonFX(Constants.ElevatorConstants.elevatorMotorRtID);
-//   private final TalonFX elevatorMotorLt =
-//       new TalonFX(Constants.ElevatorConstants.elevatorMotorLtID);
+public class Elevator extends ProfiledPIDSubsystem {
 
-//   boolean bypassStop = false;
+  private final TalonFX frontMotor = new TalonFX(Constants.ElevatorConstants.frontMotorID);
+  private final TalonFX backMotor = new TalonFX(Constants.ElevatorConstants.backMotorID);
 
-//   public Elevator() {
-//     super(
-//         new ProfiledPIDController(
-//             Constants.ElevatorConstants.kP,
-//             Constants.ElevatorConstants.kI,
-//             Constants.ElevatorConstants.kD,
-//             Constants.ElevatorConstants.constraints));
-//     getController().setTolerance(Constants.ElevatorConstants.tolerance);
+  private final ElevatorFeedforward feedforward =
+      new ElevatorFeedforward(
+          Constants.ElevatorConstants.kS,
+          Constants.ElevatorConstants.kG,
+          Constants.ElevatorConstants.kV,
+          Constants.ElevatorConstants.kA);
 
-//     elevatorMotorLt.setControl(new Follower(elevatorMotorRt.getDeviceID(), false));
+  boolean bypassStop = false;
+  double goal = 0.0;
 
-//     elevatorMotorRt.setNeutralMode(NeutralModeValue.Brake);
-//     elevatorMotorLt.setNeutralMode(NeutralModeValue.Brake);
-//   }
+  public Elevator() {
+    super(
+        new ProfiledPIDController(
+            Constants.ElevatorConstants.kP,
+            Constants.ElevatorConstants.kI,
+            Constants.ElevatorConstants.kD,
+            Constants.ElevatorConstants.constraints));
+    getController().setTolerance(Constants.ElevatorConstants.tolerance);
 
-//   public void elevatorUp() {
-//     elevatorMotorLt.set(0.5);
-//     elevatorMotorRt.set(0.5);
-//   }
+    frontMotor.setNeutralMode(NeutralModeValue.Brake);
+    backMotor.setNeutralMode(NeutralModeValue.Brake);
 
-//   public void elevatorDown() {
-//     elevatorMotorLt.set(-0.5);
-//     elevatorMotorRt.set(-0.5);
-//   }
+    frontMotor.setPosition(0.000);
 
-//   public void elevatorStop() {
-//     elevatorMotorLt.set(0.0);
-//     elevatorMotorRt.set(0.0);
-//     disable();
-//   }
+    backMotor.setControl(new Follower(frontMotor.getDeviceID(), false));
 
-//   public void stow() {
-//     setElevatorGoal(0.0);
-//     enable();
-//   }
+    // Be sure to remove this function when usning manual control
+    enable();
+  }
 
-//   public void hp() {
-//     setElevatorGoal(0.2768);
-//     enable();
-//   }
+  public Command manualElevator(double speed) {
+    return run(
+        () -> {
+          frontMotor.set(speed);
+          backMotor.set(speed);
+        });
+  }
 
-//   public void l1() {
-//     setElevatorGoal(0.2895);
-//     enable();
-//   }
+  public void stow() {
+    setClampedGoal(Constants.ElevatorConstants.stowPos);
+  }
 
-//   public void l2() {
-//     setElevatorGoal(0.5752);
-//     enable();
-//   }
+  public void hp() {
+    setClampedGoal(Constants.ElevatorConstants.hpPos);
+  }
 
-//   public void l3() {
-//     setElevatorGoal(0.9499);
-//     enable();
-//   }
+  public void l1() {
+    setClampedGoal(Constants.ElevatorConstants.l1Pos);
+  }
 
-//   public void l4() {
-//     setElevatorGoal(1.5214);
-//     enable();
-//   }
+  public void l2() {
+    setClampedGoal(Constants.ElevatorConstants.l2Pos);
+  }
 
-//   public void a1() {
-//     setElevatorGoal(0.2895);
-//     enable();
-//   }
+  public void l3() {
+    setClampedGoal(Constants.ElevatorConstants.l3Pos);
+  }
 
-//   public void a2() {
-//     setElevatorGoal(0.7403);
-//     enable();
-//   }
+  public void l4() {
+    setClampedGoal(Constants.ElevatorConstants.l4Pos);
+  }
 
-//   public void setElevatorGoal(double targetGoalMeters) {
-//     setGoal(
-//         Utility.metersToRotations(
-//             targetGoalMeters,
-//             Constants.ElevatorConstants.elevatorDrumRadiusMeters,
-//             Constants.ElevatorConstants.elevatorGearRatio));
-//   }
+  public void a1() {
+    setClampedGoal(Constants.ElevatorConstants.a1Pos);
+  }
 
-//   @Override
-//   public void periodic() {
-//     super.periodic();
+  public void a2() {
+    setClampedGoal(Constants.ElevatorConstants.a2Pos);
+  }
 
-//     SmartDashboard.putNumber(
-//         "Elevator/ElevatorPos",
-//         Utility.rotationsToMeters(
-//             getMeasurement(),
-//             Constants.ElevatorConstants.elevatorDrumRadiusMeters,
-//             Constants.ElevatorConstants.elevatorGearRatio));
-//   }
+  public void zeroMotor() {
+    frontMotor.setPosition(0.000);
+  }
 
-//   @Override
-//   protected void useOutput(double output, State setpoint) {
-//     elevatorMotorRt.setVoltage(output);
-//   }
+  public void setClampedGoal(double goal) {
+    setGoal(MathUtil.clamp(goal, 0.5, 47));
+  }
 
-//   @Override
-//   protected double getMeasurement() {
-//     return elevatorMotorRt.getPosition().getValueAsDouble();
-//   }
-// }
+  @Override
+  public void periodic() {
+    super.periodic();
+
+    SmartDashboard.putNumber(
+        "Elevator/ElevatorFrontMotorEncoder", frontMotor.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber("Elevator/Elevator Goal", getController().getSetpoint().position);
+
+    SmartDashboard.putNumber(
+        "Elevator/Elevator Voltage", frontMotor.getMotorVoltage().getValueAsDouble());
+  }
+
+  @Override
+  protected void useOutput(double output, State setpoint) {
+    frontMotor.setVoltage(output + feedforward.calculate(getController().getSetpoint().velocity));
+    backMotor.setVoltage(output + feedforward.calculate(getController().getSetpoint().velocity));
+  }
+
+  @Override
+  protected double getMeasurement() {
+    return frontMotor.getPosition().getValueAsDouble();
+  }
+}
