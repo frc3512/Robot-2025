@@ -74,7 +74,7 @@ public class Reeftake extends ProfiledPIDSubsystem {
   }
 
   public void prossecer() {
-    setGoal(0.8);
+    setGoal(Constants.ReeftakeConstants.prossecer);
     enable();
   }
 

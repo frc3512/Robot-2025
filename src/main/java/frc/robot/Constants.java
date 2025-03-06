@@ -28,7 +28,7 @@ public class Constants {
         new TrapezoidProfile.Constraints(20, 30);
 
     public static final double stowPos = 1.0;
-    public static final double hpPos = 6.0;
+    public static final double hpPos = 5.0;
     public static final double l1Pos = 8.7;
     public static final double l2Pos = 14.2;
     public static final double l3Pos = 25.6;
@@ -59,16 +59,17 @@ public class Constants {
     public static final double kP = 1;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
-    public static final double kV = 0.05;
+    public static final double kV = 0.1;
     public static final double kG = 0.2;
     public static final double kS = 0.0;
 
     public static final double tolerance = 0.002;
 
     public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(1, 1);
+        new TrapezoidProfile.Constraints(7, 5);
 
-    public static final double extendPivot = 1.3;
+    public static final double extendPivot = 0.7;
+    public static final double prossecer = 0.6;
     public static final double retractPivot = 0.0;
   }
 

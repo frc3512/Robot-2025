@@ -26,6 +26,9 @@ import frc.robot.subsystems.Groundtake;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Reeftake;
 import frc.robot.subsystems.Swerve;
+
+import java.util.Queue;
+
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
@@ -113,9 +116,11 @@ public class Robot extends TimedRobot {
             false,
             drivetrain);
 
-    autoFactory.bind("Score l4", scorel4());
+    autoFactory
+        .bind("Score l4", scorel4());
 
-    autoChooser.addOption("Mid l4", midl4());
+    autoChooser
+        .addOption("Mid l4", midl4());
 
     // Controler Bindings
     drivetrain.setDefaultCommand(
@@ -257,27 +262,6 @@ public class Robot extends TimedRobot {
         .andThen(new InstantCommand(() -> elevator.stow()));
   }
 
-  public Command scorel4() {
-    return Commands.sequence(
-        Commands.runOnce(() -> elevator.l4()),
-        Commands.waitUntil(elevator::isAtSetPoint),
-        Commands.runOnce(() -> score()));
-  }
-
-  public Command scorel3() {
-    return Commands.sequence(
-        Commands.runOnce(() -> elevator.l3()),
-        Commands.waitUntil(elevator::isAtSetPoint),
-        Commands.runOnce(() -> score()));
-  }
-
-  public Command scorel2() {
-    return Commands.sequence(
-        Commands.runOnce(() -> elevator.l2()),
-        Commands.waitUntil(elevator::isAtSetPoint),
-        Commands.runOnce(() -> score()));
-  }
-
   public SequentialCommandGroup score() {
     return new InstantCommand(() -> reeftake.coralIntake())
         .andThen(new WaitCommand(0.5))
@@ -286,12 +270,11 @@ public class Robot extends TimedRobot {
   }
 
   // Commands for auto modes
-
-  // public SequentialCommandGroup autoScorel4() {
-  //   return new InstantCommand(() -> elevator.l4())
-  //    .andThen(new WaitCommand(4))
-  //    .andThen(score());
-  // }
+  public SequentialCommandGroup scorel4() {
+    return new InstantCommand(() -> elevator.l4())
+     .andThen(new WaitCommand(4))
+     .andThen(score());
+  }
 
   public AutoRoutine midl4() {
 
