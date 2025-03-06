@@ -43,7 +43,7 @@ public class Reeftake extends ProfiledPIDSubsystem {
     reefAlgaePivotMotor.setNeutralMode(NeutralModeValue.Brake);
     intakeMotor.setNeutralMode(NeutralModeValue.Brake);
 
-    setGoal(Constants.ReeftakeConstants.retractPivot);
+    enable();
   }
 
   public void coralIntake() {
@@ -68,12 +68,10 @@ public class Reeftake extends ProfiledPIDSubsystem {
 
   public void extendPivot() {
     setGoal(Constants.ReeftakeConstants.extendPivot);
-    enable();
   }
 
   public void retractPivot() {
     setGoal(Constants.ReeftakeConstants.retractPivot);
-    enable();
   }
 
   public void prossecer() {
@@ -104,10 +102,14 @@ public class Reeftake extends ProfiledPIDSubsystem {
   public void periodic() {
     super.periodic();
 
-    SmartDashboard.putNumber("Reeftake/Pivot Goal", getController().getSetpoint().position);
+    SmartDashboard.putNumber(
+      "Reeftake/Pivot Goal", getController().getSetpoint().position);
     SmartDashboard.putNumber(
         "Reeftake/Reeftake Motor Position", reefAlgaePivotMotor.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber(
+      "Reeftake/Motor Voltage", reefAlgaePivotMotor.getMotorVoltage().getValueAsDouble());
 
-    SmartDashboard.putNumber("Reeftake/Motor Temp", intakeMotor.getDeviceTemp().getValueAsDouble());
+    SmartDashboard.putNumber(
+      "Reeftake/Motor Temp", intakeMotor.getDeviceTemp().getValueAsDouble());
   }
 }

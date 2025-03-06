@@ -56,7 +56,7 @@ public class Constants {
 
     public static final int digitalInputChannel = 0;
 
-    public static final double kP = 1;
+    public static final double kP = .5;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double kV = 0.05;
@@ -66,10 +66,10 @@ public class Constants {
     public static final double tolerance = 0.002;
 
     public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(1, 1);
+        new TrapezoidProfile.Constraints(5, 3);
 
     public static final double extendPivot = 1.3;
-    public static final double prossecer = 1.0;
+    public static final double prossecer = 0.8;
     public static final double retractPivot = 0.4;
   }
 
