@@ -12,7 +12,6 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.*;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Swerve;
 
 public class DriveConstants {
@@ -28,18 +27,25 @@ public class DriveConstants {
           .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
 
   private static final Slot0Configs driveGains =
-      new Slot0Configs().withKP(0.2).withKI(0).withKD(0).withKS(0).withKV(0.125).withKA(0);
+      new Slot0Configs()
+            .withKP(0.2)
+            .withKI(0)
+            .withKD(0)
+            .withKS(0)
+            .withKV(0.125)
+            .withKA(0);
 
   private static final ClosedLoopOutputType kSteerClosedLoopOutput = ClosedLoopOutputType.Voltage;
   private static final ClosedLoopOutputType kDriveClosedLoopOutput = ClosedLoopOutputType.Voltage;
 
   private static final DriveMotorArrangement kDriveMotorType =
-      DriveMotorArrangement.TalonFX_Integrated;
+    DriveMotorArrangement.TalonFX_Integrated;
 
   private static final SteerMotorArrangement kSteerMotorType =
-      SteerMotorArrangement.TalonFX_Integrated;
+    SteerMotorArrangement.TalonFX_Integrated;
 
-  private static final SteerFeedbackType kSteerFeedbackType = SteerFeedbackType.FusedCANcoder;
+  private static final SteerFeedbackType kSteerFeedbackType = 
+    SteerFeedbackType.FusedCANcoder;
 
   private static final double kSlipCurrent = 80.0;
 
@@ -56,14 +62,8 @@ public class DriveConstants {
 
   public static final CANBus kCANBus = new CANBus("Drivetrain", "./logs/example.hoot");
 
-  private static final CommandXboxController controller = new CommandXboxController(0);
-
   public static double MaxSpeed = 5.2 * 0.80; // Drive velocity in meters per second
-  public static double MaxAngularRate = 3; // Controls how fast the robot quick turns
-
-  public static final double forward = -controller.getLeftY() * MaxSpeed; // Drives robot forward
-  public static final double strafe = -controller.getLeftX() * MaxSpeed; // Drives robot sideways
-  public static final double turn = -controller.getRightX() * MaxAngularRate; // Turns robot
+  public static double MaxAngularRate = 3.25; // Controls how fast the robot quick turns
 
   private static final double kCoupleRatio = 3.5714285714285716;
   private static final double kDriveGearRatio = 6.122448979591837;
@@ -215,16 +215,21 @@ public class DriveConstants {
               kBackRightEncoderInverted);
 
   public static Swerve createDrivetrain() {
-
     return new Swerve(DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight);
   }
 
   public static class TunerSwerveDrivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> {
 
     public TunerSwerveDrivetrain(
-        SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
+        SwerveDrivetrainConstants drivetrainConstants, 
+        SwerveModuleConstants<?, ?, ?>... modules) {
 
-      super(TalonFX::new, TalonFX::new, CANcoder::new, drivetrainConstants, modules);
+        super(
+            TalonFX::new,
+            TalonFX::new, 
+            CANcoder::new, 
+            drivetrainConstants, 
+            modules);
     }
 
     public TunerSwerveDrivetrain(

@@ -25,12 +25,12 @@ import frc.robot.subsystems.Groundtake;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Reeftake;
 import frc.robot.subsystems.Swerve;
+// import frc.robot.subsystems.Vision;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
-// import frc.robot.subsystems.Vision;
 
 public class Robot extends TimedRobot {
 
@@ -94,8 +94,8 @@ public class Robot extends TimedRobot {
                   continue;
                 }
 
-                Imgproc.line(mat, pt1, pt2, color, 3);
-                Imgproc.line(mat, pt3, pt4, color, 3);
+                Imgproc.line(mat, pt1, pt2, color, 2);
+                Imgproc.line(mat, pt3, pt4, color, 2);
                 outputStream.putFrame(mat);
               }
             });
