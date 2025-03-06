@@ -68,7 +68,7 @@ public class Constants {
     public static final TrapezoidProfile.Constraints constraints =
         new TrapezoidProfile.Constraints(7, 5);
 
-    public static final double extendPivot = 0.7;
+    public static final double extendPivot = 0.85;
     public static final double prossecer = 0.6;
     public static final double retractPivot = 0.0;
   }
