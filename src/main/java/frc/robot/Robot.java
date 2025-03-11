@@ -113,7 +113,8 @@ public class Robot extends TimedRobot {
             drivetrain);
 
     autoFactory
-        .bind("Score l4", scorel4());
+        .bind("Score l4", scorel4())
+        .bind("Intake", autoIntake());
 
     autoChooser
         .addOption("Mid l4", midl4());
@@ -176,11 +177,6 @@ public class Robot extends TimedRobot {
     appendageJoystick.button(3).onFalse(score());
     appendageJoystick.button(3).onFalse(leds.runPattern(leds.red));
 
-    // Auto Scoring, needs to be tested
-    // appendageJoystick.button(5).onTrue(scorel2());
-    // appendageJoystick.button(4).onTrue(scorel3());
-    // appendageJoystick.button(3).onTrue(scorel4());
-
     appendageJoystick.button(8).onTrue(a1());
     appendageJoystick.button(8).onFalse(rectractAlgae());
 
@@ -189,13 +185,7 @@ public class Robot extends TimedRobot {
 
     appendageJoystick.button(9).onTrue(new InstantCommand(() -> elevator.stow()));
 
-    appendageJoystick
-        .button(12)
-        .onTrue(
-            new InstantCommand(() -> elevator.hp())
-                .andThen(reeftake.reeftakeIntake())
-                .andThen(leds.runPattern(leds.scrollngRainbow))
-                .andThen(new InstantCommand(() -> elevator.stow())));
+    appendageJoystick.button(12).onTrue(autoIntake());
 
     // Manual control, COMMENT OUT WHEN NOT IN USE
     // DISABLE PID IN ELEVATOR CLASS!!!
@@ -223,14 +213,14 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    elevator.setClampedGoal(Constants.ElevatorConstants.stowPos);
+    reeftake.setGoal(Constants.ReeftakeConstants.retractPivot);
+    groundtake.setGoal(Constants.GroundtakeConstants.stowPos);
+  }
 
   @Override
-  public void disabledInit() {
-    elevator.stow();
-    reeftake.retractPivot();
-    groundtake.retractPivot();
-  }
+  public void disabledInit() {}
 
   @Override
   public void robotPeriodic() {
@@ -268,14 +258,30 @@ public class Robot extends TimedRobot {
   // Commands for auto modes
   public SequentialCommandGroup scorel4() {
     return new InstantCommand(() -> elevator.l4())
-     .andThen(new WaitCommand(4))
+     .andThen(new WaitCommand(1.5))
      .andThen(score());
   }
 
+  public SequentialCommandGroup autoIntake() {
+    return new InstantCommand(() -> elevator.hp())
+      .andThen(reeftake.reeftakeIntake())
+      .andThen(leds.runPattern(leds.scrollngRainbow));
+  }
+
+  // Auto paths
   public AutoRoutine midl4() {
 
     AutoRoutine routine = autoFactory.newRoutine("Mid l4");
     AutoTrajectory trajectory = routine.trajectory("Mid l4");
+
+    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+    return routine;
+  }
+
+  public AutoRoutine doublel4() {
+
+    AutoRoutine routine = autoFactory.newRoutine("Double l4");
+    AutoTrajectory trajectory = routine.trajectory("Double l4");
 
     routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
     return routine;

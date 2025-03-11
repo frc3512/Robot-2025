@@ -32,11 +32,11 @@ public class Groundtake extends ProfiledPIDSubsystem {
   }
 
   public void floorAlgaeIntake() {
-    floorAlgaeRollerMotor.set(0.65);
+    floorAlgaeRollerMotor.set(0.75);
   }
 
   public void keepAlgae() {
-    floorAlgaeRollerMotor.set(0.3);
+    floorAlgaeRollerMotor.set(0.65);
   }
 
   public void floorAlgaeOuttake() {
@@ -48,12 +48,12 @@ public class Groundtake extends ProfiledPIDSubsystem {
   }
 
   public void retractPivot() {
-    setGoal(0.297);
+    setGoal(Constants.GroundtakeConstants.stowPos);
     enable();
   }
 
   public void extendPivot() {
-    setGoal(0.115);
+    setGoal(Constants.GroundtakeConstants.extendPivot);
     enable();
   }
 

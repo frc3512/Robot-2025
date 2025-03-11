@@ -9,14 +9,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.command.ProfiledPIDSubsystem;
 import frc.robot.Constants;
 
-@SuppressWarnings("unused")
 public class Climber extends ProfiledPIDSubsystem {
 
   private final TalonFX climbMotor1 = new TalonFX(Constants.ClimberConstants.climbMotor1ID);
 
-  private boolean canClimbUp = false;
-  private boolean wantClimbUp = false;
-  private boolean shouldClimbUp = false;
+  public final DigitalInput climberBreak =
+      new DigitalInput(Constants.ClimberConstants.digitalInputChannel);
 
   public Climber() {
     super(
