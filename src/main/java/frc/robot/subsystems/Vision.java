@@ -1,14 +1,15 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+
 import org.photonvision.PhotonCamera;
 
 public class Vision extends SubsystemBase {
 
-  // private static PhotonCamera photonCamera = new
-  // PhotonCamera(Constants.VisionConstants.leftCamera);
+  private static PhotonCamera photonCamera = 
+      new PhotonCamera(Constants.VisionConstants.elevatorCam);
 
   private boolean targetVisible = false;
 
@@ -16,29 +17,22 @@ public class Vision extends SubsystemBase {
   private final double visionYawOffset = 0;
 
   public Vision() {
-    CameraServer.startAutomaticCapture();
-
     PhotonCamera.setVersionCheckEnabled(false);
   }
 
-  //   public static PhotonCamera returnCamera() {
-
-  //     return photonCamera;
-
-  //   }
+  public static PhotonCamera returnCamera() {
+    return photonCamera;
+  }
 
   public boolean isTargetVisible() {
-
     return targetVisible;
   }
 
   public double getTargetYaw() {
-
     return targetYaw;
   }
 
   public double getYawOffset() {
-
     return visionYawOffset;
   }
 
@@ -50,24 +44,24 @@ public class Vision extends SubsystemBase {
     targetVisible = false;
     targetYaw = 0.0;
 
-    // var results = photonCamera.getAllUnreadResults();
+    var results = photonCamera.getAllUnreadResults();
 
-    // if (!results.isEmpty()) {
+    if (!results.isEmpty()) {
 
-    //   var result = results.get(results.size() - 1);
+      var result = results.get(results.size() - 1);
 
-    //   if (result.hasTargets()) {
+      if (result.hasTargets()) {
 
-    //     for (var target : result.getTargets()) {
+        for (var target : result.getTargets()) {
 
-    //       if (target.getFiducialId() == 10 || target.getFiducialId() == 21) {
+          if (target.getFiducialId() == 18) {
 
-    //         targetYaw = target.getYaw();
+            targetYaw = target.getYaw();
 
-    //         targetVisible = true;
-    //       }
-    //     }
-    //   }
-    // }
+            targetVisible = true;
+          }
+        }
+      }
+    }
   }
 }

@@ -187,16 +187,6 @@ public class Robot extends TimedRobot {
 
     appendageJoystick.button(12).onTrue(autoIntake());
 
-    // Manual control, COMMENT OUT WHEN NOT IN USE
-    // DISABLE PID IN ELEVATOR CLASS!!!
-    // appendageJoystick.button(7).onTrue(elevator.manualElevator(0.2));
-    // appendageJoystick.button(7).onFalse(elevator.manualElevator(0.0));
-
-    // appendageJoystick.button(8).onTrue(elevator.manualElevator(-0.1));
-    // appendageJoystick.button(8).onFalse(elevator.manualElevator(0.0));
-
-    // appendageJoystick.button(11).onTrue(new InstantCommand(() -> elevator.zeroMotor()));
-
     // Climber controls
     appendageJoystick.button(1).onTrue(climber.setClimber(0.8));
     appendageJoystick.button(1).onFalse(climber.setClimber(0.0));
@@ -217,6 +207,7 @@ public class Robot extends TimedRobot {
     elevator.setClampedGoal(Constants.ElevatorConstants.stowPos);
     reeftake.setGoal(Constants.ReeftakeConstants.retractPivot);
     groundtake.setGoal(Constants.GroundtakeConstants.stowPos);
+    leds.runPattern(leds.red);
   }
 
   @Override
@@ -230,7 +221,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {}
 
-  // Make sequencial commands for the elevator here once reeftake pivot it made.
   public SequentialCommandGroup a1() {
     return new InstantCommand(() -> elevator.a1())
         .andThen(new InstantCommand(() -> reeftake.extendPivot()))
@@ -250,7 +240,7 @@ public class Robot extends TimedRobot {
 
   public SequentialCommandGroup score() {
     return new InstantCommand(() -> reeftake.coralIntake())
-        .andThen(new WaitCommand(0.5))
+        .andThen(new WaitCommand(0.75))
         .andThen(new InstantCommand(() -> elevator.hp()))
         .andThen(new InstantCommand(() -> reeftake.coralStop()));
   }

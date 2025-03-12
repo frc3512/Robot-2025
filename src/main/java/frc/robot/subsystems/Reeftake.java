@@ -101,13 +101,18 @@ public class Reeftake extends ProfiledPIDSubsystem {
   public void periodic() {
     super.periodic();
 
-    SmartDashboard.putNumber("Reeftake/Pivot Goal", getController().getSetpoint().position);
+    // Values for PID graphing
     SmartDashboard.putNumber(
-        "Reeftake/Reeftake Motor Position", reefAlgaePivotMotor.getPosition().getValueAsDouble());
+      "Reeftake/Pivot Goal", getController().getSetpoint().position);
     SmartDashboard.putNumber(
-        "Reeftake/Pivot Voltage", reefAlgaePivotMotor.getMotorVoltage().getValueAsDouble());
+      "Reeftake/Reeftake Motor Position", reefAlgaePivotMotor.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber(
+      "Reeftake/Pivot Voltage", reefAlgaePivotMotor.getMotorVoltage().getValueAsDouble());
 
+    // General Info 
     SmartDashboard.putNumber(
-      "Reeftake/Motor Temp", intakeMotor.getDeviceTemp().getValueAsDouble());
+      "Reeftake/Intake Motor Temp", intakeMotor.getDeviceTemp().getValueAsDouble());
+    SmartDashboard.putNumber(
+      "Reeftake/Pivot Motot Temp", reefAlgaePivotMotor.getDeviceTemp().getValueAsDouble());
   }
 }

@@ -18,13 +18,13 @@ public class DriveConstants {
 
   private static final Slot0Configs steerGains =
       new Slot0Configs()
-          .withKP(100)
-          .withKI(0)
-          .withKD(0.2)
-          .withKS(0)
-          .withKV(1.5)
-          .withKA(0)
-          .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
+            .withKP(100)
+            .withKI(0)
+            .withKD(0.2)
+            .withKS(0)
+            .withKV(1.5)
+            .withKA(0)
+            .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
 
   private static final Slot0Configs driveGains =
       new Slot0Configs()

@@ -17,12 +17,8 @@ public class Constants {
     public static final double kP = 0.75;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
-    public static final double kV = 0.15;
-    public static final double kG = 0.4;
-    public static final double kS = 0.0;
-    public static final double kA = 0.15;
 
-    public static final double tolerance = 0.0002;
+    public static final double tolerance = 0.002;
 
     public static final TrapezoidProfile.Constraints constraints =
         new TrapezoidProfile.Constraints(1000, 1000);
@@ -32,13 +28,13 @@ public class Constants {
     public static final double l1Pos = 8.7;
     public static final double l2Pos = 14.2;
     public static final double l3Pos = 26;
-    public static final double l4Pos = 45.5;
+    public static final double l4Pos = 46;
     public static final double a1Pos = 9.5;
     public static final double a2Pos = 21.84;
   }
 
   public static class ClimberConstants {
-    public static final int climbMotor1ID = 11;
+    public static final int climbMotorID = 11;
     public static final int digitalInputChannel = 1;
 
     public static final double kP = 1.0;
@@ -94,8 +90,8 @@ public class Constants {
   }
 
   public static class VisionConstants {
-    public static final String leftCamera = "Arducam OV9281 3512 left";
-    public static final String rightCamera = "Arducam OV9281 3512 right";
+    public static final String elevatorCam = "Arducam OV9281 3512 left";
+    public static final String climberCam = "Arducam OV9281 3512 right";
 
     public static final Transform3d robotToCam =
         new Transform3d(

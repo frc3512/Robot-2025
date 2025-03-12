@@ -16,14 +16,8 @@ public class Elevator extends ProfiledPIDSubsystem {
   private final TalonFX frontMotor = new TalonFX(Constants.ElevatorConstants.frontMotorID);
   private final TalonFX backMotor = new TalonFX(Constants.ElevatorConstants.backMotorID);
 
-  // private final ElevatorFeedforward feedforward =
-  //     new ElevatorFeedforward(
-  //         Constants.ElevatorConstants.kS,
-  //         Constants.ElevatorConstants.kG,
-  //         Constants.ElevatorConstants.kV,
-  //         Constants.ElevatorConstants.kA);
-
-  private double constantFeedforward = 0.5;
+  // Use only a gravity constant
+  private double gravity = 0.5;
 
   boolean bypassStop = false;
 
@@ -43,7 +37,6 @@ public class Elevator extends ProfiledPIDSubsystem {
 
     backMotor.setControl(new Follower(frontMotor.getDeviceID(), false));
 
-    // Be sure to remove this function when usning manual control
     enable();
   }
 
@@ -87,10 +80,6 @@ public class Elevator extends ProfiledPIDSubsystem {
     setClampedGoal(Constants.ElevatorConstants.a2Pos);
   }
 
-  public void zeroMotor() {
-    frontMotor.setPosition(0.000);
-  }
-
   public void setClampedGoal(double goal) {
     setGoal(MathUtil.clamp(goal, 0.5, 47));
   }
@@ -99,18 +88,26 @@ public class Elevator extends ProfiledPIDSubsystem {
   public void periodic() {
     super.periodic();
 
+    // Values for PID graphing
     SmartDashboard.putNumber(
-        "Elevator/ElevatorFrontMotorEncoder", frontMotor.getPosition().getValueAsDouble());
-    SmartDashboard.putNumber("Elevator/Elevator Goal", getController().getSetpoint().position);
+      "Elevator/ElevatorFrontMotorEncoder", frontMotor.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber(
+      "Elevator/Elevator Goal", getController().getSetpoint().position);
+    SmartDashboard.putNumber(
+      "Elevator/Elevator Voltage", frontMotor.getMotorVoltage().getValueAsDouble());
 
+    // General Info
     SmartDashboard.putNumber(
-        "Elevator/Elevator Voltage", frontMotor.getMotorVoltage().getValueAsDouble());
+      "Elevator/Front Motor Temp", frontMotor.getDeviceTemp().getValueAsDouble());
+    SmartDashboard.putNumber(
+      "Elevator/Back Motor Temp", backMotor.getDeviceTemp().getValueAsDouble());
+
   }
 
   @Override
   protected void useOutput(double output, State setpoint) {
-    frontMotor.setVoltage(output + constantFeedforward);//feedforward.calculate(getController().getSetpoint().velocity));
-    backMotor.setVoltage(output + constantFeedforward);//+ feedforward.calculate(getController().getSetpoint().velocity));
+    frontMotor.setVoltage(output + gravity);
+    backMotor.setVoltage(output + gravity);
   }
 
   @Override
