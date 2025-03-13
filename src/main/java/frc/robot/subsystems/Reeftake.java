@@ -8,7 +8,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.lib.command.ProfiledPIDSubsystem;
 import frc.robot.Constants;
 
@@ -19,6 +18,10 @@ public class Reeftake extends ProfiledPIDSubsystem {
 
   public final DigitalInput coralIn =
       new DigitalInput(Constants.ReeftakeConstants.digitalInputChannel);
+
+  public boolean getBeamBreak() {
+    return !coralIn.get();
+  }
 
   private final ArmFeedforward feedforward =
       new ArmFeedforward(
@@ -76,13 +79,6 @@ public class Reeftake extends ProfiledPIDSubsystem {
   public void prossecer() {
     setGoal(Constants.ReeftakeConstants.prossecer);
     enable();
-  }
-
-  public Command reeftakeIntake() {
-    return Commands.sequence(
-        Commands.runOnce(() -> intakeMotor.set(0.2)),
-        Commands.waitUntil(() -> !coralIn.get()),
-        Commands.runOnce(() -> intakeMotor.set(0.0)));
   }
 
   @Override

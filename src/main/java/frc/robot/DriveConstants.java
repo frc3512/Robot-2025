@@ -62,8 +62,10 @@ public class DriveConstants {
 
   public static final CANBus kCANBus = new CANBus("Drivetrain", "./logs/example.hoot");
 
-  public static double MaxSpeed = 5.2 * 0.80; // Drive velocity in meters per second
-  public static double MaxAngularRate = 3.25; // Controls how fast the robot quick turns
+  public static double maxSpeed = 5.2 * 0.80; // Drive velocity in meters per second
+  public static double maxAngularRate = 3.25; // Controls how fast the robot quick turns
+  public static double slowSpeed = 5.2 * 0.40; // Drive velocity for slow mode in meters per second
+  public static double slowAngularRate = 1.5; // Controls how fast the robot quick turns in slow mode
 
   private static final double kCoupleRatio = 3.5714285714285716;
   private static final double kDriveGearRatio = 6.122448979591837;
@@ -102,7 +104,7 @@ public class DriveConstants {
               .withSteerMotorClosedLoopOutput(kSteerClosedLoopOutput)
               .withDriveMotorClosedLoopOutput(kDriveClosedLoopOutput)
               .withSlipCurrent(kSlipCurrent)
-              .withSpeedAt12Volts(MaxSpeed)
+              .withSpeedAt12Volts(maxSpeed)
               .withDriveMotorType(kDriveMotorType)
               .withSteerMotorType(kSteerMotorType)
               .withFeedbackSource(kSteerFeedbackType)
