@@ -12,7 +12,6 @@ import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -122,7 +121,7 @@ public class Robot extends TimedRobot {
 
     autoFactory
         .bind("Score l4", scorel4())
-        .bind("Intake", coralIntake());
+        .bind("Intake", intake());
 
     autoChooser
         .addOption("Mid l4", midl4());
@@ -208,7 +207,7 @@ public class Robot extends TimedRobot {
         .onTrue(new InstantCommand(() -> elevator.stow()));
 
     appendageJoystick.button(12)
-        .onTrue(coralIntake());
+        .onTrue(intake());
 
     // Climber controls
     appendageJoystick.button(1)
@@ -236,6 +235,13 @@ public class Robot extends TimedRobot {
     elevator.setClampedGoal(Constants.ElevatorConstants.stowPos);
     reeftake.setGoal(Constants.ReeftakeConstants.retractPivot);
     groundtake.setGoal(Constants.GroundtakeConstants.stowPos);
+
+    drivetrain.applyRequest(
+                () ->
+                    drive
+                        .withVelocityX(-controller.getLeftY() * maxSpeed)
+                        .withVelocityY(-controller.getLeftX() * maxSpeed)
+                        .withRotationalRate(-controller.getRightX() * maxAngularRate));
   }
 
   @Override
@@ -271,50 +277,21 @@ public class Robot extends TimedRobot {
   public SequentialCommandGroup score() {
     return new InstantCommand(() -> reeftake.coralIntake())
         .andThen(new WaitCommand(0.75))
-        .andThen(leds.runPattern(leds.red))
         .andThen(new InstantCommand(() -> elevator.hp()))
         .andThen(new InstantCommand(() -> reeftake.coralStop()));
   }
 
-  public Command coralIntake() {
-    return Commands.sequence(
-        Commands.runOnce(() -> elevator.hp()),
-        Commands.runOnce(() -> reeftake.runCoralIntake(0.2)),
-        Commands.waitUntil(() -> reeftake.getBeamBreak()),
-        Commands.runOnce(() -> reeftake.runCoralIntake(0.0)),
-        Commands.runOnce(() -> leds.runPattern(leds.scrollngRainbow))
-    );
+  public SequentialCommandGroup intake() {
+    return new InstantCommand(() -> elevator.hp())
+        .andThen(reeftake.autoIntake())
+        .andThen(leds.runPattern(leds.scrollngRainbow));
   }
 
-  public Command scorel4() {
-    return Commands.sequence(
-      Commands.runOnce(() -> elevator.l4()),
-      Commands.waitUntil(() -> elevator.isAtSetPoint()),
-      Commands.runOnce(() -> score())
-    );
+  public SequentialCommandGroup scorel4() {
+    return new InstantCommand(() -> elevator.l4())
+     .andThen(new WaitCommand(1.5))
+     .andThen(score());
   }
-
-  public Command scorel3() {
-    return Commands.sequence(
-      Commands.runOnce(() -> elevator.l3()),
-      Commands.waitUntil(() -> elevator.isAtSetPoint()),
-      Commands.runOnce(() -> score())
-    );
-  }
-
-  public Command scorel2() {
-    return Commands.sequence(
-      Commands.runOnce(() -> elevator.l2()),
-      Commands.waitUntil(() -> elevator.isAtSetPoint()),
-      Commands.runOnce(() -> score())
-    );
-  }
-
-  // public SequentialCommandGroup scorel4() {
-  //   return new InstantCommand(() -> elevator.l4())
-  //    .andThen(new WaitCommand(1.5))
-  //    .andThen(score());
-  // }
 
   // Auto paths
   public AutoRoutine midl4() {

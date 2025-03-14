@@ -84,19 +84,6 @@ public class Elevator extends ProfiledPIDSubsystem {
     setGoal(MathUtil.clamp(goal, 0.5, 47));
   }
 
-  public boolean isAtSetPoint() {
-    return (getElevatorPosition() > (getSetpoint() - Constants.ElevatorConstants.tolerance)) &&
-        (getElevatorPosition() < (getSetpoint() + Constants.ElevatorConstants.tolerance));
-  }
-
-  public double getElevatorPosition() {
-    return frontMotor.getPosition().getValueAsDouble();
-  }
-
-  public double getSetpoint() {
-    return getController().getSetpoint().position;
-  }
-
   @Override
   public void periodic() {
     super.periodic();

@@ -19,6 +19,7 @@ public class Constants {
     public static final double kD = 0.0;
 
     public static final double tolerance = 0.002;
+    public static final double scoringTolerance = 0.1;
 
     public static final TrapezoidProfile.Constraints constraints =
         new TrapezoidProfile.Constraints(1000, 1000);
