@@ -236,12 +236,13 @@ public class Robot extends TimedRobot {
     reeftake.setGoal(Constants.ReeftakeConstants.retractPivot);
     groundtake.setGoal(Constants.GroundtakeConstants.stowPos);
 
-    drivetrain.applyRequest(
-                () ->
-                    drive
-                        .withVelocityX(-controller.getLeftY() * maxSpeed)
-                        .withVelocityY(-controller.getLeftX() * maxSpeed)
-                        .withRotationalRate(-controller.getRightX() * maxAngularRate));
+    drivetrain.setDefaultCommand(
+        drivetrain.applyRequest(
+                    () ->
+                        drive
+                            .withVelocityX(-controller.getLeftY() * maxSpeed)
+                            .withVelocityY(-controller.getLeftX() * maxSpeed)
+                            .withRotationalRate(-controller.getRightX() * maxAngularRate)));
   }
 
   @Override
@@ -249,9 +250,19 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    CommandScheduler
-        .getInstance()
-        .run();
+    vision.getPose();
+
+    var visionEst = vision.getEstimatedGlobalPose();
+    visionEst.ifPresent(
+            est -> {
+                // Change our trust in the measurement based on the tags we can see
+                var estStdDevs = vision.getEstimationStdDevs();
+
+                drivetrain.addVisionMeasurement(
+                        est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+            });
+
+    CommandScheduler.getInstance().run();
   }
 
   @Override
@@ -298,15 +309,6 @@ public class Robot extends TimedRobot {
 
     AutoRoutine routine = autoFactory.newRoutine("Mid l4");
     AutoTrajectory trajectory = routine.trajectory("Mid l4");
-
-    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
-    return routine;
-  }
-
-  public AutoRoutine doublel4() {
-
-    AutoRoutine routine = autoFactory.newRoutine("Double l4");
-    AutoTrajectory trajectory = routine.trajectory("Double l4");
 
     routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
     return routine;

@@ -15,13 +15,19 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.DriveConstants.TunerSwerveDrivetrain;
+
+import java.lang.reflect.Field;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
+  private final Field2d robotView = new Field2d();
+
   private static final double kSimLoopPeriod = 0.005; // 5 ms
   private Notifier m_simNotifier = null;
   private double m_lastSimTime;
@@ -32,8 +38,13 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
 
   public Swerve(
       SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
+
     super(drivetrainConstants, modules);
+
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+    SmartDashboard.putData("Position", robotView);
+
     if (Utils.isSimulation()) {
       startSimThread();
     }
@@ -43,8 +54,13 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
       SwerveDrivetrainConstants drivetrainConstants,
       double odometryUpdateFrequency,
       SwerveModuleConstants<?, ?, ?>... modules) {
+
     super(drivetrainConstants, odometryUpdateFrequency, modules);
+
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
+    
+    SmartDashboard.putData("Position", robotView);
+
     if (Utils.isSimulation()) {
       startSimThread();
     }
@@ -56,13 +72,18 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
       Matrix<N3, N1> odometryStandardDeviation,
       Matrix<N3, N1> visionStandardDeviation,
       SwerveModuleConstants<?, ?, ?>... modules) {
+
     super(
         drivetrainConstants,
         odometryUpdateFrequency,
         odometryStandardDeviation,
         visionStandardDeviation,
         modules);
+
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+    SmartDashboard.putData("Position", robotView);
+
     if (Utils.isSimulation()) {
       startSimThread();
     }
@@ -178,6 +199,8 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
       DogLog.log(
           "Swerve/Modules/" + moduleNames[i] + "/TurnTemperature",
           getModule(i).getSteerMotor().getDeviceTemp().getValueAsDouble());
+
+      robotView.setRobotPose(getState().Pose);
     }
   }
 
