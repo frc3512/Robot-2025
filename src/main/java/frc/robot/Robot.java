@@ -12,6 +12,7 @@ import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -258,6 +259,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {}
+
+  public Command autoAim(Pose2d targetPose) {
+    return Commands.sequence(drivetrain.resetAutoAimPID());
+  }
 
   public SequentialCommandGroup a1() {
     return new InstantCommand(() -> elevator.a1())

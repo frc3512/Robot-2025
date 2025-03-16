@@ -8,15 +8,19 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.Constants;
 import frc.robot.DriveConstants.TunerSwerveDrivetrain;
 import java.util.function.Supplier;
 
@@ -30,10 +34,43 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
   private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
   private boolean m_hasAppliedOperatorPerspective = false;
 
+  // Choreo
+  private final PIDController choreoXController =
+      new PIDController(
+          Constants.AutoConstants.xP, Constants.AutoConstants.xI, Constants.AutoConstants.xD);
+  private final PIDController choreoYController =
+      new PIDController(
+          Constants.AutoConstants.yP, Constants.AutoConstants.xI, Constants.AutoConstants.xD);
+  private final PIDController choreoThetaController =
+      new PIDController(
+          Constants.AutoConstants.thetaP,
+          Constants.AutoConstants.thetaI,
+          Constants.AutoConstants.thetaD);
+
+  // Aiming
+  private final ProfiledPIDController aimXController =
+      new ProfiledPIDController(
+          Constants.AimingConstants.xP,
+          Constants.AimingConstants.xI,
+          Constants.AimingConstants.xD,
+          Constants.AimingConstants.aimingTranslationConstraints);
+  private final ProfiledPIDController aimYController =
+      new ProfiledPIDController(
+          Constants.AimingConstants.yP,
+          Constants.AimingConstants.xI,
+          Constants.AimingConstants.xD,
+          Constants.AimingConstants.aimingTranslationConstraints);
+  private final ProfiledPIDController aimThetaController =
+      new ProfiledPIDController(
+          Constants.AimingConstants.thetaP,
+          Constants.AimingConstants.thetaI,
+          Constants.AimingConstants.thetaD,
+          Constants.AimingConstants.aimingRotationConstraints);
+
   public Swerve(
       SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
     super(drivetrainConstants, modules);
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+    choreoThetaController.enableContinuousInput(-Math.PI, Math.PI);
     if (Utils.isSimulation()) {
       startSimThread();
     }
@@ -44,7 +81,12 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
       double odometryUpdateFrequency,
       SwerveModuleConstants<?, ?, ?>... modules) {
     super(drivetrainConstants, odometryUpdateFrequency, modules);
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+    aimXController.setTolerance(Units.inchesToMeters(0.5), Units.inchesToMeters(0.125));
+    aimYController.setTolerance(Units.inchesToMeters(0.5), Units.inchesToMeters(0.125));
+    aimThetaController.setTolerance(Units.degreesToRadians(2.0), Units.degreesToRadians(1));
+
+    choreoThetaController.enableContinuousInput(-Math.PI, Math.PI);
+    aimThetaController.enableContinuousInput(-Math.PI, Math.PI);
     if (Utils.isSimulation()) {
       startSimThread();
     }
@@ -62,27 +104,26 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
         odometryStandardDeviation,
         visionStandardDeviation,
         modules);
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+    aimXController.setTolerance(Units.inchesToMeters(0.5));
+    aimYController.setTolerance(Units.inchesToMeters(0.5));
+    aimThetaController.setTolerance(Units.degreesToRadians(2.0));
+
+    choreoThetaController.enableContinuousInput(-Math.PI, Math.PI);
+    aimThetaController.enableContinuousInput(-Math.PI, Math.PI);
     if (Utils.isSimulation()) {
       startSimThread();
     }
   }
 
-  // Choreo Stuff
-  private final PIDController xController = new PIDController(10, 0.0, 0.0);
-  private final PIDController yController = new PIDController(10, 0.0, 0.0);
-  private final PIDController thetaController = new PIDController(7.5, 0.0, 0.0);
-
   public void followTrajectory(SwerveSample sample) {
-
     Pose2d pose = getState().Pose;
 
     ChassisSpeeds speeds =
         new ChassisSpeeds(
-            sample.vx + xController.calculate(pose.getX(), sample.x),
-            sample.vy + yController.calculate(pose.getY(), sample.y),
+            sample.vx + choreoXController.calculate(pose.getX(), sample.x),
+            sample.vy + choreoYController.calculate(pose.getY(), sample.y),
             sample.omega
-                + thetaController.calculate(pose.getRotation().getRadians(), sample.heading));
+                + choreoThetaController.calculate(pose.getRotation().getRadians(), sample.heading));
 
     this.setControl(
         new SwerveRequest.FieldCentric()
@@ -96,37 +137,47 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
   }
 
   public void applyRequest(SwerveRequest request) {
-
     this.setControl(request);
+  }
+
+  public Command resetAutoAimPID() {
+    return Commands.runOnce(
+        () -> {
+          aimXController.reset(getState().Pose.getX());
+          aimYController.reset(getState().Pose.getY());
+          aimThetaController.reset(getState().Pose.getRotation().getRadians());
+        });
+  }
+
+  public void controlPosition(Pose2d targetPose) {
+    double x = aimXController.calculate(getState().Pose.getX(), targetPose.getX());
+    double y = aimYController.calculate(getState().Pose.getY(), targetPose.getY());
+    double rot =
+        aimThetaController.calculate(
+            getState().Pose.getRotation().getRadians(), targetPose.getRotation().getRadians());
+
+    ChassisSpeeds speeds =
+        ChassisSpeeds.fromFieldRelativeSpeeds(x, y, rot, getState().Pose.getRotation());
+    this.setControl(
+        new SwerveRequest.FieldCentric()
+            .withVelocityX(speeds.vxMetersPerSecond)
+            .withVelocityY(speeds.vyMetersPerSecond)
+            .withRotationalRate(speeds.omegaRadiansPerSecond));
+  }
+
+  public Command goToPose(Supplier<Pose2d> target) {
+    return this.run(() -> controlPosition(target.get()))
+        .until(
+            () -> {
+              return aimXController.atSetpoint()
+                  && aimYController.atSetpoint()
+                  && aimThetaController.atSetpoint();
+            })
+        .andThen(Commands.runOnce(() -> this.applyRequest(new SwerveRequest.RobotCentric())));
   }
 
   @Override
   public void periodic() {
-
-    // if ((!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) &&
-    // DriverStation.isTeleopEnabled()) {
-    //   DriverStation.getAlliance()
-    //       .ifPresent(
-    //           allianceColor -> {
-    //             setOperatorPerspectiveForward(
-    //                 allianceColor == Alliance.Red
-    //                     ? kRedAlliancePerspectiveRotation
-    //                     : kBlueAlliancePerspectiveRotation);
-    //             m_hasAppliedOperatorPerspective = true;
-    //           });
-
-    // if(DriverStation.isAutonomousEnabled()){
-    //   DriverStation.getAlliance()
-    //   .ifPresent(
-    //     allianceColor -> {
-
-    //       setOperatorPerspectiveForward(kBlueAlliancePerspectiveRotation);
-    //         m_hasAppliedOperatorPerspective=false;
-    //     });
-    // }
-
-    // }
-
     // Log General Swerve Information
     DogLog.log("Swerve/ModuleStates", getState().ModuleStates);
     DogLog.log("Swerve/ModuleStateSetpoints", getState().ModuleTargets);
