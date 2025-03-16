@@ -12,8 +12,7 @@ import frc.robot.Constants;
 
 public class Climber extends ProfiledPIDSubsystem {
 
-  private final TalonFX climbMotor = 
-      new TalonFX(Constants.ClimberConstants.climbMotorID);
+  private final TalonFX climbMotor = new TalonFX(Constants.ClimberConstants.climbMotorID);
 
   public final DigitalInput climberBreak =
       new DigitalInput(Constants.ClimberConstants.digitalInputChannel);
@@ -37,7 +36,7 @@ public class Climber extends ProfiledPIDSubsystem {
   public void periodic() {
     // General Info
     SmartDashboard.putNumber(
-      "Climber/Climber Motor Temp", climbMotor.getDeviceTemp().getValueAsDouble());
+        "Climber/Climber Motor Temp", climbMotor.getDeviceTemp().getValueAsDouble());
   }
 
   @Override

@@ -82,12 +82,11 @@ public class Reeftake extends ProfiledPIDSubsystem {
     return Commands.sequence(
         Commands.runOnce(() -> coralIntake()),
         Commands.waitUntil(() -> !coralIn.get()),
-        Commands.runOnce(() -> coralStop())
-    );
+        Commands.runOnce(() -> coralStop()));
   }
 
   @Override
-  protected void useOutput(double output, State setpoint) {   
+  protected void useOutput(double output, State setpoint) {
     double angleRadians = getController().getSetpoint().position * 2.0 * Math.PI;
     reefAlgaePivotMotor.setVoltage(
         output + feedforward.calculate(angleRadians, getController().getSetpoint().velocity));
@@ -103,17 +102,16 @@ public class Reeftake extends ProfiledPIDSubsystem {
     super.periodic();
 
     // Values for PID graphing
+    SmartDashboard.putNumber("Reeftake/Pivot Goal", getController().getSetpoint().position);
     SmartDashboard.putNumber(
-      "Reeftake/Pivot Goal", getController().getSetpoint().position);
+        "Reeftake/Reeftake Motor Position", reefAlgaePivotMotor.getPosition().getValueAsDouble());
     SmartDashboard.putNumber(
-      "Reeftake/Reeftake Motor Position", reefAlgaePivotMotor.getPosition().getValueAsDouble());
-    SmartDashboard.putNumber(
-      "Reeftake/Pivot Voltage", reefAlgaePivotMotor.getMotorVoltage().getValueAsDouble());
+        "Reeftake/Pivot Voltage", reefAlgaePivotMotor.getMotorVoltage().getValueAsDouble());
 
-    // General Info 
+    // General Info
     SmartDashboard.putNumber(
-      "Reeftake/Intake Motor Temp", intakeMotor.getDeviceTemp().getValueAsDouble());
+        "Reeftake/Intake Motor Temp", intakeMotor.getDeviceTemp().getValueAsDouble());
     SmartDashboard.putNumber(
-      "Reeftake/Pivot Motot Temp", reefAlgaePivotMotor.getDeviceTemp().getValueAsDouble());
+        "Reeftake/Pivot Motot Temp", reefAlgaePivotMotor.getDeviceTemp().getValueAsDouble());
   }
 }

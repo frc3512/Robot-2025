@@ -62,18 +62,17 @@ public class Groundtake extends ProfiledPIDSubsystem {
     super.periodic();
 
     // Values for PID graphing
+    SmartDashboard.putNumber("Groundtake/Pos", getMeasurement());
     SmartDashboard.putNumber(
-      "Groundtake/Pos", getMeasurement());
-    SmartDashboard.putNumber(
-      "Groundtake/MotorPos", floorAlgaePivotMotor.getRotorPosition().getValueAsDouble());
-    SmartDashboard.putNumber(
-      "Groundtake/Goal", getController().getGoal().position);
+        "Groundtake/MotorPos", floorAlgaePivotMotor.getRotorPosition().getValueAsDouble());
+    SmartDashboard.putNumber("Groundtake/Goal", getController().getGoal().position);
 
     // General Info
     SmartDashboard.putNumber(
-      "Groundtake/Grountake Pivot Temp", floorAlgaePivotMotor.getDeviceTemp().getValueAsDouble());
+        "Groundtake/Grountake Pivot Temp", floorAlgaePivotMotor.getDeviceTemp().getValueAsDouble());
     SmartDashboard.putNumber(
-      "Groundtake/Grountake Roller Temp", floorAlgaeRollerMotor.getDeviceTemp().getValueAsDouble());
+        "Groundtake/Grountake Roller Temp",
+        floorAlgaeRollerMotor.getDeviceTemp().getValueAsDouble());
   }
 
   @Override

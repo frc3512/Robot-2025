@@ -18,34 +18,27 @@ public class DriveConstants {
 
   private static final Slot0Configs steerGains =
       new Slot0Configs()
-            .withKP(100)
-            .withKI(0)
-            .withKD(0.2)
-            .withKS(0)
-            .withKV(1.5)
-            .withKA(0)
-            .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
+          .withKP(100)
+          .withKI(0)
+          .withKD(0.2)
+          .withKS(0)
+          .withKV(1.5)
+          .withKA(0)
+          .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
 
   private static final Slot0Configs driveGains =
-      new Slot0Configs()
-            .withKP(0.2)
-            .withKI(0)
-            .withKD(0)
-            .withKS(0)
-            .withKV(0.125)
-            .withKA(0);
+      new Slot0Configs().withKP(0.2).withKI(0).withKD(0).withKS(0).withKV(0.125).withKA(0);
 
   private static final ClosedLoopOutputType kSteerClosedLoopOutput = ClosedLoopOutputType.Voltage;
   private static final ClosedLoopOutputType kDriveClosedLoopOutput = ClosedLoopOutputType.Voltage;
 
   private static final DriveMotorArrangement kDriveMotorType =
-    DriveMotorArrangement.TalonFX_Integrated;
+      DriveMotorArrangement.TalonFX_Integrated;
 
   private static final SteerMotorArrangement kSteerMotorType =
-    SteerMotorArrangement.TalonFX_Integrated;
+      SteerMotorArrangement.TalonFX_Integrated;
 
-  private static final SteerFeedbackType kSteerFeedbackType = 
-    SteerFeedbackType.FusedCANcoder;
+  private static final SteerFeedbackType kSteerFeedbackType = SteerFeedbackType.FusedCANcoder;
 
   private static final double kSlipCurrent = 80.0;
 
@@ -65,7 +58,8 @@ public class DriveConstants {
   public static double maxSpeed = 5.2 * 0.80; // Drive velocity in meters per second
   public static double maxAngularRate = 3.25; // Controls how fast the robot quick turns
   public static double slowSpeed = 5.2 * 0.40; // Drive velocity for slow mode in meters per second
-  public static double slowAngularRate = 1.5; // Controls how fast the robot quick turns in slow mode
+  public static double slowAngularRate =
+      1.5; // Controls how fast the robot quick turns in slow mode
 
   private static final double kCoupleRatio = 3.5714285714285716;
   private static final double kDriveGearRatio = 6.122448979591837;
@@ -223,15 +217,9 @@ public class DriveConstants {
   public static class TunerSwerveDrivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> {
 
     public TunerSwerveDrivetrain(
-        SwerveDrivetrainConstants drivetrainConstants, 
-        SwerveModuleConstants<?, ?, ?>... modules) {
+        SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
 
-        super(
-            TalonFX::new,
-            TalonFX::new, 
-            CANcoder::new, 
-            drivetrainConstants, 
-            modules);
+      super(TalonFX::new, TalonFX::new, CANcoder::new, drivetrainConstants, modules);
     }
 
     public TunerSwerveDrivetrain(

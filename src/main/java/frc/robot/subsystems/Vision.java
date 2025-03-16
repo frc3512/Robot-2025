@@ -3,12 +3,11 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-
 import org.photonvision.PhotonCamera;
 
 public class Vision extends SubsystemBase {
 
-  private static PhotonCamera photonCamera = 
+  private static PhotonCamera photonCamera =
       new PhotonCamera(Constants.VisionConstants.elevatorCam);
 
   private boolean targetVisible = false;
