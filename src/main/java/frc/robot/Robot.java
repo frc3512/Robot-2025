@@ -231,9 +231,29 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {}
 
+  public void poseEstimation() {
+    var visionEstElevator = vision.getEstimatedGlobalPose(vision.getElevatorCamera());
+    var visionEstClimber = vision.getEstimatedGlobalPose(vision.getClimberCamera());
+
+    visionEstElevator.ifPresent(
+        est -> {
+          var estStdDevs = vision.getEstimationStdDevs();
+          drivetrain.addVisionMeasurement(
+              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+        });
+
+    visionEstClimber.ifPresent(
+        est -> {
+          var estStdDevs = vision.getEstimationStdDevs();
+          drivetrain.addVisionMeasurement(
+              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+        });
+  }
+
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    poseEstimation();
   }
 
   @Override

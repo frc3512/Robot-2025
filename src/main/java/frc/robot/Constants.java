@@ -1,5 +1,7 @@
 package frc.robot;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -94,6 +96,9 @@ public class Constants {
     public static final String elevatorCam = "Arducam OV9281 3512 left";
     public static final String climberCam = "Arducam OV9281 3512 right";
 
+    public static final AprilTagFieldLayout tagLayout =
+        AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+
     public static final Transform3d robotToCam =
         new Transform3d(
             Units.inchesToMeters(-11.0),
@@ -102,8 +107,8 @@ public class Constants {
             new Rotation3d(0.0, Units.degreesToRadians(105.0), Units.degreesToRadians(180.0)));
     public static final Transform3d camToRobot = robotToCam.inverse();
 
-    public static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(0.9, 0.9, 0.9);
-    public static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.9, 0.9, 0.9);
+    public static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(1, 1, 2);
+    public static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.2, 0.2, 0.2);
 
     public static final double visionTurnP = 1; // TUNE THIS VALUE
   }
