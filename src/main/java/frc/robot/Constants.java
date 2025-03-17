@@ -97,7 +97,7 @@ public class Constants {
     public static final String climberCam = "Arducam OV9281 3512 right";
 
     public static final AprilTagFieldLayout tagLayout =
-        AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+        AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
     public static final Transform3d robotToCam =
         new Transform3d(
