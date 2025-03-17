@@ -65,12 +65,10 @@ public class Reeftake extends ProfiledPIDSubsystem {
 
   public void extendPivot() {
     setGoal(Constants.ReeftakeConstants.extendPivot);
-    enable();
   }
 
   public void retractPivot() {
     setGoal(Constants.ReeftakeConstants.retractPivot);
-    enable();
   }
 
   public void prossecer() {

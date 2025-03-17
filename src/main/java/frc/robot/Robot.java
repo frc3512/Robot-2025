@@ -165,6 +165,21 @@ public class Robot extends TimedRobot {
 
     // Bindings for the button box
 
+    // Intake control for Groundtake
+    controller
+        .leftTrigger()
+        .onTrue(
+            new InstantCommand(() -> groundtake.extendPivot())
+                .andThen(new InstantCommand(() -> groundtake.floorAlgaeIntake())));
+    controller
+        .leftTrigger()
+        .onFalse(
+            new InstantCommand(() -> groundtake.retractPivot())
+                .andThen(new InstantCommand(() -> groundtake.keepAlgae())));
+
+    controller.rightTrigger().onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()));
+    controller.rightTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
+
     // Reeftake controls
     appendageJoystick.button(10)
         .onTrue(
