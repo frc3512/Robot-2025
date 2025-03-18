@@ -12,7 +12,6 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.*;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Swerve;
 
 public class DriveConstants {
@@ -56,14 +55,10 @@ public class DriveConstants {
 
   public static final CANBus kCANBus = new CANBus("Drivetrain", "./logs/example.hoot");
 
-  private static final CommandXboxController controller = new CommandXboxController(0);
-
-  public static double MaxSpeed = 5.2 * 0.80; // Drive velocity in meters per second
-  public static double MaxAngularRate = 3; // Controls how fast the robot quick turns
-
-  public static final double forward = -controller.getLeftY() * MaxSpeed; // Drives robot forward
-  public static final double strafe = -controller.getLeftX() * MaxSpeed; // Drives robot sideways
-  public static final double turn = -controller.getRightX() * MaxAngularRate; // Turns robot
+  public static double maxSpeed = 5.2 * 0.80; // Drive velocity in meters per second
+  public static double maxAngularRate = 3.25; // Controls how fast the robot quick turns
+  public static double slowSpeed = 5.2 * 0.40; // Drive velocity for slow mode in meters per second
+  public static double slowAngularRate = 1.5; // Controls how fast the robot quick turns in slow mode
 
   private static final double kCoupleRatio = 3.5714285714285716;
   private static final double kDriveGearRatio = 6.122448979591837;
@@ -102,7 +97,7 @@ public class DriveConstants {
               .withSteerMotorClosedLoopOutput(kSteerClosedLoopOutput)
               .withDriveMotorClosedLoopOutput(kDriveClosedLoopOutput)
               .withSlipCurrent(kSlipCurrent)
-              .withSpeedAt12Volts(MaxSpeed)
+              .withSpeedAt12Volts(maxSpeed)
               .withDriveMotorType(kDriveMotorType)
               .withSteerMotorType(kSteerMotorType)
               .withFeedbackSource(kSteerFeedbackType)
