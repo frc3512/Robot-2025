@@ -4,7 +4,10 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -93,8 +96,8 @@ public class Constants {
   }
 
   public static class VisionConstants {
-    public static final String elevatorCam = "Arducam OV9281 3512 left";
-    public static final String climberCam = "Arducam OV9281 3512 right";
+    public static final String elevatorCam = "ElevatorCam";
+    public static final String climberCam = "ClimberCam";
 
     public static final AprilTagFieldLayout tagLayout =
         AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
@@ -145,4 +148,64 @@ public class Constants {
     public static final TrapezoidProfile.Constraints aimingRotationConstraints =
         new TrapezoidProfile.Constraints(Units.rotationsToRadians(1), Units.rotationsToRadians(2));
   }
+
+  // Credit to 6657
+  public static class FieldConstants {
+    private static Pose2d getRedReefPose(Pose2d reefPose) {
+      return new Pose2d(
+          reefPose.getTranslation().getX() + 8.565,
+          reefPose.getTranslation().getY(),
+          reefPose.getRotation());
+    }
+
+    public static class ReefSlot {
+      public Pose2d middle;
+      public Pose2d left;
+      public Pose2d right;
+      public Pose2d algae;
+
+      ReefSlot(Pose2d middle, Pose2d left, Pose2d right, Pose2d algae) {
+        this.middle = middle;
+        this.left = left;
+        this.right = right;
+        this.algae = algae;
+      }
+    }
+
+    public static enum ReefPoses {
+      Reef_1(new Pose2d(5.825, 4.03, Rotation2d.fromDegrees(0))),
+      Reef_2(new Pose2d(5.163, 5.177484, Rotation2d.fromDegrees(60))),
+      Reef_3(new Pose2d(3.838, 5.177484, Rotation2d.fromDegrees(120))),
+      Reef_4(new Pose2d(3.175, 4.03, Rotation2d.fromDegrees(180))),
+      Reef_5(new Pose2d(3.8375, 2.882516, Rotation2d.fromDegrees(-120))),
+      Reef_6(new Pose2d(5.1625, 2.882516, Rotation2d.fromDegrees(-60)));
+
+      public ReefSlot blue;
+      public ReefSlot red;
+
+      // Shift the pose to the robot's left
+      public Pose2d getLeftPose(Pose2d pose) {
+        return pose.transformBy(new Transform2d(0.25, -0.26, new Rotation2d()));
+      }
+
+      public Pose2d getRightPose(Pose2d pose) {
+        return pose.transformBy(new Transform2d(0.25, 0.06, new Rotation2d()));
+      }
+
+      public Pose2d getAlgaePose(Pose2d pose) {
+        return pose.transformBy(new Transform2d(0.25, -0.09, new Rotation2d()));
+      }
+
+      ReefPoses(Pose2d pose) {
+        this.blue = new ReefSlot(pose, getLeftPose(pose), getRightPose(pose), getAlgaePose(pose));
+        this.red =
+            new ReefSlot(
+                getRedReefPose(pose),
+                getRedReefPose(getLeftPose(pose)),
+                getRedReefPose(getRightPose(pose)),
+                getRedReefPose(getAlgaePose(pose)));
+      }
+    }
+  }
+
 }

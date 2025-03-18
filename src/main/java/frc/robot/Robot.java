@@ -3,6 +3,7 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import dev.doglog.DogLog;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.cameraserver.CameraServer;
@@ -10,6 +11,9 @@ import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.units.measure.Per;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -21,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.FieldConstants.ReefSlot;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Groundtake;
@@ -28,6 +33,10 @@ import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Reeftake;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
@@ -54,6 +63,10 @@ public class Robot extends TimedRobot {
           .withRotationalDeadband(slowAngularRate * 0.07) // Add a 7% deadband
           .withDriveRequestType(DriveRequestType.Velocity);
 
+  // Aiming
+  private String selectedPiece = "Coral";
+  private String selectedReef = "Left";
+
   // Subsystem Objects
   public final Climber climber = new Climber();
   public final Elevator elevator = new Elevator();
@@ -67,7 +80,7 @@ public class Robot extends TimedRobot {
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandJoystick appendageJoystick = new CommandJoystick(1);
 
-  // Driver Camera Thread for crosshair
+  // Driver camera Thread for crosshair
   private final Thread m_visionThread;
 
   // Auton
@@ -125,22 +138,22 @@ public class Robot extends TimedRobot {
     autoChooser.addOption("Mid l4", midl4());
 
     // Controler Bindings
-    controller
-        .rightBumper()
-        .whileTrue(
-            drivetrain.applyRequest(
-                () ->
-                    driveSlow
-                        .withVelocityX(-controller.getLeftY() * slowSpeed)
-                        .withVelocityY(-controller.getLeftX() * slowSpeed)
-                        .withRotationalRate(-controller.getRightX() * slowAngularRate)))
-        .whileFalse(
-            drivetrain.applyRequest(
-                () ->
-                    drive
-                        .withVelocityX(-controller.getLeftY() * maxSpeed)
-                        .withVelocityY(-controller.getLeftX() * maxSpeed)
-                        .withRotationalRate(-controller.getRightX() * maxAngularRate)));
+    // controller
+    //     .rightBumper()
+    //     .whileTrue(
+    //         drivetrain.applyRequest(
+    //             () ->
+    //                 driveSlow
+    //                     .withVelocityX(-controller.getLeftY() * slowSpeed)
+    //                     .withVelocityY(-controller.getLeftX() * slowSpeed)
+    //                     .withRotationalRate(-controller.getRightX() * slowAngularRate)))
+    //     .whileFalse(
+    //         drivetrain.applyRequest(
+    //             () ->
+    //                 drive
+    //                     .withVelocityX(-controller.getLeftY() * maxSpeed)
+    //                     .withVelocityY(-controller.getLeftX() * maxSpeed)
+    //                     .withRotationalRate(-controller.getRightX() * maxAngularRate)));
 
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
@@ -158,6 +171,15 @@ public class Robot extends TimedRobot {
         .rightTrigger()
         .onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()))
         .onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
+
+    // Aiming Controls
+    controller.povUp().onTrue(selectPiece("Coral"));
+    controller.povDown().onTrue(selectPiece("Algae"));
+
+    controller.povLeft().onTrue(selectReef("Left"));
+    controller.povRight().onTrue(selectReef("Right"));
+
+    controller.rightBumper().whileTrue(autoAim());
 
     // Bindings for the button box
 
@@ -222,12 +244,13 @@ public class Robot extends TimedRobot {
     reeftake.setGoal(Constants.ReeftakeConstants.retractPivot);
     groundtake.setGoal(Constants.GroundtakeConstants.stowPos);
 
-    drivetrain.applyRequest(
+    drivetrain.setDefaultCommand(
+      drivetrain.applyRequest(
         () ->
             drive
                 .withVelocityX(-controller.getLeftY() * maxSpeed)
                 .withVelocityY(-controller.getLeftX() * maxSpeed)
-                .withRotationalRate(-controller.getRightX() * maxAngularRate));
+                .withRotationalRate(-controller.getRightX() * maxAngularRate)));
   }
 
   @Override
@@ -261,8 +284,73 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {}
 
-  public Command autoAim(Pose2d targetPose) {
-    return Commands.sequence(drivetrain.resetAutoAimPID());
+  
+  public Command selectReef(String reef) {
+    return Commands.runOnce(() -> this.selectedReef = reef)
+        .andThen(() -> DogLog.log("Swerve/AimingSelectedReef", reef));
+  }
+
+  public Command selectPiece(String piece) {
+    return Commands.runOnce(() -> selectedPiece = piece)
+        .andThen(() -> DogLog.log("Swerve/AimingSelectedPiece", piece));
+  }
+
+  // Credit to 6657
+  public Pose2d getNearestReef() {
+    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+    ReefSlot[] reefSlots = new ReefSlot[6];
+
+    if (alliance == Alliance.Red) {
+      reefSlots =
+          new ReefSlot[] {
+            Constants.FieldConstants.ReefPoses.Reef_1.red,
+            Constants.FieldConstants.ReefPoses.Reef_2.red,
+            Constants.FieldConstants.ReefPoses.Reef_3.red,
+            Constants.FieldConstants.ReefPoses.Reef_4.red,
+            Constants.FieldConstants.ReefPoses.Reef_5.red,
+            Constants.FieldConstants.ReefPoses.Reef_6.red
+          };
+    } else {
+      reefSlots =
+          new ReefSlot[] {
+            Constants.FieldConstants.ReefPoses.Reef_1.blue,
+            Constants.FieldConstants.ReefPoses.Reef_2.blue,
+            Constants.FieldConstants.ReefPoses.Reef_3.blue,
+            Constants.FieldConstants.ReefPoses.Reef_4.blue,
+            Constants.FieldConstants.ReefPoses.Reef_5.blue,
+            Constants.FieldConstants.ReefPoses.Reef_6.blue
+          };
+    }
+
+    List<Pose2d> reefMiddles = new ArrayList<>();
+    for (ReefSlot reefSlot : reefSlots) {
+      reefMiddles.add(reefSlot.middle);
+    }
+
+    Pose2d currentPos = drivetrain.getState().Pose;
+    Pose2d nearestReefMiddle = currentPos.nearest(reefMiddles);
+    ReefSlot nearestReefSlot =
+        reefSlots[
+            reefMiddles.indexOf(
+                nearestReefMiddle)];
+
+    if (selectedPiece == "Coral") {
+      if (selectedReef == "Left") {
+        return nearestReefSlot.left;
+      } else if (selectedReef == "Right") {
+        return nearestReefSlot.right;
+      }
+    } else {
+      return nearestReefSlot.algae;
+    }
+
+    // If the selected reef is invalid return the robot's current pose.
+    DogLog.log("Swerve/AimingErrors", "Invalid Reef Selected '" + selectedReef + "'");
+    return nearestReefMiddle;
+  }
+
+  public Command autoAim() {
+    return Commands.sequence(drivetrain.resetAutoAimPID(), drivetrain.goToPose(() -> getNearestReef()));
   }
 
   public SequentialCommandGroup a1() {
