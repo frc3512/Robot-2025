@@ -11,7 +11,6 @@ import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -33,15 +32,14 @@ import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Reeftake;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+@SuppressWarnings("unused")
 public class Robot extends TimedRobot {
 
   private double maxSpeed = DriveConstants.maxSpeed;
@@ -133,7 +131,9 @@ public class Robot extends TimedRobot {
             false,
             drivetrain);
 
-    autoFactory.bind("Score l4", scorel4()).bind("Intake", intake());
+    autoFactory
+        .bind("Score l4", scorel4())
+        .bind("Intake", intake());
 
     autoChooser.addOption("Mid l4", midl4());
 
@@ -284,7 +284,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {}
 
-  
+  // Credit to 6657  
   public Command selectReef(String reef) {
     return Commands.runOnce(() -> this.selectedReef = reef)
         .andThen(() -> DogLog.log("Swerve/AimingSelectedReef", reef));
@@ -294,8 +294,6 @@ public class Robot extends TimedRobot {
     return Commands.runOnce(() -> selectedPiece = piece)
         .andThen(() -> DogLog.log("Swerve/AimingSelectedPiece", piece));
   }
-
-  // Credit to 6657
   public Pose2d getNearestReef() {
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
     ReefSlot[] reefSlots = new ReefSlot[6];
@@ -350,9 +348,11 @@ public class Robot extends TimedRobot {
   }
 
   public Command autoAim() {
-    return Commands.sequence(drivetrain.resetAutoAimPID(), drivetrain.goToPose(() -> getNearestReef()));
+    return Commands.sequence(drivetrain.resetAutoAimPID(), 
+        drivetrain.goToPose(() -> getNearestReef()));
   }
 
+  // Scoring and dereefing commands
   public SequentialCommandGroup a1() {
     return new InstantCommand(() -> elevator.a1())
         .andThen(new InstantCommand(() -> reeftake.extendPivot()))
@@ -377,14 +377,18 @@ public class Robot extends TimedRobot {
         .andThen(new InstantCommand(() -> reeftake.coralStop()));
   }
 
+  // Intake sequence
   public SequentialCommandGroup intake() {
     return new InstantCommand(() -> elevator.hp())
         .andThen(reeftake.autoIntake())
         .andThen(leds.runPattern(leds.scrollngRainbow));
   }
 
+  // Auto commands
   public SequentialCommandGroup scorel4() {
-    return new InstantCommand(() -> elevator.l4()).andThen(new WaitCommand(1.5)).andThen(score());
+    return new InstantCommand(() -> elevator.l4())
+        .andThen(new WaitCommand(1.5))
+        .andThen(score());
   }
 
   // Auto paths
