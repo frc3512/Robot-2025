@@ -14,18 +14,15 @@ public class Constants {
     public static final int frontMotorID = 13;
     public static final int backMotorID = 14;
 
-    public static final double kP = 0.1;
+    public static final double kP = 0.75;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
-    public static final double kV = 0.15;
-    public static final double kG = 0.4;
-    public static final double kS = 0.0;
-    public static final double kA = 0.13;
 
-    public static final double tolerance = 0.0002;
+
+    public static final double tolerance = 0.002;
 
     public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(20, 30);
+        new TrapezoidProfile.Constraints(1000, 1000);
 
     public static final double stowPos = 1.0;
     public static final double hpPos = 4.0;
@@ -50,28 +47,6 @@ public class Constants {
         new TrapezoidProfile.Constraints(7, 5);
   }
 
-  public static class ReeftakeConstants {
-    public static final int pivotMotorID = 17;
-    public static final int intakeMotorID = 18;
-
-    public static final int digitalInputChannel = 0;
-
-    public static final double kP = 1;
-    public static final double kI = 0.0;
-    public static final double kD = 0.0;
-    public static final double kV = 0.05;
-    public static final double kG = 0.2;
-    public static final double kS = 0.0;
-
-    public static final double tolerance = 0.002;
-
-    public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(1, 1);
-
-    public static final double extendPivot = 1.6;
-    public static final double prossecer = 1.0;
-    public static final double retractPivot = 0.4;
-  }
 
   public static class GroundtakeConstants {
     public static final int floorAlgaeRollerMotorID = 15;

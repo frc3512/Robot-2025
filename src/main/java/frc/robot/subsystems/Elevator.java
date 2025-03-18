@@ -4,7 +4,6 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -17,12 +16,7 @@ public class Elevator extends ProfiledPIDSubsystem {
   private final TalonFX frontMotor = new TalonFX(Constants.ElevatorConstants.frontMotorID);
   private final TalonFX backMotor = new TalonFX(Constants.ElevatorConstants.backMotorID);
 
-  private final ElevatorFeedforward feedforward =
-      new ElevatorFeedforward(
-          Constants.ElevatorConstants.kS,
-          Constants.ElevatorConstants.kG,
-          Constants.ElevatorConstants.kV,
-          Constants.ElevatorConstants.kA);
+  public double gravity = 0.5;
 
   boolean bypassStop = false;
   double goal = 0.0;
@@ -109,8 +103,8 @@ public class Elevator extends ProfiledPIDSubsystem {
 
   @Override
   protected void useOutput(double output, State setpoint) {
-    frontMotor.setVoltage(output + feedforward.calculate(getController().getSetpoint().velocity));
-    backMotor.setVoltage(output + feedforward.calculate(getController().getSetpoint().velocity));
+    frontMotor.setVoltage(output + gravity);
+    backMotor.setVoltage(output + gravity);
   }
 
   @Override

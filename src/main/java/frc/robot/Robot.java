@@ -3,8 +3,19 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.CvSink;
+import edu.wpi.first.cscore.CvSource;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -51,10 +62,49 @@ public class Robot extends TimedRobot {
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandJoystick appendageJoystick = new CommandJoystick(1);
 
+  //Driver camera thread crosshair
+  private final Thread m_visionThread;
+
   // Auton
   private final AutoFactory autoFactory;
 
   public Robot() {
+    
+    CameraServer.startAutomaticCapture();
+
+    m_visionThread =
+        new Thread(
+            () -> {
+              // Get the UsbCamera from CameraServer
+              UsbCamera camera = CameraServer.startAutomaticCapture();
+              // Set the resolution
+              camera.setResolution(640, 480);
+
+              CvSink cvSink = CameraServer.getVideo();
+              CvSource outputStream = CameraServer.putVideo("Drive Cam", 640, 480);
+
+              Mat mat = new Mat();
+              Point pt1 = new Point(0, 65);
+              Point pt2 = new Point(400, 65);
+              Point pt3 = new Point(0, 55);
+              Point pt4 = new Point(400, 55);
+              Scalar color = new Scalar(28, 239, 84);
+
+              while (!Thread.interrupted()) {
+
+                if (cvSink.grabFrame(mat) == 0) {
+                  outputStream.notifyError(cvSink.getError());
+                  continue;
+                }
+
+                Imgproc.line(mat, pt1, pt2, color, 2);
+                Imgproc.line(mat, pt3, pt4, color, 2);
+                outputStream.putFrame(mat);
+              }
+            });
+
+    m_visionThread.setDaemon(true);
+    m_visionThread.start();
 
     // Create Choreo
     autoFactory =
@@ -121,10 +171,10 @@ public class Robot extends TimedRobot {
     appendageJoystick.button(3).onFalse(leds.runPattern(leds.red));
 
     appendageJoystick.button(8).onTrue(a1());
-    appendageJoystick.button(8).onFalse(rectractAlgae());
+    appendageJoystick.button(8).onFalse(new InstantCommand(() -> reeftake.algaeStop()));
 
     appendageJoystick.button(7).onTrue(a2());
-    appendageJoystick.button(7).onFalse(rectractAlgae());
+    appendageJoystick.button(7).onFalse(new InstantCommand(() -> reeftake.algaeStop()));
 
     appendageJoystick.button(9).onTrue(new InstantCommand(() -> elevator.stow()));
 
@@ -183,19 +233,13 @@ public class Robot extends TimedRobot {
   // Make sequencial commands for the elevator here once reeftake pivot it made.
   public SequentialCommandGroup a1() {
     return new InstantCommand(() -> elevator.a1())
-        .andThen(new InstantCommand(() -> reeftake.extendPivot()))
         .andThen(new InstantCommand(() -> reeftake.algaeIntake()));
   }
 
   public SequentialCommandGroup a2() {
     return new InstantCommand(() -> elevator.a2())
-        .andThen(new InstantCommand(() -> reeftake.extendPivot()))
-        .andThen(new InstantCommand(() -> reeftake.algaeIntake()));
-  }
-
-  public SequentialCommandGroup rectractAlgae() {
-    return new InstantCommand(() -> reeftake.retractPivot())
-        .andThen(new InstantCommand(() -> elevator.stow()));
+        .andThen(new InstantCommand(() -> reeftake.algaeIntake())
+        );
   }
 
   public SequentialCommandGroup score() {
