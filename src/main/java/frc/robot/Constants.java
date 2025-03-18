@@ -46,7 +46,12 @@ public class Constants {
     public static final TrapezoidProfile.Constraints constraints =
         new TrapezoidProfile.Constraints(7, 5);
   }
+  public static class ReeftakeConstants {
+    public static final int pivotMotorID = 17;
+    public static final int intakeMotorID = 18;
 
+    public static final int digitalInputChannel = 0;
+  }
 
   public static class GroundtakeConstants {
     public static final int floorAlgaeRollerMotorID = 15;
