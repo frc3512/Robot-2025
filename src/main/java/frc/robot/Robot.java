@@ -146,8 +146,8 @@ public class Robot extends TimedRobot {
     controller.rightTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
 
     // Reeftake controls
-    appendageJoystick.button(10).onTrue(new InstantCommand(() -> reeftake.algaeOuttake()));
-    appendageJoystick.button(10).onFalse(new InstantCommand(() -> reeftake.coralStop()));
+    appendageJoystick.button(10).onTrue(new InstantCommand(() -> reeftake.algaeIntake()));
+    appendageJoystick.button(10).onFalse(new InstantCommand(() -> reeftake.algaeStop()));
 
     // Elevator controls
     appendageJoystick.button(6).onTrue(new InstantCommand(() -> elevator.l1()));
