@@ -4,7 +4,10 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import dev.doglog.DogLog;
+import dev.doglog.DogLogOptions;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
@@ -61,10 +64,6 @@ public class Robot extends TimedRobot {
           .withRotationalDeadband(slowAngularRate * 0.07) // Add a 7% deadband
           .withDriveRequestType(DriveRequestType.Velocity);
 
-  // Aiming
-  private String selectedPiece = "Coral";
-  private String selectedReef = "Left";
-
   // Subsystem Objects
   public final Climber climber = new Climber();
   public final Elevator elevator = new Elevator();
@@ -72,7 +71,9 @@ public class Robot extends TimedRobot {
   public final LED leds = new LED();
   public final Reeftake reeftake = new Reeftake();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
-  public final Vision vision = new Vision();
+  public final Vision visionElevator = new Vision(Constants.VisionConstants.elevatorCam, Constants.VisionConstants.elevatorCamOffset);
+  public final Vision visionClimber = new Vision(Constants.VisionConstants.climberCam, Constants.VisionConstants.climberCamOffset);
+
 
   // Controller Objects
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -85,6 +86,8 @@ public class Robot extends TimedRobot {
   private final AutoFactory autoFactory;
 
   public Robot() {
+
+    DogLog.setOptions(new DogLogOptions().withCaptureDs(true));
 
     CameraServer.startAutomaticCapture();
 
@@ -173,11 +176,11 @@ public class Robot extends TimedRobot {
         .onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
 
     // Aiming Controls
-    controller.povUp().onTrue(selectPiece("Coral"));
-    controller.povDown().onTrue(selectPiece("Algae"));
+    controller.povUp().onTrue(drivetrain.selectPiece("Coral"));
+    controller.povDown().onTrue(drivetrain.selectPiece("Algae"));
 
-    controller.povLeft().onTrue(selectReef("Left"));
-    controller.povRight().onTrue(selectReef("Right"));
+    controller.povLeft().onTrue(drivetrain.selectReef("Left"));
+    controller.povRight().onTrue(drivetrain.selectReef("Right"));
 
     controller.rightBumper().whileTrue(autoAim());
 
@@ -257,21 +260,23 @@ public class Robot extends TimedRobot {
   public void disabledInit() {}
 
   public void poseEstimation() {
-    var visionEstElevator = vision.getEstimatedGlobalPose(vision.getElevatorCamera());
-    var visionEstClimber = vision.getEstimatedGlobalPose(vision.getClimberCamera());
+    var visionElevatorEst = visionElevator.getEstimatedGlobalPose(visionElevator.getCamera());
+    var visionClimberEst = visionClimber.getEstimatedGlobalPose(visionClimber.getCamera());
 
-    visionEstElevator.ifPresent(
+    visionElevatorEst.ifPresent(
         est -> {
-          var estStdDevs = vision.getEstimationStdDevs();
+          var estStdDevs = visionElevator.getEstimationStdDevs();
+          DogLog.log("Vision/Elevator Estimated Pose", est.estimatedPose);
           drivetrain.addVisionMeasurement(
-              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+              est.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(est.timestampSeconds), estStdDevs);
         });
 
-    visionEstClimber.ifPresent(
+    visionClimberEst.ifPresent(
         est -> {
-          var estStdDevs = vision.getEstimationStdDevs();
+          var estStdDevs = visionClimber.getEstimationStdDevs();
+          DogLog.log("Vision/Climber Estimated Pose", est.estimatedPose);
           drivetrain.addVisionMeasurement(
-              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+              est.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(est.timestampSeconds), estStdDevs);
         });
   }
 
@@ -279,77 +284,17 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
     poseEstimation();
+
+    // Logging 
+    DogLog.log("Vision/Nearest Reef", drivetrain.getNearestReef());
   }
 
   @Override
   public void teleopPeriodic() {}
 
-  // Credit to 6657  
-  public Command selectReef(String reef) {
-    return Commands.runOnce(() -> this.selectedReef = reef)
-        .andThen(() -> DogLog.log("Swerve/AimingSelectedReef", reef));
-  }
-
-  public Command selectPiece(String piece) {
-    return Commands.runOnce(() -> selectedPiece = piece)
-        .andThen(() -> DogLog.log("Swerve/AimingSelectedPiece", piece));
-  }
-  public Pose2d getNearestReef() {
-    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
-    ReefSlot[] reefSlots = new ReefSlot[6];
-
-    if (alliance == Alliance.Red) {
-      reefSlots =
-          new ReefSlot[] {
-            Constants.FieldConstants.ReefPoses.Reef_1.red,
-            Constants.FieldConstants.ReefPoses.Reef_2.red,
-            Constants.FieldConstants.ReefPoses.Reef_3.red,
-            Constants.FieldConstants.ReefPoses.Reef_4.red,
-            Constants.FieldConstants.ReefPoses.Reef_5.red,
-            Constants.FieldConstants.ReefPoses.Reef_6.red
-          };
-    } else {
-      reefSlots =
-          new ReefSlot[] {
-            Constants.FieldConstants.ReefPoses.Reef_1.blue,
-            Constants.FieldConstants.ReefPoses.Reef_2.blue,
-            Constants.FieldConstants.ReefPoses.Reef_3.blue,
-            Constants.FieldConstants.ReefPoses.Reef_4.blue,
-            Constants.FieldConstants.ReefPoses.Reef_5.blue,
-            Constants.FieldConstants.ReefPoses.Reef_6.blue
-          };
-    }
-
-    List<Pose2d> reefMiddles = new ArrayList<>();
-    for (ReefSlot reefSlot : reefSlots) {
-      reefMiddles.add(reefSlot.middle);
-    }
-
-    Pose2d currentPos = drivetrain.getState().Pose;
-    Pose2d nearestReefMiddle = currentPos.nearest(reefMiddles);
-    ReefSlot nearestReefSlot =
-        reefSlots[
-            reefMiddles.indexOf(
-                nearestReefMiddle)];
-
-    if (selectedPiece == "Coral") {
-      if (selectedReef == "Left") {
-        return nearestReefSlot.left;
-      } else if (selectedReef == "Right") {
-        return nearestReefSlot.right;
-      }
-    } else {
-      return nearestReefSlot.algae;
-    }
-
-    // If the selected reef is invalid return the robot's current pose.
-    DogLog.log("Swerve/AimingErrors", "Invalid Reef Selected '" + selectedReef + "'");
-    return nearestReefMiddle;
-  }
-
   public Command autoAim() {
     return Commands.sequence(drivetrain.resetAutoAimPID(), 
-        drivetrain.goToPose(() -> getNearestReef()));
+        drivetrain.goToPose(() -> drivetrain.getNearestReef()));
   }
 
   // Scoring and dereefing commands

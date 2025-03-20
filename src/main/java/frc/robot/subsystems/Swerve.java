@@ -15,13 +15,19 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
+import frc.robot.Constants.FieldConstants.ReefSlot;
 import frc.robot.DriveConstants.TunerSwerveDrivetrain;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
@@ -33,6 +39,14 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
   private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
   private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
   private boolean m_hasAppliedOperatorPerspective = false;
+
+  // Aiming
+  private String selectedPiece = "Coral";
+  private String selectedReef = "Left";
+
+  public Pose2d getPose() {
+    return getState().Pose;
+  }
 
   // Choreo
   private final PIDController choreoXController =
@@ -149,6 +163,73 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
         });
   }
 
+    // Credit to 6657  
+  public Command selectReef(String reef) {
+    return Commands.runOnce(() -> this.selectedReef = reef)
+        .andThen(() -> DogLog.log("Swerve/AimingSelectedReef", reef));
+  }
+
+  public Command selectPiece(String piece) {
+    return Commands.runOnce(() -> selectedPiece = piece)
+        .andThen(() -> DogLog.log("Swerve/AimingSelectedPiece", piece));
+  }
+
+  public Pose2d getNearestReef() {
+    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+    ReefSlot[] reefSlots = new ReefSlot[6];
+
+    if (alliance == Alliance.Red) {
+      reefSlots =
+          new ReefSlot[] {
+            Constants.FieldConstants.ReefPoses.Reef_1.red,
+            Constants.FieldConstants.ReefPoses.Reef_2.red,
+            Constants.FieldConstants.ReefPoses.Reef_3.red,
+            Constants.FieldConstants.ReefPoses.Reef_4.red,
+            Constants.FieldConstants.ReefPoses.Reef_5.red,
+            Constants.FieldConstants.ReefPoses.Reef_6.red
+          };
+    } else {
+      reefSlots =
+          new ReefSlot[] {
+            Constants.FieldConstants.ReefPoses.Reef_1.blue,
+            Constants.FieldConstants.ReefPoses.Reef_2.blue,
+            Constants.FieldConstants.ReefPoses.Reef_3.blue,
+            Constants.FieldConstants.ReefPoses.Reef_4.blue,
+            Constants.FieldConstants.ReefPoses.Reef_5.blue,
+            Constants.FieldConstants.ReefPoses.Reef_6.blue
+          };
+    }
+
+    List<Pose2d> reefMiddles = new ArrayList<>();
+    for (ReefSlot reefSlot : reefSlots) {
+      reefMiddles.add(reefSlot.middle);
+    }
+
+    Pose2d currentPos = getState().Pose;
+
+    DogLog.log("Vision/Current Pose", currentPos);
+
+    Pose2d nearestReefMiddle = currentPos.nearest(reefMiddles);
+    ReefSlot nearestReefSlot =
+        reefSlots[
+            reefMiddles.indexOf(
+                nearestReefMiddle)];
+
+    if (selectedPiece == "Coral") {
+      if (selectedReef == "Left") {
+        return nearestReefSlot.left;
+      } else if (selectedReef == "Right") {
+        return nearestReefSlot.right;
+      }
+    } else {
+      return nearestReefSlot.algae;
+    }
+
+    // If the selected reef is invalid return the robot's current pose.
+    DogLog.log("Swerve/AimingErrors", "Invalid Reef Selected '" + selectedReef + "'");
+    return nearestReefMiddle;
+  }
+
   public void controlPosition(Pose2d targetPose) {
     double x = aimXController.calculate(getState().Pose.getX(), targetPose.getX());
     double y = aimYController.calculate(getState().Pose.getY(), targetPose.getY());
@@ -164,6 +245,8 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
             .withVelocityX(speeds.vxMetersPerSecond)
             .withVelocityY(speeds.vyMetersPerSecond)
             .withRotationalRate(speeds.omegaRadiansPerSecond));
+
+    DogLog.log("Swerve/Aim Target", targetPose);
   }
 
   public Command goToPose(Supplier<Pose2d> target) {

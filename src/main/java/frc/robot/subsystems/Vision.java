@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import frc.robot.Constants;
@@ -15,31 +16,27 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class Vision {
 
-  private static final PhotonCamera elevatorCamera =
-      new PhotonCamera(Constants.VisionConstants.elevatorCam);
-  private static final PhotonCamera climberCam =
-      new PhotonCamera(Constants.VisionConstants.climberCam);
+  private final PhotonCamera camera;
 
   private PhotonPoseEstimator poseEstimator;
   private Matrix<N3, N1> curStdDevs;
 
-  public Vision() {
+  public Vision(String cameraName, Transform3d cameraOffset) {
+
+    camera = new PhotonCamera(cameraName);
+
     PhotonCamera.setVersionCheckEnabled(false);
 
     poseEstimator =
         new PhotonPoseEstimator(
             Constants.VisionConstants.tagLayout,
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-            Constants.VisionConstants.robotToCam);
+            cameraOffset);
     poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
   }
 
-  public PhotonCamera getElevatorCamera() {
-    return elevatorCamera;
-  }
-
-  public PhotonCamera getClimberCamera() {
-    return climberCam;
+  public PhotonCamera getCamera() {
+    return camera;
   }
 
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose(PhotonCamera camera) {

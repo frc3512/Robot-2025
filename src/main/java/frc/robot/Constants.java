@@ -42,15 +42,6 @@ public class Constants {
   public static class ClimberConstants {
     public static final int climbMotorID = 11;
     public static final int digitalInputChannel = 1;
-
-    public static final double kP = 1.0;
-    public static final double kI = 0.0;
-    public static final double kD = 0.0;
-
-    public static final double tolerance = 0.002;
-
-    public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(7, 5);
   }
 
   public static class ReeftakeConstants {
@@ -102,13 +93,19 @@ public class Constants {
     public static final AprilTagFieldLayout tagLayout =
         AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
-    public static final Transform3d robotToCam =
-        new Transform3d(
-            Units.inchesToMeters(-11.0),
-            Units.inchesToMeters(7.0),
-            Units.inchesToMeters(16.5),
-            new Rotation3d(0.0, Units.degreesToRadians(105.0), Units.degreesToRadians(180.0)));
-    public static final Transform3d camToRobot = robotToCam.inverse();
+    public static final Transform3d elevatorCamOffset =
+      new Transform3d(
+            Units.inchesToMeters(10.0),
+            Units.inchesToMeters(-6.0),
+            Units.inchesToMeters(20),
+            new Rotation3d(Units.degreesToRadians(90), Units.degreesToRadians(0.0), Units.degreesToRadians(0.0)));
+
+    public static final Transform3d climberCamOffset =
+      new Transform3d(
+          Units.inchesToMeters(10),
+          Units.inchesToMeters(-6.0),
+          Units.inchesToMeters(8),
+          new Rotation3d(0.0, Units.degreesToRadians(0.0), Units.degreesToRadians(0.0)));
 
     public static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(1, 1, 2);
     public static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.2, 0.2, 0.2);
