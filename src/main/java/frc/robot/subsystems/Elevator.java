@@ -80,6 +80,10 @@ public class Elevator extends ProfiledPIDSubsystem {
     setClampedGoal(Constants.ElevatorConstants.a2Pos);
   }
 
+  public void aStow() {
+    setClampedGoal(Constants.ElevatorConstants.aStowPos);
+  }
+
   public void setClampedGoal(double goal) {
     setGoal(MathUtil.clamp(goal, 0.5, 47));
   }
