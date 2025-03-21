@@ -283,7 +283,9 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    
     poseEstimation();
+    drivetrain.getNearestReef();
 
     // Logging 
     DogLog.log("Vision/Nearest Reef", drivetrain.getNearestReef());

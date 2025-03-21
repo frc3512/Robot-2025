@@ -154,6 +154,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     this.setControl(request);
   }
 
+  // Credit to 6657  
   public Command resetAutoAimPID() {
     return Commands.runOnce(
         () -> {
@@ -163,7 +164,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
         });
   }
 
-    // Credit to 6657  
   public Command selectReef(String reef) {
     return Commands.runOnce(() -> this.selectedReef = reef)
         .andThen(() -> DogLog.log("Swerve/AimingSelectedReef", reef));
@@ -252,7 +252,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
   public Command goToPose(Supplier<Pose2d> target) {
     return this.run(() -> controlPosition(target.get()))
         .until(() -> false)
-        .andThen(Commands.runOnce(() -> this.applyRequest(new SwerveRequest.RobotCentric())));
+        .andThen(Commands.runOnce(() -> this.applyRequest(new SwerveRequest.FieldCentric())));
   }
 
   @Override

@@ -170,12 +170,12 @@ public class Constants {
     }
 
     public static enum ReefPoses {
-      Reef_1(new Pose2d(5.825, 4.03, Rotation2d.fromDegrees(0))),
-      Reef_2(new Pose2d(5.163, 5.177484, Rotation2d.fromDegrees(60))),
-      Reef_3(new Pose2d(3.838, 5.177484, Rotation2d.fromDegrees(120))),
-      Reef_4(new Pose2d(3.175, 4.03, Rotation2d.fromDegrees(180))),
-      Reef_5(new Pose2d(3.8375, 2.882516, Rotation2d.fromDegrees(-120))),
-      Reef_6(new Pose2d(5.1625, 2.882516, Rotation2d.fromDegrees(-60)));
+      Reef_1(new Pose2d(5.825, 4.03, Rotation2d.fromDegrees(180))),
+      Reef_2(new Pose2d(5.163, 5.177484, Rotation2d.fromDegrees(240))),
+      Reef_3(new Pose2d(3.838, 5.177484, Rotation2d.fromDegrees(300))),
+      Reef_4(new Pose2d(3.175, 4.03, Rotation2d.fromDegrees(0))),
+      Reef_5(new Pose2d(3.8375, 2.882516, Rotation2d.fromDegrees(60))),
+      Reef_6(new Pose2d(5.1625, 2.882516, Rotation2d.fromDegrees(120)));
 
       public ReefSlot blue;
       public ReefSlot red;
