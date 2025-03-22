@@ -64,8 +64,8 @@ public class DriveConstants {
 
   public static double maxSpeed = 5.2 * 0.80; // Drive velocity in meters per second
   public static double maxAngularRate = 3.25; // Controls how fast the robot quick turns
-  public static double slowSpeed = 5.2 * 0.40; // Drive velocity for slow mode in meters per second
-  public static double slowAngularRate = 1.5; // Controls how fast the robot quick turns in slow mode
+  public static double slowSpeed = 5.2 * 0.25; // Drive velocity for slow mode in meters per second
+  public static double slowAngularRate = 0.85; // Controls how fast the robot quick turns in slow mode
 
   private static final double kCoupleRatio = 3.5714285714285716;
   private static final double kDriveGearRatio = 6.122448979591837;

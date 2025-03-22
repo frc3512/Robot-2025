@@ -182,13 +182,13 @@ public class Robot extends TimedRobot {
 
     // Dereefing controls
     appendageJoystick.button(8)
-      .onTrue(a1());
+        .onTrue(a1());
 
     appendageJoystick.button(7)
-      .onTrue(a2());
+        .onTrue(a2());
 
     appendageJoystick.button(9)
-      .onTrue(new InstantCommand(() -> elevator.stow()));
+      . onTrue(new InstantCommand(() -> elevator.stow()));
 
     // Barge Scoring
     appendageJoystick.button(10)
