@@ -252,7 +252,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
   public Command goToPose(Supplier<Pose2d> target) {
     return this.run(() -> controlPosition(target.get()))
         .until(() -> false)
-        .andThen(Commands.runOnce(() -> this.applyRequest(new SwerveRequest.FieldCentric())));
+        .andThen(Commands.runOnce(() -> this.applyRequest(new SwerveRequest.RobotCentric())));
   }
 
   @Override
