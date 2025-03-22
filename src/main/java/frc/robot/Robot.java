@@ -277,7 +277,7 @@ public class Robot extends TimedRobot {
 
   public SequentialCommandGroup scoreBarge() {
     return new InstantCommand(() -> reeftake.algaeOuttake())
-        .andThen(new WaitCommand(0.75))
+        .andThen(new WaitCommand(0.375))
         .andThen(new InstantCommand(() -> reeftake.algaeStop()))
         .andThen(new InstantCommand(() -> elevator.hp()));
   }
