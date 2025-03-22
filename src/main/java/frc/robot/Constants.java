@@ -37,6 +37,8 @@ public class Constants {
     public static final double l4Pos = 46;
     public static final double a1Pos = 3.5;
     public static final double a2Pos = 15.84;
+    public static final double aStowPos = 14.5;
+
   }
 
   public static class ClimberConstants {
