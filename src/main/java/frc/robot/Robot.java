@@ -161,21 +161,6 @@ public class Robot extends TimedRobot {
 
     // ---- Bindings for the button box ---
 
-    // Intake control for Groundtake
-    controller
-        .leftTrigger()
-        .onTrue(
-            new InstantCommand(() -> groundtake.extendPivot())
-                .andThen(new InstantCommand(() -> groundtake.floorAlgaeIntake())));
-    controller
-        .leftTrigger()
-        .onFalse(
-            new InstantCommand(() -> groundtake.retractPivot())
-                .andThen(new InstantCommand(() -> groundtake.keepAlgae())));
-
-    controller.rightTrigger().onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()));
-    controller.rightTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
-
     // Elevator controls for scoring coral
     appendageJoystick
         .button(6)
@@ -202,11 +187,16 @@ public class Robot extends TimedRobot {
         .onFalse(score());
 
     // Dereefing controls
-    appendageJoystick.button(8).onTrue(a1()).onFalse(algaeStow());
+    appendageJoystick.button(8)
+            .onTrue(a1())
+            .onFalse(algaeStow());
 
-    appendageJoystick.button(7).onTrue(a2()).onFalse(algaeStow());
+    appendageJoystick.button(7)
+            .onTrue(a2())
+            .onFalse(algaeStow());
 
-    appendageJoystick.button(9).onTrue(new InstantCommand(() -> elevator.stow()));
+    appendageJoystick.button(9)
+            .onTrue(new InstantCommand(() -> elevator.stow()));
 
     // Barge Scoring
     appendageJoystick
@@ -237,7 +227,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    elevator.setClampedGoal(Constants.ElevatorConstants.stowPos);
     groundtake.setGoal(Constants.GroundtakeConstants.stowPos);
 
     drivetrain.setDefaultCommand(
@@ -278,8 +267,9 @@ public class Robot extends TimedRobot {
   public SequentialCommandGroup scoreBarge() {
     return new InstantCommand(() -> reeftake.algaeOuttake())
         .andThen(new WaitCommand(0.375))
-        .andThen(new InstantCommand(() -> reeftake.algaeStop()))
-        .andThen(new InstantCommand(() -> elevator.hp()));
+        .andThen(new InstantCommand(() -> elevator.hp()))
+        .andThen(new WaitCommand(0.75))
+        .andThen(new InstantCommand(() -> reeftake.algaeStop()));
   }
 
   public SequentialCommandGroup score() {
