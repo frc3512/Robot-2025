@@ -81,6 +81,10 @@ public class Elevator extends ProfiledPIDSubsystem {
     setClampedGoal(Constants.ElevatorConstants.a2Pos);
   }
 
+  public void aStow() {
+    setClampedGoal(Constants.ElevatorConstants.aStowPos);
+  }
+
   public void zeroMotor() {
     frontMotor.setPosition(0.000);
   }

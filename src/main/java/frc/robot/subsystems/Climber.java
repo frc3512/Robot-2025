@@ -2,49 +2,23 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.lib.command.ProfiledPIDSubsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.ClimberConstants;
 
-@SuppressWarnings("unused")
-public class Climber extends ProfiledPIDSubsystem {
+public class Climber extends SubsystemBase {
 
   private final TalonFX climbMotor1 = new TalonFX(Constants.ClimberConstants.climbMotor1ID);
-  
+
   DigitalInput topLimitSwitch = new DigitalInput(3);
   DigitalInput bottomLimitSwitch = new DigitalInput(2);
 
-  private boolean canClimbUp = false;
-  private boolean wantClimbUp = false;
-  private boolean shouldClimbUp = false;
-
   public Climber() {
-    super(
-        new ProfiledPIDController(
-            Constants.ClimberConstants.kP,
-            Constants.ClimberConstants.kI,
-            Constants.ClimberConstants.kD,
-            Constants.ClimberConstants.constraints));
-    getController().setTolerance(Constants.ClimberConstants.tolerance);
-
     climbMotor1.setNeutralMode(NeutralModeValue.Brake);
   }
 
-  @Override
-  protected void useOutput(double output, State setpoint) {
-    climbMotor1.setVoltage(output);
-  }
-
-  @Override
-  protected double getMeasurement() {
-    return climbMotor1.getPosition().getValueAsDouble();
-  }
-
-  public void setClimber(double speed){
-      climbMotor1.set(speed);
+  public Command setClimber(double speed) {
+    return run(() -> climbMotor1.set(speed));
   }
 }

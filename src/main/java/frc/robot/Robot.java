@@ -3,15 +3,8 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
-
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
@@ -32,22 +25,32 @@ import frc.robot.subsystems.Groundtake;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Reeftake;
 import frc.robot.subsystems.Swerve;
-
-// import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.Vision;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 
 public class Robot extends TimedRobot {
 
-  private double MaxSpeed = DriveConstants.MaxSpeed;
-  private double MaxAngularRate = DriveConstants.MaxAngularRate;
+  private double maxSpeed = DriveConstants.maxSpeed;
+  private double maxAngularRate = DriveConstants.maxAngularRate;
+  private double slowSpeed = DriveConstants.slowSpeed;
+  private double slowAngularRate = DriveConstants.slowAngularRate;
+
   private SendableChooser<AutoRoutine> autoChooser = new SendableChooser<>();
 
   private final SwerveRequest.FieldCentric drive =
       new SwerveRequest.FieldCentric()
-          .withDeadband(MaxSpeed * 0.1)
-          .withRotationalDeadband(MaxAngularRate * 0.07) // Add a 7% deadband
+          .withDeadband(maxSpeed * 0.1)
+          .withRotationalDeadband(maxAngularRate * 0.07) // Add a 7% deadband
           .withDriveRequestType(DriveRequestType.Velocity);
 
-  // private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+  private final SwerveRequest.FieldCentric driveSlow =
+      new SwerveRequest.FieldCentric()
+          .withDeadband(slowSpeed * 0.1)
+          .withRotationalDeadband(slowAngularRate * 0.07) // Add a 7% deadband
+          .withDriveRequestType(DriveRequestType.Velocity);
 
   // Subsystem Objects
   public final Climber climber = new Climber();
@@ -56,20 +59,20 @@ public class Robot extends TimedRobot {
   public final LED leds = new LED();
   public final Reeftake reeftake = new Reeftake();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
-  // public final Vision vision = new Vision();
+  public final Vision vision = new Vision();
 
   // Controller Objects
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandJoystick appendageJoystick = new CommandJoystick(1);
 
-  //Driver camera thread crosshair
+  // Driver Camera Thread for crosshair
   private final Thread m_visionThread;
 
   // Auton
   private final AutoFactory autoFactory;
 
   public Robot() {
-    
+
     CameraServer.startAutomaticCapture();
 
     m_visionThread =
@@ -112,23 +115,51 @@ public class Robot extends TimedRobot {
             () -> drivetrain.getState().Pose,
             drivetrain::resetPose,
             drivetrain::followTrajectory,
-            true,
+            false,
             drivetrain);
 
-    autoChooser.addOption("Orbit Reef", orbitReef());
+    autoFactory.bind("Score l4", scorel4()).bind("Intake", intake());
 
-    // Controler Bindings
-    drivetrain.setDefaultCommand(
-        drivetrain.applyRequest(
-            () ->
-                drive
-                    .withVelocityX(-controller.getLeftY() * MaxSpeed)
-                    .withVelocityY(-controller.getLeftX() * MaxSpeed)
-                    .withRotationalRate(-controller.getRightX() * MaxAngularRate)));
+    autoChooser.addOption("Mid l4", midl4());
+
+    //  ---- Controler Bindings ----
+
+    // Slow drive button
+    controller
+        .rightBumper()
+        .whileTrue(
+            drivetrain.applyRequest(
+                () ->
+                    driveSlow
+                        .withVelocityX(-controller.getLeftY() * slowSpeed)
+                        .withVelocityY(-controller.getLeftX() * slowSpeed)
+                        .withRotationalRate(-controller.getRightX() * slowAngularRate)))
+        .whileFalse(
+            drivetrain.applyRequest(
+                () ->
+                    drive
+                        .withVelocityX(-controller.getLeftY() * maxSpeed)
+                        .withVelocityY(-controller.getLeftX() * maxSpeed)
+                        .withRotationalRate(-controller.getRightX() * maxAngularRate)));
 
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-    // Bindings for the button box
+    // Intake control for Groundtake
+    controller
+        .leftTrigger()
+        .onTrue(
+            new InstantCommand(() -> groundtake.extendPivot())
+                .andThen(new InstantCommand(() -> groundtake.floorAlgaeIntake())))
+        .onFalse(
+            new InstantCommand(() -> groundtake.retractPivot())
+                .andThen(new InstantCommand(() -> groundtake.keepAlgae())));
+
+    controller
+        .rightTrigger()
+        .onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()))
+        .onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
+
+    // ---- Bindings for the button box ---
 
     // Intake control for Groundtake
     controller
@@ -145,63 +176,56 @@ public class Robot extends TimedRobot {
     controller.rightTrigger().onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()));
     controller.rightTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
 
-    // Reeftake controls
-    appendageJoystick.button(10).onTrue(new InstantCommand(() -> reeftake.algaeIntake()));
-    appendageJoystick.button(10).onFalse(new InstantCommand(() -> reeftake.algaeStop()));
+    // Elevator controls for scoring coral
+    appendageJoystick
+        .button(6)
+        .onTrue(new InstantCommand(() -> elevator.l1()))
+        .onTrue(leds.runPattern(leds.blue))
+        .onFalse(score());
 
-    // Elevator controls
-    appendageJoystick.button(6).onTrue(new InstantCommand(() -> elevator.l1()));
-    appendageJoystick.button(6).onTrue(leds.runPattern(leds.blue));
-    appendageJoystick.button(6).onFalse(score());
-    appendageJoystick.button(6).onFalse(leds.runPattern(leds.red));
+    appendageJoystick
+        .button(5)
+        .onTrue(new InstantCommand(() -> elevator.l2()))
+        .onTrue(leds.runPattern(leds.blue))
+        .onFalse(score());
 
-    appendageJoystick.button(5).onTrue(new InstantCommand(() -> elevator.l2()));
-    appendageJoystick.button(5).onTrue(leds.runPattern(leds.blue));
-    appendageJoystick.button(5).onFalse(score());
-    appendageJoystick.button(5).onFalse(leds.runPattern(leds.red));
+    appendageJoystick
+        .button(4)
+        .onTrue(new InstantCommand(() -> elevator.l3()))
+        .onTrue(leds.runPattern(leds.blue))
+        .onFalse(score());
 
-    appendageJoystick.button(4).onTrue(new InstantCommand(() -> elevator.l3()));
-    appendageJoystick.button(4).onTrue(leds.runPattern(leds.blue));
-    appendageJoystick.button(4).onFalse(score());
-    appendageJoystick.button(4).onFalse(leds.runPattern(leds.red));
+    appendageJoystick
+        .button(3)
+        .onTrue(new InstantCommand(() -> elevator.l4()))
+        .onTrue(leds.runPattern(leds.blue))
+        .onFalse(score());
 
-    appendageJoystick.button(3).onTrue(new InstantCommand(() -> elevator.l4()));
-    appendageJoystick.button(3).onTrue(leds.runPattern(leds.blue));
-    appendageJoystick.button(3).onFalse(score());
-    appendageJoystick.button(3).onFalse(leds.runPattern(leds.red));
+    // Dereefing controls
+    appendageJoystick.button(8).onTrue(a1()).onFalse(algaeStow());
 
-    appendageJoystick.button(8).onTrue(a1());
-    appendageJoystick.button(8).onFalse(new InstantCommand(() -> reeftake.algaeStop()));
-
-    appendageJoystick.button(7).onTrue(a2());
-    appendageJoystick.button(7).onFalse(new InstantCommand(() -> reeftake.algaeStop()));
+    appendageJoystick.button(7).onTrue(a2()).onFalse(algaeStow());
 
     appendageJoystick.button(9).onTrue(new InstantCommand(() -> elevator.stow()));
 
+    // Barge Scoring
     appendageJoystick
-        .button(12)
-        .onTrue(
-            new InstantCommand(() -> elevator.hp())
-                .andThen(reeftake.reeftakeIntake())
-                .andThen(leds.runPattern(leds.scrollngRainbow))
-                .andThen(new InstantCommand(() -> elevator.stow())));
+        .button(10)
+        .onTrue(new InstantCommand(() -> elevator.l4()))
+        .onFalse(scoreBarge());
 
-    // Manual control, COMMENT OUT WHEN NOT IN USE
-    // DISABLE PID IN ELEVATOR CLASS!!!
-    // appendageJoystick.button(7).onTrue(elevator.manualElevator(0.2));
-    // appendageJoystick.button(7).onFalse(elevator.manualElevator(0.0));
+    appendageJoystick
+        .button(11)
+        .onTrue(new InstantCommand(() -> reeftake.algaeOuttake()))
+        .onFalse(new InstantCommand(() -> reeftake.algaeStop()));
 
-    // appendageJoystick.button(8).onTrue(elevator.manualElevator(-0.1));
-    // appendageJoystick.button(8).onFalse(elevator.manualElevator(0.0));
-
-    // appendageJoystick.button(11).onTrue(new InstantCommand(() -> elevator.zeroMotor()));
+    // Intake from HP
+    appendageJoystick.button(12).onTrue(intake());
 
     // Climber controls
-    appendageJoystick.button(1).onTrue(new InstantCommand(() -> climber.setClimber(0.8)));
-    appendageJoystick.button(1).onFalse(new InstantCommand(() -> climber.setClimber(0.0)));
+    appendageJoystick.button(1).onTrue(climber.setClimber(0.8)).onFalse(climber.setClimber(0.0));
 
-    appendageJoystick.button(2).onTrue(new InstantCommand(() -> climber.setClimber(-0.8)));
-    appendageJoystick.button(2).onFalse(new InstantCommand(() -> climber.setClimber(0.0)));
+    appendageJoystick.button(2).onTrue(climber.setClimber(-0.8)).onFalse(climber.setClimber(0.0));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -212,15 +236,21 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    elevator.setClampedGoal(Constants.ElevatorConstants.stowPos);
+    groundtake.setGoal(Constants.GroundtakeConstants.stowPos);
 
-  @Override
-  public void disabledInit() {
-    
+    drivetrain.setDefaultCommand(
+        drivetrain.applyRequest(
+            () ->
+                drive
+                    .withVelocityX(-controller.getLeftY() * maxSpeed)
+                    .withVelocityY(-controller.getLeftX() * maxSpeed)
+                    .withRotationalRate(-controller.getRightX() * maxAngularRate)));
   }
 
   @Override
-  public void disabledExit() {}
+  public void disabledInit() {}
 
   @Override
   public void robotPeriodic() {
@@ -230,7 +260,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {}
 
-  // Make sequencial commands for the elevator here once reeftake pivot it made.
   public SequentialCommandGroup a1() {
     return new InstantCommand(() -> elevator.a1())
         .andThen(new InstantCommand(() -> reeftake.algaeIntake()));
@@ -238,54 +267,45 @@ public class Robot extends TimedRobot {
 
   public SequentialCommandGroup a2() {
     return new InstantCommand(() -> elevator.a2())
-        .andThen(new InstantCommand(() -> reeftake.algaeIntake())
-        );
+        .andThen(new InstantCommand(() -> reeftake.algaeIntake()));
+  }
+
+  public SequentialCommandGroup algaeStow() {
+    return new InstantCommand(() -> elevator.aStow())
+        .andThen(new InstantCommand(() -> reeftake.algaeStop()));
+  }
+
+  public SequentialCommandGroup scoreBarge() {
+    return new InstantCommand(() -> reeftake.algaeOuttake())
+        .andThen(new WaitCommand(0.75))
+        .andThen(new InstantCommand(() -> reeftake.algaeStop()))
+        .andThen(new InstantCommand(() -> elevator.hp()));
   }
 
   public SequentialCommandGroup score() {
     return new InstantCommand(() -> reeftake.coralIntake())
-        .andThen(new WaitCommand(0.5))
-        .andThen(new InstantCommand(() -> elevator.stow()))
+        .andThen(new WaitCommand(0.75))
+        .andThen(new InstantCommand(() -> elevator.hp()))
         .andThen(new InstantCommand(() -> reeftake.coralStop()));
   }
 
-  public SequentialCommandGroup scorel2() {
-    return new InstantCommand(() -> elevator.l2())
-        .andThen(new WaitCommand(1))
-        .andThen(new InstantCommand(() -> reeftake.coralIntake()))
-        .andThen(new WaitCommand(0.75))
-        .andThen(
-            new InstantCommand(() -> reeftake.coralStop())
-                .andThen(new InstantCommand(() -> elevator.stow())));
-  }
-
-  public SequentialCommandGroup scorel3() {
-    return new InstantCommand(() -> elevator.l3())
-        .andThen(new WaitCommand(2))
-        .andThen(new InstantCommand(() -> reeftake.coralIntake()))
-        .andThen(new WaitCommand(0.75))
-        .andThen(
-            new InstantCommand(() -> reeftake.coralStop())
-                .andThen(new InstantCommand(() -> elevator.stow())));
+  public SequentialCommandGroup intake() {
+    return new InstantCommand(() -> elevator.hp())
+        .andThen(reeftake.autoIntake())
+        .andThen(leds.runPattern(leds.scrollngRainbow));
   }
 
   public SequentialCommandGroup scorel4() {
-    return new InstantCommand(() -> elevator.l4())
-        .andThen(new WaitCommand(2.5))
-        .andThen(new InstantCommand(() -> reeftake.coralIntake()))
-        .andThen(new WaitCommand(0.75))
-        .andThen(
-            new InstantCommand(() -> reeftake.coralStop())
-                .andThen(new InstantCommand(() -> elevator.stow())));
+    return new InstantCommand(() -> elevator.l4()).andThen(new WaitCommand(1.5)).andThen(score());
   }
 
-  public AutoRoutine orbitReef() {
+  // Auto paths
+  public AutoRoutine midl4() {
 
-    AutoRoutine routine = autoFactory.newRoutine("Orbit Reef");
-    AutoTrajectory trajectory = routine.trajectory("Orbit Reef");
+    AutoRoutine routine = autoFactory.newRoutine("Mid l4");
+    AutoTrajectory trajectory = routine.trajectory("Mid l4");
 
     routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
-
     return routine;
   }
 }

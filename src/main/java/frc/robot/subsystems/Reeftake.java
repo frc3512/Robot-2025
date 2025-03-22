@@ -1,13 +1,12 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
-
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import frc.robot.Constants;
 
 public class Reeftake extends SubsystemBase {
@@ -16,11 +15,16 @@ public class Reeftake extends SubsystemBase {
   private final TalonFX intakeMotor = new TalonFX(18);
 
   public final DigitalInput coralIn =
-  new DigitalInput(Constants.ReeftakeConstants.digitalInputChannel);
+      new DigitalInput(Constants.ReeftakeConstants.digitalInputChannel);
 
   boolean shouldScoreCoral = false;
   boolean shouldIntakeCoral = false;
   boolean canInakeCoral = false;
+
+  public Reeftake() {
+    algaeMotor.setNeutralMode(NeutralModeValue.Brake);
+    intakeMotor.setNeutralMode(NeutralModeValue.Brake);
+  }
 
   public void coralIntake() {
     intakeMotor.set(0.175);
@@ -31,7 +35,7 @@ public class Reeftake extends SubsystemBase {
   }
 
   public void algaeOuttake() {
-    algaeMotor.set(-0.8);
+    algaeMotor.set(-0.9);
   }
 
   public void algaeStop() {
@@ -46,12 +50,11 @@ public class Reeftake extends SubsystemBase {
     return run(() -> intakeMotor.set(speed));
   }
 
-
-  public Command reeftakeIntake() {
+  public Command autoIntake() {
     return Commands.sequence(
-        Commands.runOnce(() -> intakeMotor.set(0.2)),
+        Commands.runOnce(() -> coralIntake()),
         Commands.waitUntil(() -> !coralIn.get()),
-        Commands.runOnce(() -> intakeMotor.set(0.0)));
+        Commands.runOnce(() -> coralStop()));
   }
 
   @Override
