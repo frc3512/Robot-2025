@@ -26,7 +26,6 @@ public class LED extends SubsystemBase {
       rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), ledSpacing);
 
   public LED() {
-
     led.setLength(ledBuffer.getLength());
 
     led.setData(ledBuffer);
@@ -35,6 +34,10 @@ public class LED extends SubsystemBase {
 
   public Command runPattern(LEDPattern pattern) {
     return run(() -> pattern.applyTo(ledBuffer));
+  }
+
+  public void setPattern(LEDPattern pattern) {
+    pattern.applyTo(ledBuffer);
   }
 
   @Override

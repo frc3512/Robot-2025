@@ -16,9 +16,8 @@ public class Climber extends ProfiledPIDSubsystem {
   private final DigitalInput magSwitch1 = new DigitalInput(2);
   private final DigitalInput magSwitch2 = new DigitalInput(3);
 
-  private boolean canClimbUp = false;
-  private boolean wantClimbUp = false;
-  private boolean shouldClimbUp = false;
+  DigitalInput topLimitSwitch = new DigitalInput(3);
+  DigitalInput bottomLimitSwitch = new DigitalInput(2);
 
   public Climber() {
     super(
@@ -34,15 +33,5 @@ public class Climber extends ProfiledPIDSubsystem {
 
   public Command setClimber(Double speed) {
     return run(() -> climbMotor1.set(speed));
-  }
-
-  @Override
-  protected void useOutput(double output, State setpoint) {
-    climbMotor1.setVoltage(output);
-  }
-
-  @Override
-  protected double getMeasurement() {
-    return climbMotor1.getPosition().getValueAsDouble();
   }
 }
