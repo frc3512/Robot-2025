@@ -202,20 +202,20 @@ public class Robot extends TimedRobot {
         .onFalse(score());
 
     // Dereefing controls
-    appendageJoystick.button(8).onTrue(a1()).onFalse(algaeStow());
+    appendageJoystick.button(8).onTrue(a1())
+                                      .onFalse(algaeStow());
 
-    appendageJoystick.button(7).onTrue(a2()).onFalse(algaeStow());
+    appendageJoystick.button(7).onTrue(a2())
+                                      .onFalse(algaeStow());
 
     appendageJoystick.button(9).onTrue(new InstantCommand(() -> elevator.stow()));
 
     // Barge Scoring
-    appendageJoystick
-        .button(10)
+    appendageJoystick.button(10)
         .onTrue(new InstantCommand(() -> elevator.l4()))
         .onFalse(scoreBarge());
 
-    appendageJoystick
-        .button(11)
+    appendageJoystick.button(11)
         .onTrue(new InstantCommand(() -> reeftake.algaeOuttake()))
         .onFalse(new InstantCommand(() -> reeftake.algaeStop()));
 
@@ -277,9 +277,14 @@ public class Robot extends TimedRobot {
 
   public SequentialCommandGroup scoreBarge() {
     return new InstantCommand(() -> reeftake.algaeOuttake())
-        .andThen(new WaitCommand(0.75))
-        .andThen(new InstantCommand(() -> reeftake.algaeStop()))
-        .andThen(new InstantCommand(() -> elevator.hp()));
+        .andThen(new WaitCommand(1))
+        .andThen(new InstantCommand(() -> elevator.hp()))
+        .andThen(new InstantCommand(() -> reeftake.algaeStop()));
+  }
+
+  public SequentialCommandGroup algaePos() {
+    return new InstantCommand(() -> reeftake.algaeStop())
+        .andThen(new InstantCommand(() -> elevator.stow()));
   }
 
   public SequentialCommandGroup score() {
@@ -296,7 +301,9 @@ public class Robot extends TimedRobot {
   }
 
   public SequentialCommandGroup scorel4() {
-    return new InstantCommand(() -> elevator.l4()).andThen(new WaitCommand(1.5)).andThen(score());
+    return new InstantCommand(() -> elevator.l4())
+        .andThen(new WaitCommand(1.5))
+        .andThen(score());
   }
 
   // Auto paths
