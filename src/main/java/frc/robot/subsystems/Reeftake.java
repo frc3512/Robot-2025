@@ -31,7 +31,7 @@ public class Reeftake extends SubsystemBase {
   }
 
   public void algaeIntake() {
-    algaeMotor.set(0.70);
+    algaeMotor.set(0.50);
   }
 
   public void algaeOuttake() {

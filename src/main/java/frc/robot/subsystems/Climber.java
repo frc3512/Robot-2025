@@ -13,6 +13,7 @@ public class Climber extends SubsystemBase {
 
   DigitalInput topLimitSwitch = new DigitalInput(3);
   DigitalInput bottomLimitSwitch = new DigitalInput(2);
+  DigitalInput climbBeamBreak = new DigitalInput(1);
 
   public Climber() {
     climbMotor1.setNeutralMode(NeutralModeValue.Brake);
@@ -20,5 +21,9 @@ public class Climber extends SubsystemBase {
 
   public Command setClimber(double speed) {
     return run(() -> climbMotor1.set(speed));
+  }
+
+  public boolean isBeamBroken(){
+    return climbBeamBreak.get();
   }
 }

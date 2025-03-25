@@ -9,9 +9,11 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -237,9 +239,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    elevator.setClampedGoal(Constants.ElevatorConstants.stowPos);
-    groundtake.setGoal(Constants.GroundtakeConstants.stowPos);
-
     drivetrain.setDefaultCommand(
         drivetrain.applyRequest(
             () ->
@@ -255,6 +254,12 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    
+    if (climber.isBeamBroken()){
+        leds.setPattern(LEDPattern.solid(Color.kOrange));
+    } else {
+        leds.setPattern(LEDPattern.kOff);
+    }
   }
 
   @Override
