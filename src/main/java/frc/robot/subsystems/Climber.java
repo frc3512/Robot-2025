@@ -6,32 +6,28 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.command.ProfiledPIDSubsystem;
 import frc.robot.Constants;
 
 @SuppressWarnings("unused")
-public class Climber extends ProfiledPIDSubsystem {
+public class Climber extends SubsystemBase {
 
-  private final TalonFX climbMotor1 = new TalonFX(Constants.ClimberConstants.climbMotor);
-  private final DigitalInput magSwitch1 = new DigitalInput(2);
-  private final DigitalInput magSwitch2 = new DigitalInput(3);
+  private final TalonFX climbMotor1 = new TalonFX(Constants.ClimberConstants.climbMotor1ID);
 
   DigitalInput topLimitSwitch = new DigitalInput(3);
   DigitalInput bottomLimitSwitch = new DigitalInput(2);
+  DigitalInput climbBeamBreak = new DigitalInput(1);
 
   public Climber() {
-    super(
-        new ProfiledPIDController(
-            Constants.ClimberConstants.kP,
-            Constants.ClimberConstants.kI,
-            Constants.ClimberConstants.kD,
-            Constants.ClimberConstants.constraints));
-    getController().setTolerance(Constants.ClimberConstants.tolerance);
-
     climbMotor1.setNeutralMode(NeutralModeValue.Brake);
   }
 
-  public Command setClimber(Double speed) {
-    return run(() -> climbMotor1.set(speed));
+  public Command setClimber(double speed) {
+      return run(() -> climbMotor1.set(speed));
+  }
+
+  public boolean isBeamBroken() {
+    return climbBeamBreak.get();
   }
 }

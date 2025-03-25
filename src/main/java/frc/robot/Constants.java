@@ -39,7 +39,7 @@ public class Constants {
   }
 
   public static class ClimberConstants {
-    public static final int climbMotor = 11;
+    public static final int climbMotor1ID = 11;
 
     public static final double kP = 1.0;
     public static final double kI = 0.0;
