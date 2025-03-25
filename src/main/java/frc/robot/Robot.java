@@ -197,6 +197,10 @@ public class Robot extends TimedRobot {
         .onTrue(new InstantCommand(() -> elevator.l4()))
         .onFalse(scoreBarge());
 
+    appendageJoystick.button(11)
+        .onTrue(new InstantCommand(() -> reeftake.algaeOuttake()))
+        .onFalse(new InstantCommand(() -> reeftake.algaeStop()));
+
     // Elevator controls
     appendageJoystick.button(6)
         .onTrue(new InstantCommand(() -> elevator.l1()))
@@ -294,7 +298,7 @@ public class Robot extends TimedRobot {
 
   public SequentialCommandGroup scoreBarge() {
     return new InstantCommand(() -> reeftake.algaeOuttake())
-        .andThen(new WaitCommand(0.75))
+        .andThen(new WaitCommand(0.375))
         .andThen(new InstantCommand(() -> elevator.hp()))
         .andThen(new InstantCommand(() -> reeftake.algaeStop()));
   }
