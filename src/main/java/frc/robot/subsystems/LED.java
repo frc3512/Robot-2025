@@ -38,6 +38,9 @@ public class LED extends SubsystemBase {
     return run(() -> pattern.applyTo(ledBuffer));
   }
 
+  public void setPattern(LEDPattern pattern) {
+    pattern.applyTo(ledBuffer);
+  }
   @Override
   public void periodic() {
     led.setData(ledBuffer);
