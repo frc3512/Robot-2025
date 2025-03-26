@@ -270,6 +270,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
+
+    CommandScheduler.getInstance().run();
+
     // CLimber LEDs
     if (climber.isBeamBroken()){
          leds.setPattern(LEDPattern.solid(Color.kOrange));
@@ -289,7 +292,6 @@ public class Robot extends TimedRobot {
                         est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
             });
 
-    CommandScheduler.getInstance().run();
   }
 
   @Override
