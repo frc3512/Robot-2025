@@ -17,7 +17,7 @@ public class Reeftake extends SubsystemBase {
   private final TalonFX intakeMotor = new TalonFX(18);
 
   public final DigitalInput coralIn =
-  new DigitalInput(Constants.ReeftakeConstants.digitalInputChannel);
+      new DigitalInput(Constants.ReeftakeConstants.digitalInputChannel);
 
   boolean shouldScoreCoral = false;
   boolean shouldIntakeCoral = false;

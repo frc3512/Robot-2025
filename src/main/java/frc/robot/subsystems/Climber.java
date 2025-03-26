@@ -10,13 +10,14 @@ import frc.robot.Constants;
 
 public class Climber extends SubsystemBase {
 
-  DigitalInput climbBeamBreak = new DigitalInput(1);
+  private final DigitalInput climbBeamBreak = new DigitalInput(Constants.ClimberConstants.digitalInputChannel);
 
   private final TalonFX climbMotor = 
       new TalonFX(Constants.ClimberConstants.climbMotorID);
 
-  public final DigitalInput climberBreak =
-      new DigitalInput(Constants.ClimberConstants.digitalInputChannel);
+  public boolean isBeamBroken() {
+    return climbBeamBreak.get();
+  }
 
   public Climber() {
     climbMotor.setNeutralMode(NeutralModeValue.Brake);
@@ -32,7 +33,5 @@ public class Climber extends SubsystemBase {
       "Climber/Climber Motor Temp", climbMotor.getDeviceTemp().getValueAsDouble());
   }
 
-  public boolean isBeamBroken() {
-    return climbBeamBreak.get();
-  }
+
 }
