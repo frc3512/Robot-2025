@@ -193,15 +193,16 @@ public class Robot extends TimedRobot {
 
     appendageJoystick.button(7).onTrue(a2()).onFalse(algaeStow());
 
-    appendageJoystick.button(9)
-            .onTrue(new InstantCommand(() -> elevator.stow()));
+    appendageJoystick.button(9).onTrue(new InstantCommand(() -> elevator.stow()));
 
     // Barge Scoring
-    appendageJoystick.button(10)
+    appendageJoystick
+        .button(10)
         .onTrue(new InstantCommand(() -> elevator.l4()))
         .onFalse(scoreBarge());
 
-    appendageJoystick.button(11)
+    appendageJoystick
+        .button(11)
         .onTrue(new InstantCommand(() -> reeftake.algaeOuttake()))
         .onFalse(new InstantCommand(() -> reeftake.algaeStop()));
 
@@ -209,9 +210,10 @@ public class Robot extends TimedRobot {
     appendageJoystick.button(12).onTrue(intake());
 
     // Climber controls
-    appendageJoystick.button(1).onTrue(climber.setClimber(0.8)).onFalse(climber.setClimber(0.0));
+    // appendageJoystick.button(1).onTrue(climber.setClimber(0.8)).onFalse(climber.setClimber(0.0));
+    appendageJoystick.button(1).onTrue(climber.setClimber(0.8))if(climber.is)
 
-    appendageJoystick.button(2).onTrue(climber.setClimber(-0.8)).onFalse(climber.setClimber(0.0));
+    // appendageJoystick.button(2).onTrue(climber.setClimber(-0.8)).onFalse(climber.setClimber(0.0));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -240,11 +242,20 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    
-    if (climber.isBeamBroken()){
-        leds.setPattern(LEDPattern.solid(Color.kOrange));
+
+    if (climber.isBeamBroken()) {
+      leds.setPattern(LEDPattern.solid(Color.kOrange));
     } else {
-        leds.setPattern(LEDPattern.kOff);
+      leds.setPattern(LEDPattern.kOff);
+    }
+
+    if (climber.isBeamBroken()) {
+      climber.setClimber(-0.1);
+      if (climber.stopClimb()) {
+        climber.setClimber(0);
+      }
+    } else {
+      climber.setClimber(0);
     }
   }
 
@@ -287,9 +298,7 @@ public class Robot extends TimedRobot {
   }
 
   public SequentialCommandGroup scorel4() {
-    return new InstantCommand(() -> elevator.l4())
-        .andThen(new WaitCommand(1.5))
-        .andThen(score());
+    return new InstantCommand(() -> elevator.l4()).andThen(new WaitCommand(1.5)).andThen(score());
   }
 
   // Auto paths

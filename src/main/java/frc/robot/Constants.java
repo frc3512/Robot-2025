@@ -40,15 +40,6 @@ public class Constants {
 
   public static class ClimberConstants {
     public static final int climbMotor1ID = 11;
-
-    public static final double kP = 1.0;
-    public static final double kI = 0.0;
-    public static final double kD = 0.0;
-
-    public static final double tolerance = 0.002;
-
-    public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(7, 5);
   }
 
   public static class ReeftakeConstants {
