@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants.ReefSlot;
 import frc.robot.DriveConstants.TunerSwerveDrivetrain;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -163,7 +162,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
         });
   }
 
-    // Credit to 6657  
+  // Credit to 6657
   public Command selectReef(String reef) {
     return Commands.runOnce(() -> this.selectedReef = reef)
         .andThen(() -> DogLog.log("Swerve/AimingSelectedReef", reef));
@@ -210,10 +209,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     DogLog.log("Vision/Current Pose", currentPos);
 
     Pose2d nearestReefMiddle = currentPos.nearest(reefMiddles);
-    ReefSlot nearestReefSlot =
-        reefSlots[
-            reefMiddles.indexOf(
-                nearestReefMiddle)];
+    ReefSlot nearestReefSlot = reefSlots[reefMiddles.indexOf(nearestReefMiddle)];
 
     if (selectedPiece == "Coral") {
       if (selectedReef == "Left") {
@@ -239,7 +235,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
 
     ChassisSpeeds speeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(x, y, rot, getState().Pose.getRotation());
-        
+
     this.setControl(
         new SwerveRequest.FieldCentric()
             .withVelocityX(speeds.vxMetersPerSecond)

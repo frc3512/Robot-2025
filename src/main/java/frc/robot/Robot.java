@@ -3,19 +3,15 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest;
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
-
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.cscore.UsbCamera;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -27,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.FieldConstants.ReefSlot;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Groundtake;
@@ -35,8 +30,6 @@ import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Reeftake;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
-import java.util.ArrayList;
-import java.util.List;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
@@ -71,9 +64,11 @@ public class Robot extends TimedRobot {
   public final LED leds = new LED();
   public final Reeftake reeftake = new Reeftake();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
-  public final Vision visionElevator = new Vision(Constants.VisionConstants.elevatorCam, Constants.VisionConstants.elevatorCamOffset);
-  public final Vision visionClimber = new Vision(Constants.VisionConstants.climberCam, Constants.VisionConstants.climberCamOffset);
-
+  public final Vision visionElevator =
+      new Vision(
+          Constants.VisionConstants.elevatorCam, Constants.VisionConstants.elevatorCamOffset);
+  public final Vision visionClimber =
+      new Vision(Constants.VisionConstants.climberCam, Constants.VisionConstants.climberCamOffset);
 
   // Controller Objects
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -134,30 +129,22 @@ public class Robot extends TimedRobot {
             false,
             drivetrain);
 
-    autoFactory
-        .bind("Score l4", scorel4())
-        .bind("Intake", intake());
+    autoFactory.bind("Score l4", scorel4()).bind("Intake", intake());
 
     autoChooser.addOption("Mid l4", midl4());
 
-    // Controler Bindings
-    // controller
-    //     .rightBumper()
-    //     .whileTrue(
-    //         drivetrain.applyRequest(
-    //             () ->
-    //                 driveSlow
-    //                     .withVelocityX(-controller.getLeftY() * slowSpeed)
-    //                     .withVelocityY(-controller.getLeftX() * slowSpeed)
-    //                     .withRotationalRate(-controller.getRightX() * slowAngularRate)))
-    //     .whileFalse(
-    //         drivetrain.applyRequest(
-    //             () ->
-    //                 drive
-    //                     .withVelocityX(-controller.getLeftY() * maxSpeed)
-    //                     .withVelocityY(-controller.getLeftX() * maxSpeed)
-    //                     .withRotationalRate(-controller.getRightX() * maxAngularRate)));
+    // -- Controler Bindings --
 
+    // Drivetrain control
+    drivetrain.setDefaultCommand(
+        drivetrain.applyRequest(
+            () ->
+                drive
+                    .withVelocityX(-controller.getLeftY() * maxSpeed)
+                    .withVelocityY(-controller.getLeftX() * maxSpeed)
+                    .withRotationalRate(-controller.getRightX() * maxAngularRate)));
+
+    // Re gyro
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     // Intake control for Groundtake
@@ -182,51 +169,41 @@ public class Robot extends TimedRobot {
     controller.povLeft().onTrue(drivetrain.selectReef("Left"));
     controller.povRight().onTrue(drivetrain.selectReef("Right"));
 
+    // Drive to pose
     controller.rightBumper().whileTrue(autoAim());
 
-    // Bindings for the button box
-
-    // Reeftake controls
-    appendageJoystick
-        .button(10)
-        .onTrue(new InstantCommand(() -> reeftake.prossecer()))
-        .onFalse(
-            new InstantCommand(() -> reeftake.algaeOuttake())
-                .andThen(new InstantCommand(() -> reeftake.retractPivot()))
-                .andThen(new InstantCommand(() -> reeftake.coralStop())));
+    // -- Bindings for the button box --
 
     // Elevator controls
-    appendageJoystick
-        .button(6)
-        .onTrue(new InstantCommand(() -> elevator.l1()))
-        .onTrue(leds.runPattern(leds.blue))
-        .onFalse(score());
+    appendageJoystick.button(6).onTrue(new InstantCommand(() -> elevator.l1())).onFalse(score());
 
-    appendageJoystick
-        .button(5)
-        .onTrue(new InstantCommand(() -> elevator.l2()))
-        .onTrue(leds.runPattern(leds.blue))
-        .onFalse(score());
+    appendageJoystick.button(5).onTrue(new InstantCommand(() -> elevator.l2())).onFalse(score());
 
-    appendageJoystick
-        .button(4)
-        .onTrue(new InstantCommand(() -> elevator.l3()))
-        .onTrue(leds.runPattern(leds.blue))
-        .onFalse(score());
+    appendageJoystick.button(4).onTrue(new InstantCommand(() -> elevator.l3())).onFalse(score());
 
-    appendageJoystick
-        .button(3)
-        .onTrue(new InstantCommand(() -> elevator.l4()))
-        .onTrue(leds.runPattern(leds.blue))
-        .onFalse(score());
-
-    appendageJoystick.button(8).onTrue(a1()).onFalse(rectractAlgae());
-
-    appendageJoystick.button(7).onTrue(a2()).onFalse(rectractAlgae());
+    appendageJoystick.button(3).onTrue(new InstantCommand(() -> elevator.l4())).onFalse(score());
 
     appendageJoystick.button(9).onTrue(new InstantCommand(() -> elevator.stow()));
 
     appendageJoystick.button(12).onTrue(intake());
+
+    appendageJoystick.button(9).onTrue(new InstantCommand(() -> elevator.stow()));
+
+    // Dereefing controls
+    appendageJoystick.button(8).onTrue(a1()).onFalse(retractAlgae());
+
+    appendageJoystick.button(7).onTrue(a2()).onFalse(retractAlgae());
+
+    // Barge Scoring
+    appendageJoystick
+        .button(10)
+        .onTrue(new InstantCommand(() -> elevator.l4()))
+        .onFalse(scoreBarge());
+
+    appendageJoystick
+        .button(11)
+        .onTrue(new InstantCommand(() -> reeftake.algaeOuttake()))
+        .onFalse(new InstantCommand(() -> reeftake.algaeStop()));
 
     // Climber controls
     appendageJoystick.button(1).onTrue(climber.setClimber(0.8)).onFalse(climber.setClimber(0.0));
@@ -244,16 +221,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     elevator.setClampedGoal(Constants.ElevatorConstants.stowPos);
-    reeftake.setGoal(Constants.ReeftakeConstants.retractPivot);
     groundtake.setGoal(Constants.GroundtakeConstants.stowPos);
-
-    drivetrain.setDefaultCommand(
-      drivetrain.applyRequest(
-        () ->
-            drive
-                .withVelocityX(-controller.getLeftY() * maxSpeed)
-                .withVelocityY(-controller.getLeftX() * maxSpeed)
-                .withRotationalRate(-controller.getRightX() * maxAngularRate)));
   }
 
   @Override
@@ -268,7 +236,9 @@ public class Robot extends TimedRobot {
           var estStdDevs = visionElevator.getEstimationStdDevs();
           DogLog.log("Vision/Elevator Estimated Pose", est.estimatedPose);
           drivetrain.addVisionMeasurement(
-              est.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(est.timestampSeconds), estStdDevs);
+              est.estimatedPose.toPose2d(),
+              Utils.fpgaToCurrentTime(est.timestampSeconds),
+              estStdDevs);
         });
 
     visionClimberEst.ifPresent(
@@ -276,7 +246,9 @@ public class Robot extends TimedRobot {
           var estStdDevs = visionClimber.getEstimationStdDevs();
           DogLog.log("Vision/Climber Estimated Pose", est.estimatedPose);
           drivetrain.addVisionMeasurement(
-              est.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(est.timestampSeconds), estStdDevs);
+              est.estimatedPose.toPose2d(),
+              Utils.fpgaToCurrentTime(est.timestampSeconds),
+              estStdDevs);
         });
   }
 
@@ -285,7 +257,7 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
     poseEstimation();
 
-    // Logging 
+    // Logging
     DogLog.log("Vision/Nearest Reef", drivetrain.getNearestReef());
   }
 
@@ -293,26 +265,30 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {}
 
   public Command autoAim() {
-    return Commands.sequence(drivetrain.resetAutoAimPID(), 
-        drivetrain.goToPose(() -> drivetrain.getNearestReef()));
+    return Commands.sequence(
+        drivetrain.resetAutoAimPID(), drivetrain.goToPose(() -> drivetrain.getNearestReef()));
   }
 
-  // Scoring and dereefing commands
   public SequentialCommandGroup a1() {
     return new InstantCommand(() -> elevator.a1())
-        .andThen(new InstantCommand(() -> reeftake.extendPivot()))
         .andThen(new InstantCommand(() -> reeftake.algaeIntake()));
   }
 
   public SequentialCommandGroup a2() {
     return new InstantCommand(() -> elevator.a2())
-        .andThen(new InstantCommand(() -> reeftake.extendPivot()))
         .andThen(new InstantCommand(() -> reeftake.algaeIntake()));
   }
 
-  public SequentialCommandGroup rectractAlgae() {
-    return new InstantCommand(() -> reeftake.retractPivot())
-        .andThen(new InstantCommand(() -> elevator.stow()));
+  public SequentialCommandGroup scoreBarge() {
+    return new InstantCommand(() -> reeftake.algaeOuttake())
+        .andThen(new WaitCommand(0.375))
+        .andThen(new InstantCommand(() -> elevator.hp()))
+        .andThen(new InstantCommand(() -> reeftake.algaeStop()));
+  }
+
+  public SequentialCommandGroup retractAlgae() {
+    return new InstantCommand(() -> elevator.aStow())
+        .andThen(new InstantCommand(() -> reeftake.algaeStop()));
   }
 
   public SequentialCommandGroup score() {
@@ -324,16 +300,12 @@ public class Robot extends TimedRobot {
 
   // Intake sequence
   public SequentialCommandGroup intake() {
-    return new InstantCommand(() -> elevator.hp())
-        .andThen(reeftake.autoIntake())
-        .andThen(leds.runPattern(leds.scrollngRainbow));
+    return new InstantCommand(() -> elevator.hp()).andThen(reeftake.autoIntake());
   }
 
   // Auto commands
   public SequentialCommandGroup scorel4() {
-    return new InstantCommand(() -> elevator.l4())
-        .andThen(new WaitCommand(1.5))
-        .andThen(score());
+    return new InstantCommand(() -> elevator.l4()).andThen(new WaitCommand(1.5)).andThen(score());
   }
 
   // Auto paths

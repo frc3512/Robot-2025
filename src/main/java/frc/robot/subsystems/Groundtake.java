@@ -3,9 +3,9 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.reduxrobotics.sensors.canandmag.Canandmag;
+import dev.doglog.DogLog;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.command.ProfiledPIDSubsystem;
 import frc.robot.Constants;
 
@@ -62,15 +62,14 @@ public class Groundtake extends ProfiledPIDSubsystem {
     super.periodic();
 
     // Values for PID graphing
-    SmartDashboard.putNumber("Groundtake/Pos", getMeasurement());
-    SmartDashboard.putNumber(
-        "Groundtake/MotorPos", floorAlgaePivotMotor.getRotorPosition().getValueAsDouble());
-    SmartDashboard.putNumber("Groundtake/Goal", getController().getGoal().position);
+    DogLog.log("Groundtake/Pos", getMeasurement());
+    DogLog.log("Groundtake/MotorPos", floorAlgaePivotMotor.getRotorPosition().getValueAsDouble());
+    DogLog.log("Groundtake/Goal", getController().getGoal().position);
 
     // General Info
-    SmartDashboard.putNumber(
+    DogLog.log(
         "Groundtake/Grountake Pivot Temp", floorAlgaePivotMotor.getDeviceTemp().getValueAsDouble());
-    SmartDashboard.putNumber(
+    DogLog.log(
         "Groundtake/Grountake Roller Temp",
         floorAlgaeRollerMotor.getDeviceTemp().getValueAsDouble());
   }

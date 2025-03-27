@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -21,6 +22,11 @@ public class LED extends SubsystemBase {
   public final LEDPattern red = LEDPattern.solid(Color.kRed);
   public final LEDPattern green = LEDPattern.solid(Color.kGreen);
   public final LEDPattern orange = LEDPattern.solid(Color.kOrange);
+  public final LEDPattern purple = LEDPattern.solid(Color.kPurple);
+  public final LEDPattern yellow = LEDPattern.solid(Color.kYellow);
+  public final LEDPattern white = LEDPattern.solid(Color.kWhite);
+  public final LEDPattern black = LEDPattern.solid(Color.kBlack);
+
   public final LEDPattern rainbow = LEDPattern.rainbow(255, 128);
   public final LEDPattern scrollngRainbow =
       rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), ledSpacing);
@@ -35,6 +41,10 @@ public class LED extends SubsystemBase {
 
   public Command runPattern(LEDPattern pattern) {
     return run(() -> pattern.applyTo(ledBuffer));
+  }
+
+  public void setPattern(LEDPattern pattern) {
+    pattern.applyTo(ledBuffer);
   }
 
   @Override

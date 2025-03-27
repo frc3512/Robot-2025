@@ -35,8 +35,9 @@ public class Constants {
     public static final double l2Pos = 14.2;
     public static final double l3Pos = 26;
     public static final double l4Pos = 46;
-    public static final double a1Pos = 9.5;
-    public static final double a2Pos = 21.84;
+    public static final double a1Pos = 3.5;
+    public static final double a2Pos = 15.84;
+    public static final double aStowPos = 14.5;
   }
 
   public static class ClimberConstants {
@@ -77,7 +78,7 @@ public class Constants {
     public static final double kI = 0.0;
     public static final double kD = 0.0;
 
-    public static final double tolerance = 0.02;
+    public static final double tolerance = 0.005;
 
     public static final double stowPos = 0.297;
     public static final double extendPivot = 0.135;
@@ -94,23 +95,24 @@ public class Constants {
         AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
     public static final Transform3d elevatorCamOffset =
-      new Transform3d(
+        new Transform3d(
             Units.inchesToMeters(10.0),
             Units.inchesToMeters(-6.0),
             Units.inchesToMeters(20),
-            new Rotation3d(Units.degreesToRadians(90), Units.degreesToRadians(0.0), Units.degreesToRadians(0.0)));
+            new Rotation3d(
+                Units.degreesToRadians(90),
+                Units.degreesToRadians(0.0),
+                Units.degreesToRadians(0.0)));
 
     public static final Transform3d climberCamOffset =
-      new Transform3d(
-          Units.inchesToMeters(10),
-          Units.inchesToMeters(-6.0),
-          Units.inchesToMeters(8),
-          new Rotation3d(0.0, Units.degreesToRadians(0.0), Units.degreesToRadians(0.0)));
+        new Transform3d(
+            Units.inchesToMeters(10),
+            Units.inchesToMeters(-6.0),
+            Units.inchesToMeters(8),
+            new Rotation3d(0.0, Units.degreesToRadians(0.0), Units.degreesToRadians(0.0)));
 
     public static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(1, 1, 2);
     public static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.2, 0.2, 0.2);
-
-    public static final double visionTurnP = 1; // TUNE THIS VALUE
   }
 
   public static class AutoConstants {
@@ -128,15 +130,15 @@ public class Constants {
   }
 
   public static class AimingConstants {
-    public static final double xP = 10;
+    public static final double xP = 7.5;
     public static final double xI = 0.0;
     public static final double xD = 0.0;
 
-    public static final double yP = 10;
+    public static final double yP = 7.5;
     public static final double yI = 0.0;
     public static final double yD = 0.0;
 
-    public static final double thetaP = 7.5;
+    public static final double thetaP = 5;
     public static final double thetaI = 0.0;
     public static final double thetaD = 0.0;
 
@@ -182,13 +184,15 @@ public class Constants {
 
       // Shift the pose to the robot's left
       public Pose2d getLeftPose(Pose2d pose) {
-        return pose.transformBy(new Transform2d(0.25, -0.26, new Rotation2d()));
+        return pose.transformBy(new Transform2d(0, -0.16, new Rotation2d()));
       }
 
+      // Shift the pose to the robot's right
       public Pose2d getRightPose(Pose2d pose) {
-        return pose.transformBy(new Transform2d(0.25, 0.06, new Rotation2d()));
+        return pose.transformBy(new Transform2d(0, 0.16, new Rotation2d()));
       }
 
+      // Shift the pose to the center
       public Pose2d getAlgaePose(Pose2d pose) {
         return pose.transformBy(new Transform2d(0.25, -0.09, new Rotation2d()));
       }
@@ -204,5 +208,4 @@ public class Constants {
       }
     }
   }
-
 }
