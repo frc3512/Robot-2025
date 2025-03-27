@@ -64,11 +64,13 @@ public class Robot extends TimedRobot {
   public final LED leds = new LED();
   public final Reeftake reeftake = new Reeftake();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
+
   public final Vision visionElevator =
       new Vision(
           Constants.VisionConstants.elevatorCam, Constants.VisionConstants.elevatorCamOffset);
   public final Vision visionClimber =
-      new Vision(Constants.VisionConstants.climberCam, Constants.VisionConstants.climberCamOffset);
+      new Vision(
+          Constants.VisionConstants.climberCam, Constants.VisionConstants.climberCamOffset);
 
   // Controller Objects
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -175,40 +177,54 @@ public class Robot extends TimedRobot {
     // -- Bindings for the button box --
 
     // Elevator controls
-    appendageJoystick.button(6).onTrue(new InstantCommand(() -> elevator.l1())).onFalse(score());
+    appendageJoystick.button(6)
+        .onTrue(new InstantCommand(() -> elevator.l1()))
+        .onFalse(score());
 
-    appendageJoystick.button(5).onTrue(new InstantCommand(() -> elevator.l2())).onFalse(score());
+    appendageJoystick.button(5)
+        .onTrue(new InstantCommand(() -> elevator.l2()))
+        .onFalse(score());
 
-    appendageJoystick.button(4).onTrue(new InstantCommand(() -> elevator.l3())).onFalse(score());
+    appendageJoystick.button(4)
+        .onTrue(new InstantCommand(() -> elevator.l3()))
+        .onFalse(score());
 
-    appendageJoystick.button(3).onTrue(new InstantCommand(() -> elevator.l4())).onFalse(score());
+    appendageJoystick.button(3)
+        .onTrue(new InstantCommand(() -> elevator.l4()))
+        .onFalse(score());
 
-    appendageJoystick.button(9).onTrue(new InstantCommand(() -> elevator.stow()));
+    appendageJoystick.button(9)
+        .onTrue(new InstantCommand(() -> elevator.stow()));
 
-    appendageJoystick.button(12).onTrue(intake());
-
-    appendageJoystick.button(9).onTrue(new InstantCommand(() -> elevator.stow()));
+    appendageJoystick.button(12)
+        .onTrue(intake());
 
     // Dereefing controls
-    appendageJoystick.button(8).onTrue(a1()).onFalse(retractAlgae());
+    appendageJoystick.button(8)
+        .onTrue(a1())
+        .onFalse(retractAlgae());
 
-    appendageJoystick.button(7).onTrue(a2()).onFalse(retractAlgae());
+    appendageJoystick.button(7)
+        .onTrue(a2())
+        .onFalse(retractAlgae());
 
     // Barge Scoring
-    appendageJoystick
-        .button(10)
+    appendageJoystick.button(10)
         .onTrue(new InstantCommand(() -> elevator.l4()))
         .onFalse(scoreBarge());
 
-    appendageJoystick
-        .button(11)
+    appendageJoystick.button(11)
         .onTrue(new InstantCommand(() -> reeftake.algaeOuttake()))
         .onFalse(new InstantCommand(() -> reeftake.algaeStop()));
 
     // Climber controls
-    appendageJoystick.button(1).onTrue(climber.setClimber(0.8)).onFalse(climber.setClimber(0.0));
+    appendageJoystick.button(1)
+        .onTrue(climber.setClimber(0.8))
+        .onFalse(climber.setClimber(0.0));
 
-    appendageJoystick.button(2).onTrue(climber.setClimber(-0.8)).onFalse(climber.setClimber(0.0));
+    appendageJoystick.button(2)
+        .onTrue(climber.setClimber(-0.8))
+        .onFalse(climber.setClimber(0.0));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
