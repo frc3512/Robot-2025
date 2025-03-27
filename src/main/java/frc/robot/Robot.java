@@ -314,8 +314,7 @@ public class Robot extends TimedRobot {
 
   public SequentialCommandGroup intake() {
     return new InstantCommand(() -> elevator.hp())
-        .andThen(reeftake.autoIntake())
-        .andThen(leds.runPattern(leds.scrollngRainbow));
+        .andThen(reeftake.autoIntake());
   }
 
   public SequentialCommandGroup scorel4() {
