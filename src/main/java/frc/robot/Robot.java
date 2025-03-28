@@ -3,6 +3,7 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import dev.doglog.DogLog;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.cameraserver.CameraServer;
@@ -258,7 +259,7 @@ public class Robot extends TimedRobot {
 
     // LEDs
     if (climber.isBeamBroken()){
-         leds.setPattern(leds.purple);
+        leds.setPattern(leds.purple);
      } else if (!reeftake.isCoralIn()) {
         leds.setPattern(leds.scrollngRainbow);
     } else if (reeftake.isCoralIn()) {
@@ -266,13 +267,19 @@ public class Robot extends TimedRobot {
     } else {
         leds.setPattern(leds.black);
     }
+
+    // Tuning mode
+    if (Constants.GeneralConstants.tuningMode == false) {
+      DogLog.setEnabled(false);
+    } else {
+      DogLog.setEnabled(true);
+    }
     
     vision.getPose();
 
     var visionEst = vision.getEstimatedGlobalPose();
     visionEst.ifPresent(
             est -> {
-                // Change our trust in the measurement based on the tags we can see
                 var estStdDevs = vision.getEstimationStdDevs();
 
                 drivetrain.addVisionMeasurement(
