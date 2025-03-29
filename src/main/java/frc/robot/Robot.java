@@ -122,7 +122,7 @@ public class Robot extends TimedRobot {
 
     autoChooser.addOption("Mid l4", midl4());
 
-    //  ---- Controler Bindings ----
+    //  ---- Controller Bindings ----
 
     drivetrain.setDefaultCommand(
         drivetrain.applyRequest(
