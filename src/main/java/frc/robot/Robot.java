@@ -211,7 +211,7 @@ public class Robot extends TimedRobot {
 
     // Climber controls
     // appendageJoystick.button(1).onTrue(climber.setClimber(0.8)).onFalse(climber.setClimber(0.0));
-    appendageJoystick.button(1).onTrue(climber.setClimber(0.8))if(climber.is)
+    appendageJoystick.button(1).onTrue(climber.setClimber(0.8));
 
     // appendageJoystick.button(2).onTrue(climber.setClimber(-0.8)).onFalse(climber.setClimber(0.0));
 
