@@ -3,17 +3,16 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import dev.doglog.DogLog;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.cscore.UsbCamera;
-import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -32,7 +31,6 @@ import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
-
 
 public class Robot extends TimedRobot {
 
@@ -84,7 +82,7 @@ public class Robot extends TimedRobot {
               // Get the UsbCamera from CameraServer
               UsbCamera camera = CameraServer.startAutomaticCapture();
               // Set the resolution
-              camera.setResolution(640, 480);
+              camera.setResolution(320, 240);
 
               CvSink cvSink = CameraServer.getVideo();
               CvSource outputStream = CameraServer.putVideo("Drive Cam", 640, 480);
@@ -129,6 +127,14 @@ public class Robot extends TimedRobot {
         .addOption("Mid l4", midl4());
 
     // Controler Bindings
+    drivetrain.setDefaultCommand(
+        drivetrain.applyRequest(
+                    () ->
+                        drive
+                            .withVelocityX(-controller.getLeftY() * maxSpeed)
+                            .withVelocityY(-controller.getLeftX() * maxSpeed)
+                            .withRotationalRate(-controller.getRightX() * maxAngularRate)));
+
     controller.rightBumper()
         .whileTrue(
             drivetrain.applyRequest(
@@ -136,14 +142,7 @@ public class Robot extends TimedRobot {
                     driveSlow
                         .withVelocityX(-controller.getLeftY() * slowSpeed)
                         .withVelocityY(-controller.getLeftX() * slowSpeed)
-                        .withRotationalRate(-controller.getRightX() * slowAngularRate)))
-        .whileFalse(
-            drivetrain.applyRequest(
-                () ->
-                    drive
-                        .withVelocityX(-controller.getLeftY() * maxSpeed)
-                        .withVelocityY(-controller.getLeftX() * maxSpeed)
-                        .withRotationalRate(-controller.getRightX() * maxAngularRate)));
+                        .withRotationalRate(-controller.getRightX() * slowAngularRate)));
 
     controller.x()
         .onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
@@ -182,6 +181,32 @@ public class Robot extends TimedRobot {
     controller.rightTrigger().onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()));
     controller.rightTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
 
+    // Elevator controls
+    appendageJoystick.button(6)
+        .onTrue(new InstantCommand(() -> elevator.l1()))
+        .onFalse(score());
+
+    appendageJoystick.button(5)
+        .onTrue(new InstantCommand(() -> elevator.l2()))
+        .onFalse(score());
+
+    appendageJoystick.button(4)
+        .onTrue(new InstantCommand(() -> elevator.l3()))
+        .onFalse(score());
+
+    appendageJoystick.button(3)
+        .onTrue(new InstantCommand(() -> elevator.l4()))
+        .onFalse(score());
+
+    appendageJoystick.button(9)
+        .onTrue(new InstantCommand(() -> elevator.stow()));
+
+    appendageJoystick.button(12)
+        .onTrue(intake());
+
+    appendageJoystick.button(9)
+        .onTrue(new InstantCommand(() -> elevator.stow()));
+
     // Dereefing controls
     appendageJoystick.button(8)
         .onTrue(a1())
@@ -191,9 +216,6 @@ public class Robot extends TimedRobot {
         .onTrue(a2())
         .onFalse(retractAlgae());
 
-    appendageJoystick.button(9)
-      . onTrue(new InstantCommand(() -> elevator.stow()));
-
     // Barge Scoring
     appendageJoystick.button(10)
         .onTrue(new InstantCommand(() -> elevator.l4()))
@@ -202,33 +224,6 @@ public class Robot extends TimedRobot {
     appendageJoystick.button(11)
         .onTrue(new InstantCommand(() -> reeftake.algaeOuttake()))
         .onFalse(new InstantCommand(() -> reeftake.algaeStop()));
-
-    // Elevator controls
-    appendageJoystick.button(6)
-        .onTrue(new InstantCommand(() -> elevator.l1()))
-        .onTrue(leds.runPattern(leds.blue))
-        .onFalse(score());
-
-    appendageJoystick.button(5)
-        .onTrue(new InstantCommand(() -> elevator.l2()))
-        .onTrue(leds.runPattern(leds.blue))
-        .onFalse(score());
-
-    appendageJoystick.button(4)
-        .onTrue(new InstantCommand(() -> elevator.l3()))
-        .onTrue(leds.runPattern(leds.blue))
-        .onFalse(score());
-
-    appendageJoystick.button(3)
-        .onTrue(new InstantCommand(() -> elevator.l4()))
-        .onTrue(leds.runPattern(leds.blue))
-        .onFalse(score());
-
-    appendageJoystick.button(9)
-        .onTrue(new InstantCommand(() -> elevator.stow()));
-
-    appendageJoystick.button(12)
-        .onTrue(intake());
 
     // Climber controls
     appendageJoystick.button(1)
@@ -245,24 +240,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    autoChooser
-        .getSelected()
-        .cmd()
-        .schedule();
+    autoChooser.getSelected().cmd().schedule();
   }
 
   @Override
   public void teleopInit() {
     elevator.setClampedGoal(Constants.ElevatorConstants.stowPos);
     groundtake.setGoal(Constants.GroundtakeConstants.stowPos);
-
-    drivetrain.setDefaultCommand(
-        drivetrain.applyRequest(
-                    () ->
-                        drive
-                            .withVelocityX(-controller.getLeftY() * maxSpeed)
-                            .withVelocityY(-controller.getLeftX() * maxSpeed)
-                            .withRotationalRate(-controller.getRightX() * maxAngularRate)));
   }
 
   @Override
@@ -270,26 +254,37 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    // CLimber LEDs
+
+    CommandScheduler.getInstance().run();
+
+    // LEDs
     if (climber.isBeamBroken()){
-         leds.setPattern(LEDPattern.solid(Color.kOrange));
-     } else {
-         leds.setPattern(LEDPattern.kOff);
-     }
+        leds.setPattern(leds.purple);
+     } else if (!reeftake.isCoralIn()) {
+        leds.setPattern(leds.scrollngRainbow);
+    } else if (reeftake.isCoralIn()) {
+        leds.setPattern(leds.red);
+    } else {
+        leds.setPattern(leds.black);
+    }
+
+    // Tuning mode
+    if (Constants.GeneralConstants.tuningMode == false) {
+      DogLog.setEnabled(false);
+    } else {
+      DogLog.setEnabled(true);
+    }
     
     vision.getPose();
 
     var visionEst = vision.getEstimatedGlobalPose();
     visionEst.ifPresent(
             est -> {
-                // Change our trust in the measurement based on the tags we can see
                 var estStdDevs = vision.getEstimationStdDevs();
 
                 drivetrain.addVisionMeasurement(
                         est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
             });
-
-    CommandScheduler.getInstance().run();
   }
 
   @Override
@@ -326,8 +321,7 @@ public class Robot extends TimedRobot {
 
   public SequentialCommandGroup intake() {
     return new InstantCommand(() -> elevator.hp())
-        .andThen(reeftake.autoIntake())
-        .andThen(leds.runPattern(leds.scrollngRainbow));
+        .andThen(reeftake.autoIntake());
   }
 
   public SequentialCommandGroup scorel4() {
@@ -338,7 +332,6 @@ public class Robot extends TimedRobot {
 
   // Auto paths
   public AutoRoutine midl4() {
-
     AutoRoutine routine = autoFactory.newRoutine("Mid l4");
     AutoTrajectory trajectory = routine.trajectory("Mid l4");
 

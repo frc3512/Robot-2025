@@ -117,7 +117,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
   }
 
   public void applyRequest(SwerveRequest request) {
-
     this.setControl(request);
   }
 

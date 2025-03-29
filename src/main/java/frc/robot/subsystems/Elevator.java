@@ -3,10 +3,10 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.command.ProfiledPIDSubsystem;
 import frc.robot.Constants;
@@ -93,17 +93,17 @@ public class Elevator extends ProfiledPIDSubsystem {
     super.periodic();
 
     // Values for PID graphing
-    SmartDashboard.putNumber(
-      "Elevator/ElevatorFrontMotorEncoder", frontMotor.getPosition().getValueAsDouble());
-    SmartDashboard.putNumber(
+    DogLog.log(
+      "Elevator/ Elevator Front Motor Encoder", frontMotor.getPosition().getValueAsDouble());
+    DogLog.log(
       "Elevator/Elevator Goal", getController().getSetpoint().position);
-    SmartDashboard.putNumber(
+    DogLog.log(
       "Elevator/Elevator Voltage", frontMotor.getMotorVoltage().getValueAsDouble());
 
     // General Info
-    SmartDashboard.putNumber(
+    DogLog.log(
       "Elevator/Front Motor Temp", frontMotor.getDeviceTemp().getValueAsDouble());
-    SmartDashboard.putNumber(
+    DogLog.log(
       "Elevator/Back Motor Temp", backMotor.getDeviceTemp().getValueAsDouble());
 
   }
