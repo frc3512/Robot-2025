@@ -54,14 +54,12 @@ public class Reeftake extends SubsystemBase {
     return Commands.sequence(
         Commands.runOnce(() -> coralIntake()),
         Commands.waitUntil(() -> !coralIn.get()),
-        Commands.runOnce(() -> coralStop())
-    );
+        Commands.runOnce(() -> coralStop()));
   }
 
   @Override
   public void periodic() {
     // General Info
-    SmartDashboard.putNumber(
-      "Reeftake/Motor Temp", intakeMotor.getDeviceTemp().getValueAsDouble());
+    SmartDashboard.putNumber("Reeftake/Motor Temp", intakeMotor.getDeviceTemp().getValueAsDouble());
   }
 }

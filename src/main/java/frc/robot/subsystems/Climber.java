@@ -10,10 +10,10 @@ import frc.robot.Constants;
 
 public class Climber extends SubsystemBase {
 
-  private final DigitalInput climbBeamBreak = new DigitalInput(Constants.ClimberConstants.digitalInputChannel);
+  private final DigitalInput climbBeamBreak =
+      new DigitalInput(Constants.ClimberConstants.digitalInputChannel);
 
-  private final TalonFX climbMotor = 
-      new TalonFX(Constants.ClimberConstants.climbMotorID);
+  private final TalonFX climbMotor = new TalonFX(Constants.ClimberConstants.climbMotorID);
 
   public final DigitalInput climberBreak =
       new DigitalInput(Constants.ClimberConstants.digitalInputChannel);
@@ -26,9 +26,12 @@ public class Climber extends SubsystemBase {
     return run(() -> climbMotor.set(speed));
   }
 
+  public boolean isBeamBroken() {
+    return climbBeamBreak.get();
+  }
+
   public void periodic() {
     // General Info
-    DogLog.log(
-      "Climber/Climber Motor Temp", climbMotor.getDeviceTemp().getValueAsDouble());
+    DogLog.log("Climber/Climber Motor Temp", climbMotor.getDeviceTemp().getValueAsDouble());
   }
 }

@@ -41,7 +41,6 @@ public class Constants {
     public static final double a1Pos = 3.5;
     public static final double a2Pos = 15.84;
     public static final double aStowPos = 14.5;
-
   }
 
   public static class ClimberConstants {
@@ -112,20 +111,19 @@ public class Constants {
             new Rotation3d(0.0, Units.degreesToRadians(0.0), Units.degreesToRadians(270)));
 
     public static final Transform3d climberCamOffset =
-    new Transform3d(
-        Units.inchesToMeters(-10),
-        Units.inchesToMeters(6.0),
-        Units.inchesToMeters(8),
-        new Rotation3d(0.0, Units.degreesToRadians(0.0), Units.degreesToRadians(90)));
+        new Transform3d(
+            Units.inchesToMeters(-10),
+            Units.inchesToMeters(6.0),
+            Units.inchesToMeters(8),
+            new Rotation3d(0.0, Units.degreesToRadians(0.0), Units.degreesToRadians(90)));
 
     public static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(2, 2, 4);
     public static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.9, 0.9, 0.9);
-    
+
     public static final AprilTagFieldLayout kTagLayout =
         AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
-    public static final Constraints autoAimTranslationConstraints = 
-        new Constraints(2, 5);
+    public static final Constraints autoAimTranslationConstraints = new Constraints(2, 5);
     public static final Constraints autoAimRotationConstraints =
         new Constraints(Units.rotationsToRadians(3), Units.rotationsToRadians(10));
 

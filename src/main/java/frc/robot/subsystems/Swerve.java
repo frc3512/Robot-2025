@@ -20,8 +20,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.DriveConstants.TunerSwerveDrivetrain;
-
-import java.lang.reflect.Field;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
@@ -58,7 +56,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     super(drivetrainConstants, odometryUpdateFrequency, modules);
 
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
-    
+
     SmartDashboard.putData("Position", robotView);
 
     if (Utils.isSimulation()) {

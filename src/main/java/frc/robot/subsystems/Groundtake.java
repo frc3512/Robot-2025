@@ -62,18 +62,16 @@ public class Groundtake extends ProfiledPIDSubsystem {
     super.periodic();
 
     // Values for PID graphing
-    DogLog.log(
-      "Groundtake/Pos", getMeasurement());
-    DogLog.log(
-      "Groundtake/MotorPos", floorAlgaePivotMotor.getRotorPosition().getValueAsDouble());
-    DogLog.log(
-      "Groundtake/Goal", getController().getGoal().position);
+    DogLog.log("Groundtake/Pos", getMeasurement());
+    DogLog.log("Groundtake/MotorPos", floorAlgaePivotMotor.getRotorPosition().getValueAsDouble());
+    DogLog.log("Groundtake/Goal", getController().getGoal().position);
 
     // General Info
     DogLog.log(
-      "Groundtake/Grountake Pivot Temp", floorAlgaePivotMotor.getDeviceTemp().getValueAsDouble());
+        "Groundtake/Grountake Pivot Temp", floorAlgaePivotMotor.getDeviceTemp().getValueAsDouble());
     DogLog.log(
-      "Groundtake/Grountake Roller Temp", floorAlgaeRollerMotor.getDeviceTemp().getValueAsDouble());
+        "Groundtake/Grountake Roller Temp",
+        floorAlgaeRollerMotor.getDeviceTemp().getValueAsDouble());
   }
 
   @Override
