@@ -3,6 +3,8 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import dev.doglog.DogLog;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.cameraserver.CameraServer;
@@ -231,8 +233,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     groundtake.setGoal(Constants.GroundtakeConstants.stowPos);
-
-    
   }
 
   @Override
@@ -252,6 +252,8 @@ public class Robot extends TimedRobot {
     } else {
       leds.setPattern(leds.black);
     }
+
+    DogLog.setEnabled(Constants.GeneralConstants.tuningMode);
   }
 
   @Override

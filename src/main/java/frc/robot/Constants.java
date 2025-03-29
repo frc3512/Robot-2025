@@ -14,6 +14,10 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 
 public class Constants {
+  public static class GeneralConstants {
+    public static final boolean tuningMode = false;
+  }
+
   public static class ElevatorConstants {
     public static final int frontMotorID = 13;
     public static final int backMotorID = 14;
