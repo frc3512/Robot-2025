@@ -6,7 +6,7 @@ plugins {
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17x 
 }
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
