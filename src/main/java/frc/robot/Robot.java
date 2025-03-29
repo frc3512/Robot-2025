@@ -140,6 +140,14 @@ public class Robot extends TimedRobot {
 
     autoChooser.addOption("Mid l4", midl4());
 
+    drivetrain.setDefaultCommand(
+      drivetrain.applyRequest(
+        () ->
+            drive
+                .withVelocityX(-controller.getLeftY() * maxSpeed)
+                .withVelocityY(-controller.getLeftX() * maxSpeed)
+                .withRotationalRate(-controller.getRightX() * maxAngularRate)));
+
     // Controler Bindings
     // controller
     //     .rightBumper()
@@ -182,7 +190,8 @@ public class Robot extends TimedRobot {
     controller.povLeft().onTrue(drivetrain.selectReef("Left"));
     controller.povRight().onTrue(drivetrain.selectReef("Right"));
 
-    controller.rightBumper().whileTrue(autoAim());
+    controller.rightBumper()
+        .whileTrue(autoAim());
 
     // Bindings for the button box
 
@@ -240,6 +249,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     autoChooser.getSelected().cmd().schedule();
+
+    poseEstimation();
   }
 
   @Override
@@ -247,13 +258,7 @@ public class Robot extends TimedRobot {
     elevator.setClampedGoal(Constants.ElevatorConstants.stowPos);
     groundtake.setGoal(Constants.GroundtakeConstants.stowPos);
 
-    drivetrain.setDefaultCommand(
-      drivetrain.applyRequest(
-        () ->
-            drive
-                .withVelocityX(-controller.getLeftY() * maxSpeed)
-                .withVelocityY(-controller.getLeftX() * maxSpeed)
-                .withRotationalRate(-controller.getRightX() * maxAngularRate)));
+    poseEstimation();
   }
 
   @Override
@@ -284,15 +289,16 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
     
-    poseEstimation();
-    drivetrain.getNearestReef();
 
     // Logging 
     DogLog.log("Vision/Nearest Reef", drivetrain.getNearestReef());
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    poseEstimation();
+    drivetrain.getNearestReef();
+  }
 
   public Command autoAim() {
     return Commands.sequence(drivetrain.resetAutoAimPID(), 
