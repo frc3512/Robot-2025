@@ -3,6 +3,8 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import dev.doglog.DogLog;
@@ -13,6 +15,7 @@ import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -26,6 +29,7 @@ import frc.robot.subsystems.Groundtake;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Reeftake;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Vision;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
@@ -59,6 +63,8 @@ public class Robot extends TimedRobot {
   public final LED leds = new LED();
   public final Reeftake reeftake = new Reeftake();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
+  public final Vision visionElevator = new Vision(Constants.VisionConstants.elevatorCam, Constants.VisionConstants.elevatorCamOffset);
+  public final Vision visionClimber = new Vision(Constants.VisionConstants.climberCam, Constants.VisionConstants.climberCamOffset);
 
   // Controller Objects
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -135,7 +141,7 @@ public class Robot extends TimedRobot {
                     .withRotationalRate(-controller.getRightX() * maxAngularRate)));
 
     controller
-        .rightBumper()
+        .leftBumper()
         .whileTrue(
             drivetrain.applyRequest(
                 () ->
@@ -145,6 +151,16 @@ public class Robot extends TimedRobot {
                         .withRotationalRate(-controller.getRightX() * slowAngularRate)));
 
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
+    // Aiming Controls
+    controller.povUp().onTrue(drivetrain.selectPiece("Coral"));
+    controller.povDown().onTrue(drivetrain.selectPiece("Algae"));
+
+    controller.povLeft().onTrue(drivetrain.selectReef("Left"));
+    controller.povRight().onTrue(drivetrain.selectReef("Right"));
+
+    controller.rightBumper()
+        .whileTrue(autoAim());
 
     // Intake control for Groundtake
     controller.leftTrigger()
@@ -228,6 +244,27 @@ public class Robot extends TimedRobot {
     groundtake.setGoal(Constants.GroundtakeConstants.stowPos);
   }
 
+  public void poseEstimation() {
+    var visionElevatorEst = visionElevator.getEstimatedGlobalPose(visionElevator.getCamera());
+    var visionClimberEst = visionClimber.getEstimatedGlobalPose(visionClimber.getCamera());
+
+    visionElevatorEst.ifPresent(
+        est -> {
+          var estStdDevs = visionElevator.getEstimationStdDevs();
+          DogLog.log("Vision/Elevator Estimated Pose", est.estimatedPose);
+          drivetrain.addVisionMeasurement(
+              est.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(est.timestampSeconds), estStdDevs);
+        });
+
+    visionClimberEst.ifPresent(
+        est -> {
+          var estStdDevs = visionClimber.getEstimationStdDevs();
+          DogLog.log("Vision/Climber Estimated Pose", est.estimatedPose);
+          drivetrain.addVisionMeasurement(
+              est.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(est.timestampSeconds), estStdDevs);
+        });
+  }
+
   @Override
   public void disabledInit() {}
 
@@ -252,7 +289,15 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    poseEstimation();
+    drivetrain.getNearestReef();
+  }
+
+  public Command autoAim() {
+    return Commands.sequence(drivetrain.resetAutoAimPID(), 
+        drivetrain.goToPose(() -> drivetrain.getNearestReef()));
+  }
 
   public SequentialCommandGroup a1() {
     return new InstantCommand(() -> elevator.a1())
@@ -267,7 +312,7 @@ public class Robot extends TimedRobot {
   public SequentialCommandGroup scoreBarge() {
     return new InstantCommand(() -> reeftake.algaeOuttake())
         .andThen(new WaitCommand(0.375))
-        .andThen(new InstantCommand(() -> elevator.hp()))
+        .andThen(new InstantCommand(() -> elevator.stow()))
         .andThen(new InstantCommand(() -> reeftake.algaeStop()));
   }
 
