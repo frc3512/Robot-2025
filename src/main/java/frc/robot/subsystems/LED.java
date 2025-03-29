@@ -19,8 +19,13 @@ public class LED extends SubsystemBase {
   private static final Distance ledSpacing = Meters.of(1.0 / 38.0);
 
   public final LEDPattern blue = LEDPattern.solid(Color.kBlue);
+  public final LEDPattern purple = LEDPattern.solid(Color.kPurple);
+  public final LEDPattern orange = LEDPattern.solid(Color.kOrange);
   public final LEDPattern red = LEDPattern.solid(Color.kRed);
   public final LEDPattern green = LEDPattern.solid(Color.kGreen);
+  public final LEDPattern yellow = LEDPattern.solid(Color.kYellow);
+  public final LEDPattern white = LEDPattern.solid(Color.kWhite);
+  public final LEDPattern black = LEDPattern.solid(Color.kBlack);
   public final LEDPattern rainbow = LEDPattern.rainbow(255, 128);
   public final LEDPattern scrollngRainbow =
       rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), ledSpacing);

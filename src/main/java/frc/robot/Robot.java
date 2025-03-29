@@ -9,11 +9,9 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.cscore.UsbCamera;
-import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -126,6 +124,14 @@ public class Robot extends TimedRobot {
 
     //  ---- Controler Bindings ----
 
+    drivetrain.setDefaultCommand(
+        drivetrain.applyRequest(
+            () ->
+                drive
+                    .withVelocityX(-controller.getLeftY() * maxSpeed)
+                    .withVelocityY(-controller.getLeftX() * maxSpeed)
+                    .withRotationalRate(-controller.getRightX() * maxAngularRate)));
+
     // Slow drive button
     controller
         .rightBumper()
@@ -135,20 +141,12 @@ public class Robot extends TimedRobot {
                     driveSlow
                         .withVelocityX(-controller.getLeftY() * slowSpeed)
                         .withVelocityY(-controller.getLeftX() * slowSpeed)
-                        .withRotationalRate(-controller.getRightX() * slowAngularRate)))
-        .whileFalse(
-            drivetrain.applyRequest(
-                () ->
-                    drive
-                        .withVelocityX(-controller.getLeftY() * maxSpeed)
-                        .withVelocityY(-controller.getLeftX() * maxSpeed)
-                        .withRotationalRate(-controller.getRightX() * maxAngularRate)));
+                        .withRotationalRate(-controller.getRightX() * slowAngularRate)));
 
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     // Intake control for Groundtake
-    controller
-        .leftTrigger()
+    controller.leftTrigger()
         .onTrue(
             new InstantCommand(() -> groundtake.extendPivot())
                 .andThen(new InstantCommand(() -> groundtake.floorAlgaeIntake())))
@@ -156,10 +154,9 @@ public class Robot extends TimedRobot {
             new InstantCommand(() -> groundtake.retractPivot())
                 .andThen(new InstantCommand(() -> groundtake.keepAlgae())));
 
-    controller
-        .rightTrigger()
-        .onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()))
-        .onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
+    controller.rightTrigger()
+            .onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()))
+            .onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
 
     // ---- Bindings for the button box ---
 
@@ -189,11 +186,16 @@ public class Robot extends TimedRobot {
         .onFalse(score());
 
     // Dereefing controls
-    appendageJoystick.button(8).onTrue(a1()).onFalse(algaeStow());
+    appendageJoystick.button(8)
+        .onTrue(a1())
+        .onFalse(algaeStow());
 
-    appendageJoystick.button(7).onTrue(a2()).onFalse(algaeStow());
+    appendageJoystick.button(7)
+        .onTrue(a2())
+        .onFalse(algaeStow());
 
-    appendageJoystick.button(9).onTrue(new InstantCommand(() -> elevator.stow()));
+    appendageJoystick.button(9)
+        .onTrue(new InstantCommand(() -> elevator.stow()));
 
     // Barge Scoring
     appendageJoystick
@@ -210,10 +212,13 @@ public class Robot extends TimedRobot {
     appendageJoystick.button(12).onTrue(intake());
 
     // Climber controls
-    // appendageJoystick.button(1).onTrue(climber.setClimber(0.8)).onFalse(climber.setClimber(0.0));
-    appendageJoystick.button(1).onTrue(climber.setClimber(0.8))if(climber.is)
+    appendageJoystick.button(1)
+        .onTrue(climber.setClimber(0.8))
+        .onFalse(climber.setClimber(0.0));
 
-    // appendageJoystick.button(2).onTrue(climber.setClimber(-0.8)).onFalse(climber.setClimber(0.0));
+    appendageJoystick.button(2)
+        .onTrue(climber.setClimber(-0.8))
+        .onFalse(climber.setClimber(0.0));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -227,13 +232,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     groundtake.setGoal(Constants.GroundtakeConstants.stowPos);
 
-    drivetrain.setDefaultCommand(
-        drivetrain.applyRequest(
-            () ->
-                drive
-                    .withVelocityX(-controller.getLeftY() * maxSpeed)
-                    .withVelocityY(-controller.getLeftX() * maxSpeed)
-                    .withRotationalRate(-controller.getRightX() * maxAngularRate)));
+    
   }
 
   @Override
@@ -243,19 +242,15 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
 
-    if (climber.isBeamBroken()) {
-      leds.setPattern(LEDPattern.solid(Color.kOrange));
+    // LEDs
+    if (climber.isBeamBroken()){
+      leds.setPattern(leds.purple);
+    } else if (!reeftake.isCoralIn()) {
+      leds.setPattern(leds.scrollngRainbow);
+    } else if (reeftake.isCoralIn()) {
+      leds.setPattern(leds.red);
     } else {
-      leds.setPattern(LEDPattern.kOff);
-    }
-
-    if (climber.isBeamBroken()) {
-      climber.setClimber(-0.1);
-      if (climber.stopClimb()) {
-        climber.setClimber(0);
-      }
-    } else {
-      climber.setClimber(0);
+      leds.setPattern(leds.black);
     }
   }
 

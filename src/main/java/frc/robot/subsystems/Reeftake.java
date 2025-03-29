@@ -26,6 +26,10 @@ public class Reeftake extends SubsystemBase {
     intakeMotor.setNeutralMode(NeutralModeValue.Brake);
   }
 
+  public boolean isCoralIn() {
+    return coralIn.get();
+  }
+
   public void coralIntake() {
     intakeMotor.set(0.15);
   }

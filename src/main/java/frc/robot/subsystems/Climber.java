@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-@SuppressWarnings("unused")
 public class Climber extends SubsystemBase {
 
   private final TalonFX climbMotor1 = new TalonFX(Constants.ClimberConstants.climbMotor1ID);
@@ -26,13 +25,5 @@ public class Climber extends SubsystemBase {
 
   public boolean isBeamBroken() {
     return climbBeamBreak.get();
-  }
-
-  public boolean setToClimb() {
-    return bottomLimitSwitch.get();
-  }
-
-  public boolean stopClimb() {
-    return topLimitSwitch.get();
   }
 }
