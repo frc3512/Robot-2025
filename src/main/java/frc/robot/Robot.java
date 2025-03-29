@@ -26,7 +26,6 @@ import frc.robot.subsystems.Groundtake;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Reeftake;
 import frc.robot.subsystems.Swerve;
-import frc.robot.subsystems.Vision;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
@@ -60,7 +59,6 @@ public class Robot extends TimedRobot {
   public final LED leds = new LED();
   public final Reeftake reeftake = new Reeftake();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
-  public final Vision vision = new Vision();
 
   // Controller Objects
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -119,13 +117,15 @@ public class Robot extends TimedRobot {
             false,
             drivetrain);
 
-    autoFactory.bind("Score l4", scorel4()).bind("Intake", intake());
-    autoFactory.bind("Score l2", scorel2()).bind("Intake", intake());
+    autoFactory
+        .bind("Score l4", scorel4())
+        .bind("Score l2", scorel2())
+        .bind("Intake", intake());
 
     autoChooser.addOption("Mid l4", midl4());
     autoChooser.addOption("Score l2 go HP", null);
 
-    // Controler Bindings
+    //  -- Controler Bindings -- 
     drivetrain.setDefaultCommand(
         drivetrain.applyRequest(
             () ->
@@ -147,8 +147,7 @@ public class Robot extends TimedRobot {
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     // Intake control for Groundtake
-    controller
-        .leftTrigger()
+    controller.leftTrigger()
         .onTrue(
             new InstantCommand(() -> groundtake.extendPivot())
                 .andThen(new InstantCommand(() -> groundtake.floorAlgaeIntake())))
@@ -156,47 +155,44 @@ public class Robot extends TimedRobot {
             new InstantCommand(() -> groundtake.retractPivot())
                 .andThen(new InstantCommand(() -> groundtake.keepAlgae())));
 
-    controller
-        .rightTrigger()
+                
+    controller.rightTrigger()
         .onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()))
         .onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
 
-    // Bindings for the button box
-
-    // Intake control for Groundtake
-    controller
-        .leftTrigger()
-        .onTrue(
-            new InstantCommand(() -> groundtake.extendPivot())
-                .andThen(new InstantCommand(() -> groundtake.floorAlgaeIntake())));
-    controller
-        .leftTrigger()
-        .onFalse(
-            new InstantCommand(() -> groundtake.retractPivot())
-                .andThen(new InstantCommand(() -> groundtake.keepAlgae())));
-
-    controller.rightTrigger().onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()));
-    controller.rightTrigger().onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
+    //  -- Bindings for the button box -- 
 
     // Elevator controls
-    appendageJoystick.button(6).onTrue(new InstantCommand(() -> elevator.l1())).onFalse(score());
+    appendageJoystick.button(6)
+        .onTrue(new InstantCommand(() -> elevator.l1()))
+        .onFalse(score());
 
-    appendageJoystick.button(5).onTrue(new InstantCommand(() -> elevator.l2())).onFalse(score());
+    appendageJoystick.button(5)
+        .onTrue(new InstantCommand(() -> elevator.l2()))
+        .onFalse(score());
 
-    appendageJoystick.button(4).onTrue(new InstantCommand(() -> elevator.l3())).onFalse(score());
+    appendageJoystick.button(4)
+        .onTrue(new InstantCommand(() -> elevator.l3()))
+        .onFalse(score());
 
-    appendageJoystick.button(3).onTrue(new InstantCommand(() -> elevator.l4())).onFalse(score());
+    appendageJoystick.button(3)
+        .onTrue(new InstantCommand(() -> elevator.l4()))
+        .onFalse(score());
 
-    appendageJoystick.button(9).onTrue(new InstantCommand(() -> elevator.stow()));
+    appendageJoystick.button(9).
+        onTrue(new InstantCommand(() -> elevator.stow()));
 
-    appendageJoystick.button(12).onTrue(intake());
-
-    appendageJoystick.button(9).onTrue(new InstantCommand(() -> elevator.stow()));
+    appendageJoystick.button(12).
+        onTrue(intake());
 
     // Dereefing controls
-    appendageJoystick.button(8).onTrue(a1()).onFalse(retractAlgae());
+    appendageJoystick.button(8)
+        .onTrue(a1())
+        .onFalse(retractAlgae());
 
-    appendageJoystick.button(7).onTrue(a2()).onFalse(retractAlgae());
+    appendageJoystick.button(7)
+        .onTrue(a2())
+        .onFalse(retractAlgae());
 
     // Barge Scoring
     appendageJoystick
@@ -210,9 +206,13 @@ public class Robot extends TimedRobot {
         .onFalse(new InstantCommand(() -> reeftake.algaeStop()));
 
     // Climber controls
-    appendageJoystick.button(1).onTrue(climber.setClimber(0.8)).onFalse(climber.setClimber(0.0));
+    appendageJoystick.button(1)
+        .onTrue(climber.setClimber(0.8))
+        .onFalse(climber.setClimber(0.0));
 
-    appendageJoystick.button(2).onTrue(climber.setClimber(-0.8)).onFalse(climber.setClimber(0.0));
+    appendageJoystick.button(2)
+        .onTrue(climber.setClimber(-0.8))
+        .onFalse(climber.setClimber(0.0));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -248,22 +248,7 @@ public class Robot extends TimedRobot {
     }
 
     // Tuning mode
-    if (Constants.GeneralConstants.tuningMode == false) {
-      DogLog.setEnabled(false);
-    } else {
-      DogLog.setEnabled(true);
-    }
-
-    vision.getPose();
-
-    var visionEst = vision.getEstimatedGlobalPose();
-    visionEst.ifPresent(
-        est -> {
-          var estStdDevs = vision.getEstimationStdDevs();
-
-          drivetrain.addVisionMeasurement(
-              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
-        });
+    DogLog.setEnabled(Constants.GeneralConstants.tuningMode);
   }
 
   @Override
@@ -299,15 +284,20 @@ public class Robot extends TimedRobot {
   }
 
   public SequentialCommandGroup intake() {
-    return new InstantCommand(() -> elevator.hp()).andThen(reeftake.autoIntake());
+    return new InstantCommand(() -> elevator.hp())
+      .andThen(reeftake.autoIntake());
   }
 
   public SequentialCommandGroup scorel4() {
-    return new InstantCommand(() -> elevator.l4()).andThen(new WaitCommand(1.5)).andThen(score());
+    return new InstantCommand(() -> elevator.l4())
+      .andThen(new WaitCommand(1.5))
+      .andThen(score());
   }
 
   public SequentialCommandGroup scorel2() {
-    return new InstantCommand(() -> elevator.l4()).andThen(new WaitCommand(1.5)).andThen(score());
+    return new InstantCommand(() -> elevator.l2())
+      .andThen(new WaitCommand(1))
+      .andThen(score());
   }
 
   // Auto paths

@@ -15,9 +15,6 @@ public class Climber extends SubsystemBase {
 
   private final TalonFX climbMotor = new TalonFX(Constants.ClimberConstants.climbMotorID);
 
-  public final DigitalInput climberBreak =
-      new DigitalInput(Constants.ClimberConstants.digitalInputChannel);
-
   public Climber() {
     climbMotor.setNeutralMode(NeutralModeValue.Brake);
   }
