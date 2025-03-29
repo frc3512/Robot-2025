@@ -120,8 +120,10 @@ public class Robot extends TimedRobot {
             drivetrain);
 
     autoFactory.bind("Score l4", scorel4()).bind("Intake", intake());
+    autoFactory.bind("Score l2", scorel2()).bind("Intake", intake());
 
     autoChooser.addOption("Mid l4", midl4());
+    autoChooser.addOption("Score l2 go HP", null);
 
     // Controler Bindings
     drivetrain.setDefaultCommand(
@@ -304,10 +306,22 @@ public class Robot extends TimedRobot {
     return new InstantCommand(() -> elevator.l4()).andThen(new WaitCommand(1.5)).andThen(score());
   }
 
+  public SequentialCommandGroup scorel2() {
+    return new InstantCommand(() -> elevator.l4()).andThen(new WaitCommand(1.5)).andThen(score());
+  }
+
   // Auto paths
   public AutoRoutine midl4() {
     AutoRoutine routine = autoFactory.newRoutine("Mid l4");
     AutoTrajectory trajectory = routine.trajectory("Mid l4");
+
+    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+    return routine;
+  }
+
+  public AutoRoutine scoreL2GoHP() {
+    AutoRoutine routine = autoFactory.newRoutine("Score l2 go Hp");
+    AutoTrajectory trajectory = routine.trajectory("Score l2 go HP");
 
     routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
     return routine;
