@@ -98,7 +98,10 @@ public class Robot extends TimedRobot {
               Point pt2 = new Point(400, 65);
               Point pt3 = new Point(0, 55);
               Point pt4 = new Point(400, 55);
-              Scalar color = new Scalar(28, 239, 84);
+              Point pt5 = new Point(0, 30);
+              Point pt6 = new Point(400, 30);
+              Scalar coralColor = new Scalar(28, 239, 84);
+              Scalar algaeColor = new Scalar(18, 5, 92);
 
               while (!Thread.interrupted()) {
 
@@ -107,8 +110,9 @@ public class Robot extends TimedRobot {
                   continue;
                 }
 
-                Imgproc.line(mat, pt1, pt2, color, 2);
-                Imgproc.line(mat, pt3, pt4, color, 2);
+                Imgproc.line(mat, pt1, pt2, coralColor, 2);
+                Imgproc.line(mat, pt3, pt4, coralColor, 2);
+                Imgproc.line(mat, pt5, pt6, algaeColor, 3);
                 outputStream.putFrame(mat);
               }
             });
