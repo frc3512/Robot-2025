@@ -1,5 +1,5 @@
 {
- "name":"Mid l4",
+ "name":"Mid l4 - Barge",
  "version":1,
  "snapshot":{
   "waypoints":[
@@ -15,7 +15,8 @@
  "params":{
   "waypoints":[
     {"x":{"exp":"7.592716217041016 m", "val":7.592716217041016}, "y":{"exp":"4.0172810554504395 m", "val":4.0172810554504395}, "heading":{"exp":"180 deg", "val":3.141592653589793}, "intervals":37, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"5.842322826385498 m", "val":5.842322826385498}, "y":{"exp":"3.8829643726348877 m", "val":3.882964372634888}, "heading":{"exp":"180 deg", "val":3.141592653589793}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
+    {"x":{"exp":"5.842322826385498 m", "val":5.842322826385498}, "y":{"exp":"3.8829643726348877 m", "val":3.882964372634888}, "heading":{"exp":"180 deg", "val":3.141592653589793}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"5.841989040374756 m", "val":5.841989040374756}, "y":{"exp":"3.6852734088897705 m", "val":3.6852734088897705}, "heading":{"exp":"3.1350567431433496 rad", "val":3.1350567431433496}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
@@ -71,5 +72,6 @@
   "splits":[0]
  },
  "events":[
-   {"name":"Score l4", "from":{"target":1, "targetTimestamp":1.84543, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Score l4"}}}]
+   {"name":"Score l4", "from":{"target":1, "targetTimestamp":1.84543, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Score l4"}}},
+   {"name":"De-reef a1", "from":{"target":2, "targetTimestamp":null, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"De-reef a1"}}}]
 }

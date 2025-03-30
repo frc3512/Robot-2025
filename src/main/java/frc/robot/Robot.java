@@ -125,7 +125,13 @@ public class Robot extends TimedRobot {
             false,
             drivetrain);
 
-    autoFactory.bind("Score l4", scorel4()).bind("Score l2", scorel2()).bind("Intake", intake());
+    autoFactory
+        .bind("Score l4", scorel4())
+        .bind("Score l2", scorel2())
+        .bind("De-reef a1", a1DeReef())
+        .bind("Intake", intake());
+
+    autoChooser.addOption("Mid l4", midl4());
 
     //  -- Controler Bindings --
     drivetrain.setDefaultCommand(
@@ -311,21 +317,41 @@ public class Robot extends TimedRobot {
   }
 
   public SequentialCommandGroup intake() {
-    return new InstantCommand(() -> elevator.hp()).andThen(reeftake.autoIntake());
+    return new InstantCommand(() -> elevator.hp())
+        .andThen(reeftake.autoIntake());
   }
 
   public SequentialCommandGroup scorel4() {
-    return new InstantCommand(() -> elevator.l4()).andThen(new WaitCommand(1.5)).andThen(score());
+    return new InstantCommand(() -> elevator.l4())
+        .andThen(new WaitCommand(1.5))
+        .andThen(score());
   }
 
   public SequentialCommandGroup scorel2() {
-    return new InstantCommand(() -> elevator.l2()).andThen(new WaitCommand(1)).andThen(score());
+    return new InstantCommand(() -> elevator.l2())
+        .andThen(new WaitCommand(1))
+        .andThen(score());
+  }
+
+  public SequentialCommandGroup a1DeReef() {
+    return new InstantCommand(() -> elevator.a1())
+        .andThen(new InstantCommand(() -> reeftake.algaeIntake()))
+        .andThen(new WaitCommand(1))
+        .andThen(retractAlgae());
   }
 
   // Auto paths
   public AutoRoutine midl4() {
     AutoRoutine routine = autoFactory.newRoutine("Mid l4");
     AutoTrajectory trajectory = routine.trajectory("Mid l4");
+
+    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+    return routine;
+  }
+
+  public AutoRoutine midl4Barge() {
+    AutoRoutine routine = autoFactory.newRoutine("Mid l4 - Barge");
+    AutoTrajectory trajectory = routine.trajectory("Mid l4 - Barge");
 
     routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
     return routine;
