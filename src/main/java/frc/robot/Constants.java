@@ -87,7 +87,10 @@ public class Constants {
             Units.inchesToMeters(10.0),
             Units.inchesToMeters(-6.0),
             Units.inchesToMeters(20),
-            new Rotation3d(Units.degreesToRadians(90), Units.degreesToRadians(0), Units.degreesToRadians(0.0)));
+            new Rotation3d(
+                Units.degreesToRadians(90),
+                Units.degreesToRadians(0),
+                Units.degreesToRadians(0.0)));
 
     public static final Transform3d climberCamOffset =
         new Transform3d(
@@ -183,8 +186,7 @@ public class Constants {
       }
 
       ReefPoses(Pose2d pose) {
-        this.blue = 
-            new ReefSlot(pose, getLeftPose(pose), getRightPose(pose), getAlgaePose(pose));
+        this.blue = new ReefSlot(pose, getLeftPose(pose), getRightPose(pose), getAlgaePose(pose));
         this.red =
             new ReefSlot(
                 getRedReefPose(pose),
@@ -194,5 +196,4 @@ public class Constants {
       }
     }
   }
-
 }

@@ -1,5 +1,5 @@
 {
- "name":"Paths",
+ "name":"Path",
  "version":1,
  "type":"Swerve",
  "variables":{
@@ -28,8 +28,8 @@
    }
   },
   "mass":{
-   "exp":"115 lbs",
-   "val":52.16312255
+   "exp":"112 lbs",
+   "val":50.80234544
   },
   "inertia":{
    "exp":"6 kg m ^ 2",

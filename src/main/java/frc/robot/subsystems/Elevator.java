@@ -93,7 +93,8 @@ public class Elevator extends ProfiledPIDSubsystem {
     super.periodic();
 
     // Values for PID graphing
-    DogLog.log("Elevator/ Elevator Front Motor Encoder", frontMotor.getPosition().getValueAsDouble());
+    DogLog.log(
+        "Elevator/ Elevator Front Motor Encoder", frontMotor.getPosition().getValueAsDouble());
     DogLog.log("Elevator/Elevator Goal", getController().getSetpoint().position);
     DogLog.log("Elevator/Elevator Voltage", frontMotor.getMotorVoltage().getValueAsDouble());
 

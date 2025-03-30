@@ -12,7 +12,6 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
@@ -26,11 +25,8 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants.ReefSlot;
 import frc.robot.DriveConstants.TunerSwerveDrivetrain;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
@@ -157,7 +153,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     this.setControl(request);
   }
 
-  // Credit to 6657  
+  // Credit to 6657
   public Command resetAutoAimPID() {
     return Commands.runOnce(
         () -> {
@@ -213,10 +209,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     DogLog.log("Vision/Current Pose", currentPos);
 
     Pose2d nearestReefMiddle = currentPos.nearest(reefMiddles);
-    ReefSlot nearestReefSlot =
-        reefSlots[
-            reefMiddles.indexOf(
-                nearestReefMiddle)];
+    ReefSlot nearestReefSlot = reefSlots[reefMiddles.indexOf(nearestReefMiddle)];
 
     if (selectedPiece == "Coral") {
       if (selectedReef == "Left") {
@@ -242,7 +235,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
 
     ChassisSpeeds speeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(x, y, rot, getState().Pose.getRotation());
-        
+
     this.setControl(
         new SwerveRequest.FieldCentric()
             .withVelocityX(speeds.vxMetersPerSecond)
