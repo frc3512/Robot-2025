@@ -46,6 +46,10 @@ public class Reeftake extends SubsystemBase {
     algaeMotor.set(0);
   }
 
+  public void hpIntake() {
+    intakeMotor.set(0.5);
+  }
+
   public void coralStop() {
     intakeMotor.set(0.0);
   }
@@ -56,7 +60,7 @@ public class Reeftake extends SubsystemBase {
 
   public Command autoIntake() {
     return Commands.sequence(
-        Commands.runOnce(() -> coralIntake()),
+        Commands.runOnce(() -> hpIntake()),
         Commands.waitUntil(() -> !coralIn.get()),
         Commands.runOnce(() -> coralStop()));
   }
