@@ -90,8 +90,8 @@ public class Robot extends TimedRobot {
               Point pt2 = new Point(400, 65);
               Point pt3 = new Point(0, 55);
               Point pt4 = new Point(400, 55);
-              Point pt5 = new Point(0, 30);
-              Point pt6 = new Point(400, 30);
+              Point pt5 = new Point(0, 135);
+              Point pt6 = new Point(400, 135);
               Scalar coralColor = new Scalar(28, 239, 84);
               Scalar algaeColor = new Scalar(18, 5, 92);
 
@@ -210,13 +210,9 @@ public class Robot extends TimedRobot {
         .onFalse(new InstantCommand(() -> reeftake.algaeStop()));
 
     // Climber controls
-    appendageJoystick.button(1)
-        .onTrue(climber.setClimber(0.8))
-        .onFalse(climber.setClimber(0.0));
+    appendageJoystick.button(1).onTrue(climber.setClimber(0.8)).onFalse(climber.setClimber(0.0));
 
-    appendageJoystick.button(2)
-        .onTrue(climber.setClimber(-0.8))
-        .onFalse(climber.setClimber(0.0));
+    appendageJoystick.button(2).onTrue(climber.setClimber(-0.8)).onFalse(climber.setClimber(0.0));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -230,6 +226,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     elevator.setClampedGoal(Constants.ElevatorConstants.stowPos);
     groundtake.setGoal(Constants.GroundtakeConstants.stowPos);
+    elevator.setClampedGoal(Constants.ElevatorConstants.stowPos);
   }
 
   @Override

@@ -37,8 +37,8 @@ public class Constants {
     public static final double l2Pos = 14.2;
     public static final double l3Pos = 25.6;
     public static final double l4Pos = 45.5;
-    public static final double a1Pos = 3.5;
-    public static final double a2Pos = 15.84;
+    public static final double a1Pos = 3.0;
+    public static final double a2Pos = 15.3;
     public static final double aStowPos = 14.5;
   }
 
