@@ -3,9 +3,9 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
-import dev.doglog.DogLog;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import dev.doglog.DogLog;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
@@ -77,40 +77,39 @@ public class Robot extends TimedRobot {
     CameraServer.startAutomaticCapture();
 
     m_visionThread =
-    new Thread(
-        () -> {
-          // Get the UsbCamera from CameraServer
-          UsbCamera camera = CameraServer.startAutomaticCapture();
-          // Set the resolution
-          camera.setResolution(320, 240);
+        new Thread(
+            () -> {
+              // Get the UsbCamera from CameraServer
+              UsbCamera camera = CameraServer.startAutomaticCapture();
+              // Set the resolution
+              camera.setResolution(320, 240);
 
-          CvSink cvSink = CameraServer.getVideo();
-          CvSource outputStream = CameraServer.putVideo("Drive Cam", 640, 480);
+              CvSink cvSink = CameraServer.getVideo();
+              CvSource outputStream = CameraServer.putVideo("Drive Cam", 640, 480);
 
-          Mat mat = new Mat();
-          Point pt1 = new Point(0, 65);
-          Point pt2 = new Point(400, 65);
-          Point pt3 = new Point(0, 55);
-          Point pt4 = new Point(400, 55);
-          Point pt5 = new Point(0, 135);
-          Point pt6 = new Point(400, 135);
-          Scalar coralColor = new Scalar(28, 239, 84);
-          Scalar algaeColor = new Scalar(18, 5, 92);
+              Mat mat = new Mat();
+              Point pt1 = new Point(0, 65);
+              Point pt2 = new Point(400, 65);
+              Point pt3 = new Point(0, 55);
+              Point pt4 = new Point(400, 55);
+              Point pt5 = new Point(0, 135);
+              Point pt6 = new Point(400, 135);
+              Scalar coralColor = new Scalar(28, 239, 84);
+              Scalar algaeColor = new Scalar(18, 5, 92);
 
-          while (!Thread.interrupted()) {
+              while (!Thread.interrupted()) {
 
-            if (cvSink.grabFrame(mat) == 0) {
-              outputStream.notifyError(cvSink.getError());
-              continue;
-            }
+                if (cvSink.grabFrame(mat) == 0) {
+                  outputStream.notifyError(cvSink.getError());
+                  continue;
+                }
 
-            Imgproc.line(mat, pt1, pt2, coralColor, 2);
-            Imgproc.line(mat, pt3, pt4, coralColor, 2);
-            Imgproc.line(mat, pt5, pt6, algaeColor, 3);
-            outputStream.putFrame(mat);
-          }
-        });
-
+                Imgproc.line(mat, pt1, pt2, coralColor, 2);
+                Imgproc.line(mat, pt3, pt4, coralColor, 2);
+                Imgproc.line(mat, pt5, pt6, algaeColor, 3);
+                outputStream.putFrame(mat);
+              }
+            });
 
     m_visionThread.setDaemon(true);
     m_visionThread.start();
@@ -152,7 +151,8 @@ public class Robot extends TimedRobot {
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     // Intake control for Groundtake
-    controller.leftTrigger()
+    controller
+        .leftTrigger()
         .onTrue(
             new InstantCommand(() -> groundtake.extendPivot())
                 .andThen(new InstantCommand(() -> groundtake.floorAlgaeIntake())))
@@ -160,9 +160,10 @@ public class Robot extends TimedRobot {
             new InstantCommand(() -> groundtake.retractPivot())
                 .andThen(new InstantCommand(() -> groundtake.keepAlgae())));
 
-    controller.rightTrigger()
-            .onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()))
-            .onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
+    controller
+        .rightTrigger()
+        .onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()))
+        .onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
 
     // ---- Bindings for the button box ---
 
@@ -192,16 +193,11 @@ public class Robot extends TimedRobot {
         .onFalse(score());
 
     // Dereefing controls
-    appendageJoystick.button(8)
-        .onTrue(a1())
-        .onFalse(algaeStow());
+    appendageJoystick.button(8).onTrue(a1()).onFalse(algaeStow());
 
-    appendageJoystick.button(7)
-        .onTrue(a2())
-        .onFalse(algaeStow());
+    appendageJoystick.button(7).onTrue(a2()).onFalse(algaeStow());
 
-    appendageJoystick.button(9)
-        .onTrue(new InstantCommand(() -> elevator.stow()));
+    appendageJoystick.button(9).onTrue(new InstantCommand(() -> elevator.stow()));
 
     // Barge Scoring
     appendageJoystick
@@ -218,13 +214,9 @@ public class Robot extends TimedRobot {
     appendageJoystick.button(12).onTrue(intake());
 
     // Climber controls
-    appendageJoystick.button(1)
-        .onTrue(climber.setClimber(0.8))
-        .onFalse(climber.setClimber(0.0));
+    appendageJoystick.button(1).onTrue(climber.setClimber(0.8)).onFalse(climber.setClimber(0.0));
 
-    appendageJoystick.button(2)
-        .onTrue(climber.setClimber(-0.8))
-        .onFalse(climber.setClimber(0.0));
+    appendageJoystick.button(2).onTrue(climber.setClimber(-0.8)).onFalse(climber.setClimber(0.0));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -237,6 +229,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     groundtake.setGoal(Constants.GroundtakeConstants.stowPos);
+    elevator.setClampedGoal(Constants.ElevatorConstants.stowPos);
   }
 
   @Override
@@ -247,7 +240,7 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
 
     // LEDs
-    if (climber.isBeamBroken()){
+    if (climber.isBeamBroken()) {
       leds.setPattern(leds.purple);
     } else if (!reeftake.isCoralIn()) {
       leds.setPattern(leds.scrollngRainbow);
