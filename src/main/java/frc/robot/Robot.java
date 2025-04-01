@@ -137,6 +137,7 @@ public class Robot extends TimedRobot {
         .bind("Intake", intake());
 
     autoChooser.addOption("Mid l4", midl4());
+    autoChooser.addOption("Mid l4 - Barge", midl4Barge());
 
     //  -- Controler Bindings --
     drivetrain.setDefaultCommand(
