@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,5 +27,11 @@ public class Climber extends SubsystemBase {
 
   public boolean isBeamBroken() {
     return climbBeamBreak.get();
+  }
+
+  @Override
+  public void periodic() {
+    // General Info
+    DogLog.log("Climber/Climber Temp", climbMotor1.getDeviceTemp().getValueAsDouble());
   }
 }

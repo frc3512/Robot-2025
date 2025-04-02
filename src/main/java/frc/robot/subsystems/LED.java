@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -49,5 +50,9 @@ public class LED extends SubsystemBase {
   public void periodic() {
     led.setData(ledBuffer);
     led.start();
+
+    // General Info
+    DogLog.log(
+      "LEDs/LED Pattern", ledBuffer.getLED(0).toString());
   }
 }

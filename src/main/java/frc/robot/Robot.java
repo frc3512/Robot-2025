@@ -72,8 +72,8 @@ public class Robot extends TimedRobot {
 
   public Robot() {
 
+    // Camera crosshair
     CameraServer.startAutomaticCapture();
-
     m_visionThread =
         new Thread(
             () -> {
@@ -130,6 +130,8 @@ public class Robot extends TimedRobot {
     autoChooser.addOption("Mid l4", midl4());
 
     //  -- Controler Bindings --
+
+    // Drive control
     drivetrain.setDefaultCommand(
         drivetrain.applyRequest(
             () ->
@@ -138,6 +140,7 @@ public class Robot extends TimedRobot {
                     .withVelocityY(-controller.getLeftX() * maxSpeed)
                     .withRotationalRate(-controller.getRightX() * maxAngularRate)));
 
+    // Slow mode
     controller.rightBumper()
         .whileTrue(
             drivetrain.applyRequest(
@@ -147,20 +150,19 @@ public class Robot extends TimedRobot {
                         .withVelocityY(-controller.getLeftX() * slowSpeed)
                         .withRotationalRate(-controller.getRightX() * slowAngularRate)));
 
+    // Reset gyro
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     // Intake control for Groundtake
     controller.leftTrigger()
-        .onTrue(
-            new InstantCommand(() -> groundtake.extendPivot())
-                .andThen(new InstantCommand(() -> groundtake.floorAlgaeIntake())))
-        .onFalse(
-            new InstantCommand(() -> groundtake.retractPivot())
-                .andThen(new InstantCommand(() -> groundtake.keepAlgae())));
+        .onTrue(new InstantCommand(() -> groundtake.extendPivot())
+            .andThen(new InstantCommand(() -> groundtake.floorAlgaeIntake())))
+        .onFalse(new InstantCommand(() -> groundtake.retractPivot())
+            .andThen(new InstantCommand(() -> groundtake.keepAlgae())));
 
-    controller
-        .rightTrigger()
-        .onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()))
+    controller.rightTrigger()
+        .onTrue(new InstantCommand(() -> groundtake.retractPivot())
+            .andThen(new InstantCommand(() -> groundtake.floorAlgaeOuttake())))
         .onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
 
     //  -- Bindings for the button box --
@@ -197,13 +199,11 @@ public class Robot extends TimedRobot {
         .onFalse(retractAlgae());
 
     // Barge Scoring
-    appendageJoystick
-        .button(10)
+    appendageJoystick.button(10)
         .onTrue(new InstantCommand(() -> elevator.l4()))
         .onFalse(scoreBarge());
 
-    appendageJoystick
-        .button(11)
+    appendageJoystick.button(11)
         .onTrue(new InstantCommand(() -> reeftake.algaeOuttake()))
         .onFalse(new InstantCommand(() -> reeftake.algaeStop()));
 
@@ -227,7 +227,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     elevator.setClampedGoal(Constants.ElevatorConstants.stowPos);
-    groundtake.retractPivot();
+    groundtake.setGoal(Constants.GroundtakeConstants.stowPos);
   }
 
   @Override
@@ -250,7 +250,7 @@ public class Robot extends TimedRobot {
     }
 
     // Tuning mode
-    DogLog.setEnabled(Constants.GeneralConstants.tuningMode);
+    DogLog.setEnabled(Constants.GeneralConstants.shouldLog);
   }
 
   @Override
@@ -298,7 +298,7 @@ public class Robot extends TimedRobot {
 
   public SequentialCommandGroup scorel2() {
     return new InstantCommand(() -> elevator.l2())
-        .andThen(new WaitCommand(1))
+        .andThen(new WaitCommand(0.75))
         .andThen(score());
   }
 

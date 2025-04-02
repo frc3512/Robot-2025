@@ -3,9 +3,10 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.reduxrobotics.sensors.canandmag.Canandmag;
+
+import dev.doglog.DogLog;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.command.ProfiledPIDSubsystem;
 import frc.robot.Constants;
 
@@ -29,6 +30,8 @@ public class Groundtake extends ProfiledPIDSubsystem {
 
     floorAlgaeRollerMotor.setNeutralMode(NeutralModeValue.Brake);
     floorAlgaePivotMotor.setNeutralMode(NeutralModeValue.Brake);
+
+    enable();
   }
 
   public void floorAlgaeIntake() {
@@ -49,21 +52,27 @@ public class Groundtake extends ProfiledPIDSubsystem {
 
   public void retractPivot() {
     setGoal(Constants.GroundtakeConstants.stowPos);
-    enable();
   }
 
   public void extendPivot() {
     setGoal(Constants.GroundtakeConstants.extendPivot);
-    enable();
   }
 
   @Override
   public void periodic() {
     super.periodic();
 
-    SmartDashboard.putNumber("Groundtake/Pos", getMeasurement());
-    SmartDashboard.putNumber("Groundtake/MotorPos", floorAlgaePivotMotor.getRotorPosition().getValueAsDouble());
-    SmartDashboard.putNumber("Groundtake/Goal", getController().getGoal().position);
+    // PID Graphing
+    DogLog.log(
+      "Groundtake/Pivot Motor Position", floorAlgaePivotMotor.getRotorPosition().getValueAsDouble());
+    DogLog.log(
+      "Groundtake/Pivot Goal", getController().getGoal().position);
+
+    // General Info
+    DogLog.log(
+      "Groundtake/Roller Temp", floorAlgaeRollerMotor.getDeviceTemp().getValueAsDouble());
+    DogLog.log(
+      "Groundtake/Pivot Temp", floorAlgaePivotMotor.getDeviceTemp().getValueAsDouble());
   }
 
   @Override

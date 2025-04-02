@@ -15,7 +15,7 @@ import edu.wpi.first.math.util.Units;
 
 public class Constants {
   public static class GeneralConstants {
-    public static final boolean tuningMode = false;
+    public static final boolean shouldLog = true;
   }
 
   public static class ElevatorConstants {
