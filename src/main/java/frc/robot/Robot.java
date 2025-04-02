@@ -167,7 +167,7 @@ public class Robot extends TimedRobot {
     controller.povLeft().onTrue(drivetrain.selectReef("Left"));
     controller.povRight().onTrue(drivetrain.selectReef("Right"));
 
-    controller.leftBumper().whileTrue(autoAim());
+   // controller.leftBumper().whileTrue(autoAim());
 
     // Intake control for Groundtake
     controller
