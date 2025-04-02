@@ -99,7 +99,8 @@ public class Elevator extends ProfiledPIDSubsystem {
 
     SmartDashboard.putNumber(
         "Elevator/ElevatorFrontMotorEncoder", frontMotor.getPosition().getValueAsDouble());
-    SmartDashboard.putNumber("Elevator/Elevator Goal", getController().getSetpoint().position);
+    SmartDashboard.putNumber(
+      "Elevator/Elevator Goal", getController().getSetpoint().position);
 
     SmartDashboard.putNumber(
         "Elevator/Elevator Voltage", frontMotor.getMotorVoltage().getValueAsDouble());

@@ -138,8 +138,7 @@ public class Robot extends TimedRobot {
                     .withVelocityY(-controller.getLeftX() * maxSpeed)
                     .withRotationalRate(-controller.getRightX() * maxAngularRate)));
 
-    controller
-        .rightBumper()
+    controller.rightBumper()
         .whileTrue(
             drivetrain.applyRequest(
                 () ->
@@ -151,8 +150,7 @@ public class Robot extends TimedRobot {
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     // Intake control for Groundtake
-    controller
-        .leftTrigger()
+    controller.leftTrigger()
         .onTrue(
             new InstantCommand(() -> groundtake.extendPivot())
                 .andThen(new InstantCommand(() -> groundtake.floorAlgaeIntake())))
@@ -210,9 +208,13 @@ public class Robot extends TimedRobot {
         .onFalse(new InstantCommand(() -> reeftake.algaeStop()));
 
     // Climber controls
-    appendageJoystick.button(1).onTrue(climber.setClimber(0.8)).onFalse(climber.setClimber(0.0));
+    appendageJoystick.button(1)
+        .onTrue(climber.setClimber(0.8))
+        .onFalse(climber.setClimber(0.0));
 
-    appendageJoystick.button(2).onTrue(climber.setClimber(-0.8)).onFalse(climber.setClimber(0.0));
+    appendageJoystick.button(2)
+        .onTrue(climber.setClimber(-0.8))
+        .onFalse(climber.setClimber(0.0));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -225,8 +227,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     elevator.setClampedGoal(Constants.ElevatorConstants.stowPos);
-    groundtake.setGoal(Constants.GroundtakeConstants.stowPos);
-    elevator.setClampedGoal(Constants.ElevatorConstants.stowPos);
+    groundtake.retractPivot();
   }
 
   @Override
