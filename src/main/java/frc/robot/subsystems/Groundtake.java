@@ -64,7 +64,7 @@ public class Groundtake extends ProfiledPIDSubsystem {
 
     // PID Graphing
     DogLog.log(
-      "Groundtake/Pivot Motor Position", floorAlgaePivotMotor.getRotorPosition().getValueAsDouble());
+      "Groundtake/Pivot Motor Position", encoder.getAbsPosition());
     DogLog.log(
       "Groundtake/Pivot Goal", getController().getGoal().position);
 
