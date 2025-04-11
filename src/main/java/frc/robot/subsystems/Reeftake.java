@@ -17,10 +17,6 @@ public class Reeftake extends SubsystemBase {
   public final DigitalInput coralIn =
       new DigitalInput(Constants.ReeftakeConstants.digitalInputChannel);
 
-  boolean shouldScoreCoral = false;
-  boolean shouldIntakeCoral = false;
-  boolean canInakeCoral = false;
-
   public Reeftake() {
     algaeMotor.setNeutralMode(NeutralModeValue.Brake);
     intakeMotor.setNeutralMode(NeutralModeValue.Brake);
