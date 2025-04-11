@@ -37,7 +37,7 @@ public class Elevator extends ProfiledPIDSubsystem {
 
     backMotor.setControl(new Follower(frontMotor.getDeviceID(), false));
 
-    // Be sure to remove this function when usning manual control
+    // Be sure to remove this function when using manual control
     enable();
   }
 

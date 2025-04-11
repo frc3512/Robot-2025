@@ -66,15 +66,15 @@ public class Constants {
     public static final double tolerance = 0.002;
 
     public static final double stowPos = 0.297;
-    public static final double extendPivot = 0.135;
+    public static final double extendPivot = 0.12;
 
     public static final TrapezoidProfile.Constraints constraints =
         new TrapezoidProfile.Constraints(5, 3);
   }
 
   public static class VisionConstants {
-    public static final String elevatorCam = "Arducam OV9281 3512 left";
-    public static final String climberCam = "Arducam OV9281 3512 right";
+    public static final String elevatorCam = "ElevatorCam";
+    public static final String climberCam = "ClimberCam";
 
     public static final Transform3d elevatorCamOffset =
         new Transform3d(
