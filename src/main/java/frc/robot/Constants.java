@@ -40,6 +40,8 @@ public class Constants {
     public static final double a1Pos = 3.0;
     public static final double a2Pos = 15.3;
     public static final double aStowPos = 14.5;
+
+    public static String level = "stow";
   }
 
   public static class ClimberConstants {
@@ -78,16 +80,16 @@ public class Constants {
 
     public static final Transform3d elevatorCamOffset =
         new Transform3d(
-            Units.inchesToMeters(10.0),
-            Units.inchesToMeters(6.0),
-            Units.inchesToMeters(20),
-            new Rotation3d(0.0, Units.degreesToRadians(0.0), Units.degreesToRadians(270)));
+            Units.inchesToMeters(10),
+            Units.inchesToMeters(4),
+            Units.inchesToMeters(8),
+            new Rotation3d(0.0, Units.degreesToRadians(0.0), Units.degreesToRadians(0)));
 
     public static final Transform3d climberCamOffset =
         new Transform3d(
+            Units.inchesToMeters(10),
             Units.inchesToMeters(-10),
-            Units.inchesToMeters(6.0),
-            Units.inchesToMeters(8),
+            Units.inchesToMeters(2),
             new Rotation3d(0.0, Units.degreesToRadians(0.0), Units.degreesToRadians(90)));
 
     public static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(2, 2, 4);

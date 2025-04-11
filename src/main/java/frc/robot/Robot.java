@@ -13,6 +13,7 @@ import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -122,8 +123,8 @@ public class Robot extends TimedRobot {
             drivetrain);
 
     autoFactory
-        .bind("Score l4", scorel4())
-        .bind("Score l2", scorel2())
+        .bind("Score l4", autonScorel4())
+        .bind("Score l2", autonScorel2())
         .bind("De-reef a1", a1DeReef())
         .bind("Intake", intake());
 
@@ -186,6 +187,12 @@ public class Robot extends TimedRobot {
 
     appendageJoystick.button(9)
         .onTrue(new InstantCommand(() -> elevator.stow()));
+    
+    // controller.a().onTrue(new InstantCommand(() -> autoScore()));
+
+    // controller.y().onTrue(elevator.selectLevel("l4"));
+    // controller.b().onTrue(elevator.selectLevel("l3"));
+    // controller.x().onTrue(elevator.selectLevel("l2"));
 
     appendageJoystick.button(12).onTrue(intake());
 
@@ -256,6 +263,19 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {}
 
+  public void autoScore() {
+    if (elevator.selectedLevel == "l4") {
+      scorel4();
+    } else if (elevator.selectedLevel == "l3") {
+      scorel3();
+    } else if (elevator.selectedLevel == "l2") {
+      scorel2();
+    } else {
+      elevator.selectLevel("stow");
+      elevator.stow();
+    }
+  }
+
   public SequentialCommandGroup a1() {
     return new InstantCommand(() -> elevator.a1())
         .andThen(new InstantCommand(() -> reeftake.algaeIntake()));
@@ -285,18 +305,51 @@ public class Robot extends TimedRobot {
         .andThen(new InstantCommand(() -> reeftake.coralStop()));
   }
 
+  public Command scorel4() {
+    return Commands.sequence(
+      Commands.runOnce(() -> elevator.l4()),
+      Commands.waitUntil(() -> elevator.isAtSetpoint()),
+      Commands.runOnce(() -> score())
+    );
+  }
+
+  public Command scorel3() {
+    return Commands.sequence(
+      Commands.runOnce(() -> elevator.l3()),
+      Commands.waitUntil(() -> elevator.isAtSetpoint()),
+      Commands.runOnce(() -> score())
+    );
+  }
+
+  public Command scorel2() {
+    return Commands.sequence(
+      Commands.runOnce(() -> elevator.l2()),
+      Commands.waitUntil(() -> elevator.isAtSetpoint()),
+      Commands.runOnce(() -> score())
+    );
+  }
+
+
+  public Command scorel1() {
+    return Commands.sequence(
+      Commands.runOnce(() -> elevator.l1()),
+      Commands.waitUntil(() -> elevator.isAtSetpoint()),
+      Commands.runOnce(() -> score())
+    );
+  }
+
   public SequentialCommandGroup intake() {
     return new InstantCommand(() -> elevator.hp())
         .andThen(reeftake.autoIntake());
   }
 
-  public SequentialCommandGroup scorel4() {
+  public SequentialCommandGroup autonScorel4() {
     return new InstantCommand(() -> elevator.l4())
         .andThen(new WaitCommand(1.5))
         .andThen(score());
   }
 
-  public SequentialCommandGroup scorel2() {
+  public SequentialCommandGroup autonScorel2() {
     return new InstantCommand(() -> elevator.l2())
         .andThen(new WaitCommand(0.75))
         .andThen(score());

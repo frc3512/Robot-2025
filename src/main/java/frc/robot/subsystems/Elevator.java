@@ -8,6 +8,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.lib.command.ProfiledPIDSubsystem;
 import frc.robot.Constants;
 
@@ -18,8 +19,7 @@ public class Elevator extends ProfiledPIDSubsystem {
 
   public double gravity = 0.5;
 
-  boolean bypassStop = false;
-  double goal = 0.0;
+  public String selectedLevel = "l2";
 
   public Elevator() {
     super(
@@ -39,6 +39,10 @@ public class Elevator extends ProfiledPIDSubsystem {
 
     // Be sure to remove this function when using manual control
     enable();
+  }
+
+  public boolean isAtSetpoint() {
+    return getController().atSetpoint();
   }
 
   public Command manualElevator(double speed) {
@@ -83,6 +87,11 @@ public class Elevator extends ProfiledPIDSubsystem {
 
   public void aStow() {
     setClampedGoal(Constants.ElevatorConstants.aStowPos);
+  }
+
+  public Command selectLevel(String level) {
+    return Commands.runOnce(() -> selectedLevel = level)
+        .andThen(() -> DogLog.log("Elevator/Selected Scoring level", level));
   }
 
   public void zeroMotor() {
