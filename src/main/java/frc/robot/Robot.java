@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Elevator;
@@ -36,8 +35,6 @@ public class Robot extends TimedRobot {
 
   private double maxSpeed = DriveConstants.maxSpeed;
   private double maxAngularRate = DriveConstants.maxAngularRate;
-  private double slowSpeed = DriveConstants.slowSpeed;
-  private double slowAngularRate = DriveConstants.slowAngularRate;
 
   private SendableChooser<AutoRoutine> autoChooser = new SendableChooser<>();
 
@@ -45,12 +42,6 @@ public class Robot extends TimedRobot {
       new SwerveRequest.FieldCentric()
           .withDeadband(maxSpeed * 0.1)
           .withRotationalDeadband(maxAngularRate * 0.07) // Add a 7% deadband
-          .withDriveRequestType(DriveRequestType.Velocity);
-
-  private final SwerveRequest.FieldCentric driveSlow =
-      new SwerveRequest.FieldCentric()
-          .withDeadband(slowSpeed * 0.1)
-          .withRotationalDeadband(slowAngularRate * 0.07) // Add a 7% deadband
           .withDriveRequestType(DriveRequestType.Velocity);
 
   // Subsystem Objects
@@ -63,7 +54,6 @@ public class Robot extends TimedRobot {
 
   // Controller Objects
   private final CommandXboxController controller = new CommandXboxController(0);
-  private final CommandJoystick appendageJoystick = new CommandJoystick(1);
 
   // Driver Camera Thread for crosshair
   private final Thread m_visionThread;
@@ -142,17 +132,17 @@ public class Robot extends TimedRobot {
                     .withRotationalRate(-controller.getRightX() * maxAngularRate)));
 
     // Slow mode
-    controller.rightBumper()
-        .whileTrue(
-            drivetrain.applyRequest(
-                () ->
-                    driveSlow
-                        .withVelocityX(-controller.getLeftY() * slowSpeed)
-                        .withVelocityY(-controller.getLeftX() * slowSpeed)
-                        .withRotationalRate(-controller.getRightX() * slowAngularRate)));
+    // controller.rightBumper()
+    //     .whileTrue(
+    //         drivetrain.applyRequest(
+    //             () ->
+    //                 driveSlow
+    //                     .withVelocityX(-controller.getLeftY() * slowSpeed)
+    //                     .withVelocityY(-controller.getLeftX() * slowSpeed)
+    //                     .withRotationalRate(-controller.getRightX() * slowAngularRate)));
 
     // Reset gyro
-    controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+    controller.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     // Intake control for Groundtake
     controller.leftTrigger()
@@ -166,60 +156,40 @@ public class Robot extends TimedRobot {
             .andThen(new InstantCommand(() -> groundtake.floorAlgaeOuttake())))
         .onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
 
-    //  -- Bindings for the button box --
-
     // Elevator controls
-    appendageJoystick.button(6)
-        .onTrue(new InstantCommand(() -> elevator.l1()))
-        .onFalse(score());
+    controller.b().onTrue(new InstantCommand(() -> autoScore()));
 
-    appendageJoystick.button(5)
-        .onTrue(new InstantCommand(() -> elevator.l2()))
-        .onFalse(score());
+    controller.y().onTrue(elevator.selectLevel("l4"));
+    controller.x().onTrue(elevator.selectLevel("l3"));
+    controller.a().onTrue(elevator.selectLevel("l2"));
 
-    appendageJoystick.button(4)
-        .onTrue(new InstantCommand(() -> elevator.l3()))
-        .onFalse(score());
-
-    appendageJoystick.button(3)
-        .onTrue(new InstantCommand(() -> elevator.l4()))
-        .onFalse(score());
-
-    appendageJoystick.button(9)
-        .onTrue(new InstantCommand(() -> elevator.stow()));
-    
-    // controller.a().onTrue(new InstantCommand(() -> autoScore()));
-
-    // controller.y().onTrue(elevator.selectLevel("l4"));
-    // controller.b().onTrue(elevator.selectLevel("l3"));
-    // controller.x().onTrue(elevator.selectLevel("l2"));
-
-    appendageJoystick.button(12).onTrue(intake());
+    // Intake
+    controller.rightBumper().onTrue(intake());
 
     // Dereefing controls
-    appendageJoystick.button(8)
+    controller.povUpLeft()
         .onTrue(a1())
         .onFalse(retractAlgae());
 
-    appendageJoystick.button(7)
+    controller.povUpRight()
         .onTrue(a2())
         .onFalse(retractAlgae());
 
     // Barge Scoring
-    appendageJoystick.button(10)
+    controller.povDownLeft()
         .onTrue(new InstantCommand(() -> elevator.l4()))
         .onFalse(scoreBarge());
 
-    appendageJoystick.button(11)
+    controller.povDownRight()
         .onTrue(new InstantCommand(() -> reeftake.algaeOuttake()))
         .onFalse(new InstantCommand(() -> reeftake.algaeStop()));
 
     // Climber controls
-    appendageJoystick.button(1)
+    controller.povUp()
         .onTrue(climber.setClimber(0.8))
         .onFalse(climber.setClimber(0.0));
 
-    appendageJoystick.button(2)
+    controller.povDown()
         .onTrue(climber.setClimber(-0.8))
         .onFalse(climber.setClimber(0.0));
 
@@ -234,7 +204,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     elevator.setClampedGoal(Constants.ElevatorConstants.stowPos);
-    groundtake.setGoal(Constants.GroundtakeConstants.stowPos);
   }
 
   @Override
@@ -271,7 +240,6 @@ public class Robot extends TimedRobot {
     } else if (elevator.selectedLevel == "l2") {
       scorel2();
     } else {
-      elevator.selectLevel("stow");
       elevator.stow();
     }
   }
