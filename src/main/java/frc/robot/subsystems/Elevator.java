@@ -19,7 +19,7 @@ public class Elevator extends ProfiledPIDSubsystem {
 
   public double gravity = 0.5;
 
-  public String selectedLevel = "l2";
+  public String selectedLevel = "stow";
 
   public Elevator() {
     super(
@@ -90,8 +90,7 @@ public class Elevator extends ProfiledPIDSubsystem {
   }
 
   public Command selectLevel(String level) {
-    return Commands.runOnce(() -> selectedLevel = level)
-        .andThen(() -> DogLog.log("Elevator/Selected Scoring level", level));
+    return Commands.runOnce(() -> selectedLevel = level);
   }
 
   public void zeroMotor() {
@@ -119,6 +118,8 @@ public class Elevator extends ProfiledPIDSubsystem {
       "Elevator/Front Motor Temp", frontMotor.getDeviceTemp().getValueAsDouble());
     DogLog.log(
       "Elevator/Back Motor Temp", backMotor.getDeviceTemp().getValueAsDouble());
+    DogLog.log(
+      "Elevator/Selected Scoring level", selectedLevel);
 
   }
 
