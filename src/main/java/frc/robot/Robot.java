@@ -212,6 +212,12 @@ public class Robot extends TimedRobot {
         .onTrue(climber.setClimber(-0.8))
         .onFalse(climber.setClimber(0.0));
 
+    // controller.povUp()
+    //     .onTrue(climber.autoClimb());
+
+    // controller.povDown()
+    //     .onTrue(climber.retractClimber());
+
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
