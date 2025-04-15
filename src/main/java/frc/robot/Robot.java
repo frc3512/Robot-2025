@@ -375,8 +375,9 @@ public class Robot extends TimedRobot {
   public AutoRoutine midl4Barge() {
     AutoRoutine routine = autoFactory.newRoutine("Mid l4 - Barge");
     AutoTrajectory trajectory = routine.trajectory("Mid l4 - Barge");
+    AutoTrajectory trajectory2 = routine.trajectory("De-reef");
 
-    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd(), trajectory2.resetOdometry(), trajectory2.cmd()));
     return routine;
   }
 }

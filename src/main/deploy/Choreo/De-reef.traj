@@ -1,0 +1,29 @@
+{
+ "name":"De-reef",
+ "version":1,
+ "snapshot":{
+  "waypoints":[],
+  "constraints":[],
+  "targetDt":0.05
+ },
+ "params":{
+  "waypoints":[
+    {"x":{"exp":"5.841989040374756 m", "val":5.841989040374756}, "y":{"exp":"3.9852734088897708 m", "val":3.985273408889771}, "heading":{"exp":"3.1350567431433496 rad", "val":3.1350567431433496}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
+  "constraints":[
+    {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
+    {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
+    {"from":"first", "to":"last", "data":{"type":"KeepInRectangle", "props":{"x":{"exp":"4.92478609085083 m", "val":4.92478609085083}, "y":{"exp":"3.3207124173641205 m", "val":3.3207124173641205}, "w":{"exp":"1.9293940286636335 m", "val":1.9293940286636335}, "h":{"exp":"1.4387165148258205 m", "val":1.4387165148258203}}}, "enabled":true}],
+  "targetDt":{
+   "exp":"0.05 s",
+   "val":0.05
+  }
+ },
+ "trajectory":{
+  "sampleType":null,
+  "waypoints":[],
+  "samples":[],
+  "splits":[]
+ },
+ "events":[
+   {"name":"De-reef", "from":{"target":0, "targetTimestamp":null, "offset":{"exp":"1 s", "val":1.0}}, "event":{"type":"named", "data":{"name":"De-reef a1"}}}]
+}
