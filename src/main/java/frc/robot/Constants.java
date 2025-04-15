@@ -46,7 +46,9 @@ public class Constants {
   public static class ClimberConstants {
     public static final int climbMotorID = 11;
 
-    public static final int digitalInputChannel = 1;
+    public static final int beamBreak = 1;
+    public static final int climberTopSwitch = 3;
+    public static final int climberBottomSwitch = 2;
   }
 
   public static class ReeftakeConstants {
