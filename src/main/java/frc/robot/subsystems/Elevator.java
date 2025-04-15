@@ -6,131 +6,103 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.lib.command.ProfiledPIDSubsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class Elevator extends ProfiledPIDSubsystem {
+public class Elevator extends SubsystemBase {
+    private final TalonFX frontMotor = new TalonFX(Constants.ElevatorConstants.frontMotorID);
+    private final TalonFX backMotor = new TalonFX(Constants.ElevatorConstants.backMotorID);
 
-  private final TalonFX frontMotor = new TalonFX(Constants.ElevatorConstants.frontMotorID);
-  private final TalonFX backMotor = new TalonFX(Constants.ElevatorConstants.backMotorID);
+    public String scoringLevel = "stow";
 
-  public double gravity = 0.5;
+    public boolean scoringl2 = false;
+    public boolean scoringl3 = false;
+    public boolean scoringl4 = false;
 
-  public String selectedLevel = "stow";
-
-  public Elevator() {
-    super(
+    private final ProfiledPIDController elevatorPID = 
         new ProfiledPIDController(
             Constants.ElevatorConstants.kP,
             Constants.ElevatorConstants.kI,
             Constants.ElevatorConstants.kD,
-            Constants.ElevatorConstants.constraints));
-    getController().setTolerance(Constants.ElevatorConstants.tolerance);
+            Constants.ElevatorConstants.constraints);
 
-    frontMotor.setNeutralMode(NeutralModeValue.Brake);
-    backMotor.setNeutralMode(NeutralModeValue.Brake);
+    public Elevator() {
+        frontMotor.setNeutralMode(NeutralModeValue.Brake);
+        backMotor.setNeutralMode(NeutralModeValue.Brake);
 
-    frontMotor.setPosition(0.000);
+        elevatorPID.setTolerance(Constants.ElevatorConstants.tolerance);
 
-    backMotor.setControl(new Follower(frontMotor.getDeviceID(), false));
+        backMotor.setControl(new Follower(frontMotor.getDeviceID(), false));
 
-    // Be sure to remove this function when using manual control
-    enable();
-  }
+        frontMotor.setPosition(0.0000); // Zero the front motor position
 
-  public boolean isAtSetpoint() {
-    return getController().atSetpoint();
-  }
+        setLevel("stow"); // Set initial position to stow
+    }
 
-  public Command manualElevator(double speed) {
-    return run(
-        () -> {
-          frontMotor.set(speed);
-          backMotor.set(speed);
-        });
-  }
+    public void setLevel(String level) {
+        double setpoint = Constants.ElevatorConstants.stowPos; // Default to stow position
+        switch (level) {
+            case "stow":
+                setpoint = Constants.ElevatorConstants.stowPos;
+                break;
+            case "hp":
+                setpoint = Constants.ElevatorConstants.hpPos;
+                break;
+            case "l1":
+                setpoint = Constants.ElevatorConstants.l1Pos;
+                break;
+            case "l2":
+                setpoint = Constants.ElevatorConstants.l2Pos;
+                break;
+            case "l3":
+                setpoint = Constants.ElevatorConstants.l3Pos;
+                break;
+            case "l4":
+                setpoint = Constants.ElevatorConstants.l4Pos;
+                break;
+            case "a1":
+                setpoint = Constants.ElevatorConstants.a1Pos;
+                break;
+            case "a2":
+                setpoint = Constants.ElevatorConstants.a2Pos;
+                break;
+            case "aStow":
+                setpoint = Constants.ElevatorConstants.aStowPos;
+                break;
+        }
+        frontMotor.setVoltage(MathUtil.clamp(elevatorPID.calculate(getElevatorPos(), setpoint), 0.5, 47));
 
-  public void stow() {
-    setClampedGoal(Constants.ElevatorConstants.stowPos);
-  }
+        DogLog.log("Elevator/Elevator Setpoint", level);
+    }
 
-  public void hp() {
-    setClampedGoal(Constants.ElevatorConstants.hpPos);
-  }
+    public Command selectLevel(String level) {
+        return Commands.runOnce(() -> scoringLevel = level);
+    }
 
-  public void l1() {
-    setClampedGoal(Constants.ElevatorConstants.l1Pos);
-  }
+    public boolean isAtSetpoint() {
+        return elevatorPID.atGoal();
+    }
+    public double getElevatorPos() {
+        return frontMotor.getPosition().getValueAsDouble();
+    }
 
-  public void l2() {
-    setClampedGoal(Constants.ElevatorConstants.l2Pos);
-  }
+    @Override
+    public void periodic() {
+        // PID Info
+        DogLog.log("Elevator/Elevator Position", getElevatorPos());
+        DogLog.log("Elevator/Elevator Setpoint", elevatorPID.getSetpoint().position);
+        DogLog.log("Elevator/Front Motor Voltage", frontMotor.getMotorVoltage().getValueAsDouble());
 
-  public void l3() {
-    setClampedGoal(Constants.ElevatorConstants.l3Pos);
-  }
+        // General Info
+        DogLog.log("Elevator/Front Motor Temp", frontMotor.getDeviceTemp().getValueAsDouble());
+        DogLog.log("Elevator/Back Motor Temp", backMotor.getDeviceTemp().getValueAsDouble());
+        DogLog.log("Elevator/Scoring Level", scoringLevel);
 
-  public void l4() {
-    setClampedGoal(Constants.ElevatorConstants.l4Pos);
-  }
-
-  public void a1() {
-    setClampedGoal(Constants.ElevatorConstants.a1Pos);
-  }
-
-  public void a2() {
-    setClampedGoal(Constants.ElevatorConstants.a2Pos);
-  }
-
-  public void aStow() {
-    setClampedGoal(Constants.ElevatorConstants.aStowPos);
-  }
-
-  public Command selectLevel(String level) {
-    return Commands.runOnce(() -> selectedLevel = level);
-  }
-
-  public void zeroMotor() {
-    frontMotor.setPosition(0.000);
-  }
-
-  public void setClampedGoal(double goal) {
-    setGoal(MathUtil.clamp(goal, 0.5, 47));
-  }
-
-  @Override
-  public void periodic() {
-    super.periodic();
-
-    // Pid Graphing
-    DogLog.log(
-      "Elevator/Elevator Front Motor Encoder", frontMotor.getPosition().getValueAsDouble());
-    DogLog.log(
-      "Elevator/Elevator Goal", getController().getSetpoint().position);
-    DogLog.log(
-      "Elevator/Elevator Voltage", frontMotor.getMotorVoltage().getValueAsDouble());
-
-    // General Info
-    DogLog.log(
-      "Elevator/Front Motor Temp", frontMotor.getDeviceTemp().getValueAsDouble());
-    DogLog.log(
-      "Elevator/Back Motor Temp", backMotor.getDeviceTemp().getValueAsDouble());
-    DogLog.log(
-      "Elevator/Selected Scoring level", selectedLevel);
-
-  }
-
-  @Override
-  protected void useOutput(double output, State setpoint) {
-    frontMotor.setVoltage(output + gravity);
-    backMotor.setVoltage(output + gravity);
-  }
-
-  @Override
-  protected double getMeasurement() {
-    return frontMotor.getPosition().getValueAsDouble();
-  }
+        // Logging scoring levels
+        DogLog.log("Elevator/Scoring l4", scoringl4);
+        DogLog.log("Elevator/Scoring l3", scoringl3);
+        DogLog.log("Elevator/Scoring l2", scoringl2);
+    }
 }

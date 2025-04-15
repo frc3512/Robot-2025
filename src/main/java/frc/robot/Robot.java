@@ -196,7 +196,7 @@ public class Robot extends TimedRobot {
 
     // Barge Scoring
     controller.povDownLeft()
-        .onTrue(new InstantCommand(() -> elevator.l4()))
+        .onTrue(new InstantCommand(() -> elevator.setLevel("l4")))
         .onFalse(scoreBarge());
 
     controller.povDownRight()
@@ -222,11 +222,11 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    elevator.setClampedGoal(Constants.ElevatorConstants.stowPos);
-  }
+    CommandScheduler.getInstance().cancelAll();
 
-  @Override
-  public void disabledInit() {}
+    // Tuning mode
+    DogLog.setEnabled(Constants.GeneralConstants.shouldLog);
+  }
 
   @Override
   public void robotPeriodic() {
@@ -244,8 +244,6 @@ public class Robot extends TimedRobot {
       leds.setPattern(leds.black);
     }
 
-    // Tuning mode
-    DogLog.setEnabled(Constants.GeneralConstants.shouldLog);
   }
 
   @Override
@@ -283,25 +281,25 @@ public class Robot extends TimedRobot {
 
   // Score on selected level
   public void autoScore() {
-    if (elevator.selectedLevel == "l4") {
+    if (elevator.scoringLevel == "l4") {
       scorel4();
-    } else if (elevator.selectedLevel == "l3") {
+    } else if (elevator.scoringLevel == "l3") {
       scorel3();
-    } else if (elevator.selectedLevel == "l2") {
+    } else if (elevator.scoringLevel == "l2") {
       scorel2();
     } else {
-      elevator.stow();
+      elevator.setLevel("stow");
     }
   }
 
   // De-Reef algae
   public SequentialCommandGroup a1() {
-    return new InstantCommand(() -> elevator.a1())
+    return new InstantCommand(() -> elevator.setLevel("a1"))
         .andThen(new InstantCommand(() -> reeftake.algaeIntake()));
   }
 
   public SequentialCommandGroup a2() {
-    return new InstantCommand(() -> elevator.a2())
+    return new InstantCommand(() -> elevator.setLevel("a2"))
         .andThen(new InstantCommand(() -> reeftake.algaeIntake()));
   }
 
@@ -309,13 +307,13 @@ public class Robot extends TimedRobot {
   public SequentialCommandGroup scoreBarge() {
     return new InstantCommand(() -> reeftake.algaeOuttake())
         .andThen(new WaitCommand(0.375))
-        .andThen(new InstantCommand(() -> elevator.stow()))
+        .andThen(new InstantCommand(() -> elevator.setLevel("stow")))
         .andThen(new InstantCommand(() -> reeftake.algaeStop()));
   }
 
   // Hold algae 
   public SequentialCommandGroup retractAlgae() {
-    return new InstantCommand(() -> elevator.aStow())
+    return new InstantCommand(() -> elevator.setLevel("aStow"))
         .andThen(new InstantCommand(() -> reeftake.algaeStop()));
   }
 
@@ -323,39 +321,45 @@ public class Robot extends TimedRobot {
   public SequentialCommandGroup score() {
     return new InstantCommand(() -> reeftake.coralIntake())
         .andThen(new WaitCommand(0.75))
-        .andThen(new InstantCommand(() -> elevator.hp()))
+        .andThen(new InstantCommand(() -> elevator.setLevel("stow")))
         .andThen(new InstantCommand(() -> reeftake.coralStop()));
   }
 
   // Auto scoring for choosen level
   public Command scorel4() {
     return Commands.sequence(
-      Commands.runOnce(() -> elevator.l4()),
+      Commands.runOnce(() -> elevator.scoringl4 = true),
+      Commands.runOnce(() -> elevator.setLevel("l4")),
       Commands.waitUntil(() -> elevator.isAtSetpoint()),
-      Commands.runOnce(() -> score())
+      Commands.runOnce(() -> score()),
+      Commands.runOnce(() -> elevator.scoringl4 = false)
     );
   }
 
   public Command scorel3() {
     return Commands.sequence(
-      Commands.runOnce(() -> elevator.l3()),
+      Commands.runOnce(() -> elevator.scoringl3 = true),
+      Commands.runOnce(() -> elevator.setLevel("l3")),
       Commands.waitUntil(() -> elevator.isAtSetpoint()),
-      Commands.runOnce(() -> score())
+      Commands.runOnce(() -> score()),
+      Commands.runOnce(() -> elevator.scoringl3 = false)
     );
   }
 
   public Command scorel2() {
     return Commands.sequence(
-      Commands.runOnce(() -> elevator.l2()),
+      Commands.runOnce(() -> elevator.scoringl2 = true),
+      Commands.runOnce(() -> elevator.setLevel("l2")),
       Commands.waitUntil(() -> elevator.isAtSetpoint()),
-      Commands.runOnce(() -> score())
+      Commands.runOnce(() -> score()),
+      Commands.runOnce(() -> elevator.scoringl2 = false)
     );
   }
 
 
   public Command scorel1() {
     return Commands.sequence(
-      Commands.runOnce(() -> elevator.l1()),
+      Commands.runOnce(() -> elevator.setLevel("l1")),
       Commands.waitUntil(() -> elevator.isAtSetpoint()),
       Commands.runOnce(() -> score())
     );
@@ -363,25 +367,25 @@ public class Robot extends TimedRobot {
 
   // Intake Coral
   public SequentialCommandGroup intake() {
-    return new InstantCommand(() -> elevator.hp())
+    return new InstantCommand(() -> elevator.setLevel("stow"))
         .andThen(reeftake.autoIntake());
   }
 
   // Auton scoring methods
   public SequentialCommandGroup autonScorel4() {
-    return new InstantCommand(() -> elevator.l4())
+    return new InstantCommand(() -> elevator.setLevel("l4"))
         .andThen(new WaitCommand(1.5))
         .andThen(score());
   }
 
   public SequentialCommandGroup autonScorel2() {
-    return new InstantCommand(() -> elevator.l2())
+    return new InstantCommand(() -> elevator.setLevel("l2"))
         .andThen(new WaitCommand(0.75))
         .andThen(score());
   }
 
   public SequentialCommandGroup a1DeReef() {
-    return new InstantCommand(() -> elevator.a1())
+    return new InstantCommand(() -> elevator.setLevel("a1"))
         .andThen(new InstantCommand(() -> reeftake.algaeIntake()))
         .andThen(new WaitCommand(1))
         .andThen(retractAlgae());
