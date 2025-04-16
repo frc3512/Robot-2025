@@ -37,7 +37,9 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
 
   private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
   private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
+
   private boolean m_hasAppliedOperatorPerspective = false;
+  public boolean alligning = false;
 
   // Aiming
   private String selectedPiece = "Coral";

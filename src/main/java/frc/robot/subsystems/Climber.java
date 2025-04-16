@@ -47,6 +47,7 @@ public class Climber extends SubsystemBase {
       Commands.waitUntil(() -> climberAtTop()),
       Commands.runOnce(() -> setClimber(0.0)),
       Commands.waitUntil(() -> isBeamBroken()),
+      Commands.waitSeconds(1),
       Commands.runOnce(() -> setClimber(-0.8)),
       Commands.waitUntil(() -> climberAtBottom()),
       Commands.runOnce(() -> setClimber(0.0))

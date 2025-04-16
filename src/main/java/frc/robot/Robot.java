@@ -3,7 +3,6 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
-
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -29,7 +28,6 @@ import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Reeftake;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
-
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
@@ -73,6 +71,9 @@ public class Robot extends TimedRobot {
   private final AutoFactory autoFactory;
 
   public Robot() {
+
+    // Tuning mode
+    DogLog.setEnabled(Constants.GeneralConstants.shouldLog);
 
     // Camera crosshair
     CameraServer.startAutomaticCapture();
@@ -229,9 +230,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     CommandScheduler.getInstance().cancelAll();
-
-    // Tuning mode
-    DogLog.setEnabled(Constants.GeneralConstants.shouldLog);
   }
 
   @Override
@@ -242,6 +240,8 @@ public class Robot extends TimedRobot {
     // LEDs
     if (climber.isBeamBroken()) {
       leds.setPattern(leds.purple);
+    } else if (elevator.scoringl2 == true || elevator.scoringl3 == true || elevator.scoringl4 == true) {
+      leds.setPattern(leds.white);      
     } else if (!reeftake.isCoralIn()) {
       leds.setPattern(leds.scrollngRainbow);
     } else if (reeftake.isCoralIn()) {
@@ -282,7 +282,8 @@ public class Robot extends TimedRobot {
 
   public Command autoAim() {
     return Commands.sequence(
-        drivetrain.resetAutoAimPID(), drivetrain.goToPose(() -> drivetrain.getNearestReef()));
+        drivetrain.resetAutoAimPID(), 
+        drivetrain.goToPose(() -> drivetrain.getNearestReef()));
   }
 
   // Score on selected level
@@ -373,7 +374,7 @@ public class Robot extends TimedRobot {
 
   // Intake Coral
   public SequentialCommandGroup intake() {
-    return new InstantCommand(() -> elevator.setLevel("stow"))
+    return new InstantCommand(() -> elevator.setLevel("hp"))
         .andThen(reeftake.autoIntake());
   }
 
