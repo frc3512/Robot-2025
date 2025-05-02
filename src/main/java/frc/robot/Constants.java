@@ -86,20 +86,17 @@ public class Constants {
 
     public static final Transform3d elevatorCamOffset =
         new Transform3d(
-            Units.inchesToMeters(10.0),
-            Units.inchesToMeters(-6.0),
-            Units.inchesToMeters(20),
-            new Rotation3d(
-                Units.degreesToRadians(90),
-                Units.degreesToRadians(0),
-                Units.degreesToRadians(0.0)));
+            Units.inchesToMeters(10),
+            Units.inchesToMeters(6),
+            Units.inchesToMeters(16.5),
+            new Rotation3d(0.0, Units.degreesToRadians(0.0), Units.degreesToRadians(0)));
 
     public static final Transform3d climberCamOffset =
         new Transform3d(
-            Units.inchesToMeters(10),
-            Units.inchesToMeters(-6.0),
             Units.inchesToMeters(8),
-            new Rotation3d(0.0, Units.degreesToRadians(0.0), Units.degreesToRadians(0.0)));
+            Units.inchesToMeters(-11),
+            Units.inchesToMeters(6.5),
+            new Rotation3d(0.0, Units.degreesToRadians(0.0), Units.degreesToRadians(90)));
 
     public static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(1, 1, 2);
     public static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.2, 0.2, 0.2);
