@@ -62,6 +62,14 @@ public class Climber extends SubsystemBase {
     );
   }
 
+  public Command extendClimber() {
+    return Commands.sequence(
+      Commands.runOnce(() -> setClimber(0.8)),
+      Commands.waitUntil(() -> climberAtTop()),
+      Commands.runOnce(() -> setClimber(0.0))
+    );
+  }
+
   public void periodic() {
     // Cimber Data
     DogLog.log("Climber/Climber Beam Break", isBeamBroken());
