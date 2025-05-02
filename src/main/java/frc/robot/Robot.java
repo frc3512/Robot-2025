@@ -187,15 +187,15 @@ public class Robot extends TimedRobot {
 
     // Dereefing controls
     controller.povUpLeft()
-        .onTrue(a1())
-        .onFalse(retractAlgae());
-
-    controller.povUpRight()
         .onTrue(a2())
         .onFalse(retractAlgae());
 
-    // Barge Scoring
     controller.povDownLeft()
+        .onTrue(a1())
+        .onFalse(retractAlgae());
+
+    // Barge Scoring
+    controller.povUpRight()
         .onTrue(new InstantCommand(() -> elevator.l4()))
         .onFalse(scoreBarge());
 
@@ -205,12 +205,10 @@ public class Robot extends TimedRobot {
 
     // Climber controls
     controller.povUp()
-        .onTrue(climber.setClimber(0.8))
-        .onFalse(climber.setClimber(0.0));
+        .onTrue(climber.extendClimber());
 
     controller.povDown()
-        .onTrue(climber.setClimber(-0.8))
-        .onFalse(climber.setClimber(0.0));
+        .onTrue(climber.retractClimber());
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }

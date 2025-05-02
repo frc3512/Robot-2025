@@ -2,36 +2,81 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Climber extends SubsystemBase {
 
-  private final TalonFX climbMotor1 = new TalonFX(Constants.ClimberConstants.climbMotor1ID);
+  private final DigitalInput climbBeamBreak =
+      new DigitalInput(Constants.ClimberConstants.beamBreak);
+  private final DigitalInput climberTopSwitch =
+      new DigitalInput(Constants.ClimberConstants.climberTopSwitch);
+  private final DigitalInput climberBottomSwitch =
+      new DigitalInput(Constants.ClimberConstants.climberBottomSwitch);
 
-  DigitalInput bottomLimitSwitch = new DigitalInput(3);
-  DigitalInput topLimitSwitch = new DigitalInput(2);
-  DigitalInput climbBeamBreak = new DigitalInput(1);
+  private final TalonFX climbMotor = new TalonFX(Constants.ClimberConstants.climbMotorID);
 
   public Climber() {
-    climbMotor1.setNeutralMode(NeutralModeValue.Brake);
+    climbMotor.setNeutralMode(NeutralModeValue.Brake);
   }
 
-  public Command setClimber(double speed) {
-    return run(() -> climbMotor1.set(speed));
-  }
 
   public boolean isBeamBroken() {
     return climbBeamBreak.get();
   }
 
-  @Override
+  public boolean climberAtTop() {
+    return climberTopSwitch.get();
+  }
+
+  public boolean climberAtBottom() {
+    return climberBottomSwitch.get();
+  }
+
+  public Command setClimber(Double speed) {
+    return run(() -> climbMotor.set(speed));
+  }
+
+  public Command autoClimb() {
+    return Commands.sequence(
+      Commands.runOnce(() -> setClimber(0.8)),
+      Commands.waitUntil(() -> climberAtTop()),
+      Commands.runOnce(() -> setClimber(0.0)),
+      Commands.waitUntil(() -> isBeamBroken()),
+      Commands.waitSeconds(1),
+      Commands.runOnce(() -> setClimber(-0.8)),
+      Commands.waitUntil(() -> climberAtBottom()),
+      Commands.runOnce(() -> setClimber(0.0))
+    );
+  }
+
+  public Command retractClimber() {
+    return Commands.sequence(
+      Commands.runOnce(() -> setClimber(-0.8)),
+      Commands.waitUntil(() -> climberAtBottom()),
+      Commands.runOnce(() -> setClimber(0.0))
+    );
+  }
+  
+  public Command extendClimber() {
+    return Commands.sequence(
+      Commands.runOnce(() -> setClimber(0.8)),
+      Commands.waitUntil(() -> climberAtTop()),
+      Commands.runOnce(() -> setClimber(0.0))
+    );
+  }
+
   public void periodic() {
+    // Cimber Data
+    DogLog.log("Climber/Climber Beam Break", isBeamBroken());
+    DogLog.log("Climber/Climber At Top", climberAtTop());
+    DogLog.log("Climber/Climber At Bottom", climberAtBottom());
+
     // General Info
-    DogLog.log("Climber/Climber Temp", climbMotor1.getDeviceTemp().getValueAsDouble());
+    DogLog.log("Climber/Climber Motor Temp", climbMotor.getDeviceTemp().getValueAsDouble());
   }
 }
