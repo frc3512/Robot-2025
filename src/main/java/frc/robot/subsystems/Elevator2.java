@@ -80,7 +80,7 @@
 //         DogLog.log("Elevator/Elevator Setpoint", level);
 //     }
 
-//     public Command selectLevel(String level) {
+//     public Command selectScoringLevel(String level) {
 //         return Commands.runOnce(() -> scoringLevel = level);
 //     }
 
