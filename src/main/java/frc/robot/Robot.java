@@ -171,15 +171,12 @@ public class Robot extends TimedRobot {
     // Intake control for Groundtake
     controller
         .leftTrigger()
-        .onTrue(
-            new InstantCommand(() -> groundtake.extendPivot())
+        .onTrue(new InstantCommand(() -> groundtake.extendPivot())
                 .andThen(new InstantCommand(() -> groundtake.floorAlgaeIntake())))
-        .onFalse(
-            new InstantCommand(() -> groundtake.retractPivot())
+        .onFalse(new InstantCommand(() -> groundtake.retractPivot())
                 .andThen(new InstantCommand(() -> groundtake.keepAlgae())));
 
-    controller
-        .rightTrigger()
+    controller.rightTrigger()
         .onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()))
         .onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
 
@@ -318,7 +315,9 @@ public class Robot extends TimedRobot {
 
   public Command autoAim() {
     return Commands.sequence(
-        drivetrain.resetAutoAimPID(), drivetrain.goToPose(() -> drivetrain.getNearestReef()));
+        drivetrain.resetAutoAimPID(), 
+        drivetrain.goToPose(
+            () -> drivetrain.getNearestReef()));
   }
 
   public SequentialCommandGroup a1() {
