@@ -215,6 +215,18 @@ public class Robot extends TimedRobot {
         .onFalse(new InstantCommand(() -> reeftake.algaeStop()));
 
     // Climber controls
+    // Full auto climbing
+    // appendageJoystick.button(1)
+    //     .onTrue(climber.autoClimb());
+    
+    // Semi-automatic climbing
+    // appendageJoystick.button(1)
+    //     .onTrue(climber.retractClimber());
+
+    // appendageJoystick.button(2)
+    //     .onTrue(climber.extendClimber());
+
+    // Manual Climbing
     appendageJoystick.button(1)
         .onTrue(climber.setClimber(0.8))
         .onFalse(climber.setClimber(0.0));
