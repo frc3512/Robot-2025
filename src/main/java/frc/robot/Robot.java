@@ -176,11 +176,20 @@ public class Robot extends TimedRobot {
         .onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
 
     // Elevator controls
-    controller.b().onTrue(new InstantCommand(() -> autoScore()));
+    controller.y()
+        .onTrue(new InstantCommand(() -> elevator.l4()))
+        .onFalse(score());
 
-    controller.y().onTrue(elevator.selectLevel("l4"));
-    controller.x().onTrue(elevator.selectLevel("l3"));
-    controller.a().onTrue(elevator.selectLevel("l2"));
+    controller.x()
+        .onTrue(new InstantCommand(() -> elevator.l3()))
+        .onFalse(score());
+
+    controller.a()
+        .onTrue(new InstantCommand(() -> elevator.l2()))
+        .onFalse(score());
+
+    controller.b()
+        .onTrue(new InstantCommand(() -> elevator.stow()));
 
     // Intake
     controller.rightBumper().onTrue(intake());
@@ -205,10 +214,12 @@ public class Robot extends TimedRobot {
 
     // Climber controls
     controller.povUp()
-        .onTrue(climber.extendClimber());
+        .onTrue(climber.setClimber(0.8))
+        .onFalse(climber.setClimber(0.0));
 
     controller.povDown()
-        .onTrue(climber.retractClimber());
+        .onTrue(climber.setClimber(-0.8))
+        .onFalse(climber.setClimber(0.0));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -228,6 +239,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
+
+    poseEstimation();
 
     CommandScheduler.getInstance().run();
 
@@ -329,7 +342,7 @@ public class Robot extends TimedRobot {
   public Command scorel4() {
     return Commands.sequence(
       Commands.runOnce(() -> elevator.l4()),
-      Commands.waitUntil(() -> elevator.isAtSetpoint()),
+      Commands.waitUntil(() -> elevator.isAtSetpoint() == true),
       Commands.runOnce(() -> score())
     );
   }

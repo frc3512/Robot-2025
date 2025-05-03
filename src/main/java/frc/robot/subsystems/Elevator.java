@@ -120,6 +120,7 @@ public class Elevator extends ProfiledPIDSubsystem {
       "Elevator/Back Motor Temp", backMotor.getDeviceTemp().getValueAsDouble());
     DogLog.log(
       "Elevator/Selected Scoring level", selectedLevel);
+    DogLog.log("Elevator/At Setpoint", isAtSetpoint());
 
   }
 
