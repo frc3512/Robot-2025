@@ -43,21 +43,17 @@ public class Climber extends SubsystemBase {
 
   public Command autoClimb() {
     return Commands.sequence(
-      Commands.runOnce(() -> setClimber(0.8)),
-      Commands.waitUntil(() -> climberAtTop()),
-      Commands.runOnce(() -> setClimber(0.0)),
+      extendClimber(),
       Commands.waitUntil(() -> isBeamBroken()),
       Commands.waitSeconds(1),
-      Commands.runOnce(() -> setClimber(-0.8)),
-      Commands.waitUntil(() -> climberAtBottom()),
-      Commands.runOnce(() -> setClimber(0.0))
+      retractClimber()
     );
   }
 
   public Command retractClimber() {
     return Commands.sequence(
       Commands.runOnce(() -> setClimber(-0.8)),
-      Commands.waitUntil(() -> climberAtBottom()),
+      Commands.waitUntil(() -> !climberAtBottom()),
       Commands.runOnce(() -> setClimber(0.0))
     );
   }
@@ -65,7 +61,7 @@ public class Climber extends SubsystemBase {
   public Command extendClimber() {
     return Commands.sequence(
       Commands.runOnce(() -> setClimber(0.8)),
-      Commands.waitUntil(() -> climberAtTop()),
+      Commands.waitUntil(() -> !climberAtTop()),
       Commands.runOnce(() -> setClimber(0.0))
     );
   }
