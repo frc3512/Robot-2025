@@ -238,12 +238,12 @@ public class Robot extends TimedRobot {
     // Manual climbing
     appendageJoystick.button(1)
         .onTrue(climber.setClimber(0.8)
-            .until(() -> climber.climberAtTop()))
+            .until(() -> climber.climberAtTop() == false))
         .onFalse(climber.setClimber(0.0));
 
     appendageJoystick.button(2)
         .onTrue(climber.setClimber(-0.8)
-            .until(() -> climber.climberAtBottom()))
+            .until(() -> climber.climberAtBottom() == false))
         .onFalse(climber.setClimber(0.0));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
