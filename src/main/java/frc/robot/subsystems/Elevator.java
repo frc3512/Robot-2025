@@ -73,6 +73,7 @@ public class Elevator extends SubsystemBase {
                 break;
         }
         frontMotor.setVoltage(MathUtil.clamp(elevatorPID.calculate(getElevatorPos(), setpoint), 0.5, 47));
+        backMotor.setVoltage(MathUtil.clamp(elevatorPID.calculate(getElevatorPos(), setpoint), 0.5, 47));
 
         DogLog.log("Elevator/Elevator Setpoint", level);
     }
@@ -81,9 +82,6 @@ public class Elevator extends SubsystemBase {
         return Commands.runOnce(() -> scoringLevel = level);
     }
 
-    public boolean isAtSetpoint() {
-        return elevatorPID.atGoal();
-    }
     public double getElevatorPos() {
         return frontMotor.getPosition().getValueAsDouble();
     }

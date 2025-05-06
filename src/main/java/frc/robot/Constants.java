@@ -25,14 +25,14 @@ public class Constants {
     public static final int frontMotorID = 13;
     public static final int backMotorID = 14;
 
-    public static final double kP = 0.75;
+    public static final double kP = 60;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
 
     public static final double tolerance = 0.002;
 
     public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(1000, 1000);
+        new TrapezoidProfile.Constraints(1, 2);
 
     public static final double stowPos = 1.0;
     public static final double hpPos = 4.0;

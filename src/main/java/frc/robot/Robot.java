@@ -177,11 +177,20 @@ public class Robot extends TimedRobot {
         .onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
 
     // Elevator controls
-    controller.b().onTrue(new InstantCommand(() -> autoScore()));
+    controller.y()
+        .onTrue(new InstantCommand(() -> elevator.setLevel("l4")))
+        .onFalse(score());
 
-    controller.y().onTrue(elevator.selectLevel("l4"));
-    controller.x().onTrue(elevator.selectLevel("l3"));
-    controller.a().onTrue(elevator.selectLevel("l2"));
+    controller.x()
+        .onTrue(new InstantCommand(() -> elevator.setLevel("l3")))
+        .onFalse(score());
+
+    controller.a()
+        .onTrue(new InstantCommand(() -> elevator.setLevel("l2")))
+        .onFalse(score());
+
+    controller.b()
+        .onTrue(new InstantCommand(() -> elevator.setLevel("stow")));
 
     // Intake
     controller.rightBumper().onTrue(intake());
@@ -206,10 +215,12 @@ public class Robot extends TimedRobot {
 
     // Climber controls
     controller.povUp()
-        .onTrue(climber.extendClimber());
+        .onTrue(climber.setClimber(0.8))
+        .onFalse(climber.setClimber(0.0));
 
     controller.povDown()
-        .onTrue(climber.retractClimber());
+        .onTrue(climber.setClimber(-0.8))
+        .onFalse(climber.setClimber(0.0));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -226,6 +237,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
+
+    poseEstimation();
 
     CommandScheduler.getInstance().run();
 
@@ -278,19 +291,6 @@ public class Robot extends TimedRobot {
         drivetrain.goToPose(() -> drivetrain.getNearestReef()));
   }
 
-  // Score on selected level
-  public void autoScore() {
-    if (elevator.scoringLevel == "l4") {
-      scorel4();
-    } else if (elevator.scoringLevel == "l3") {
-      scorel3();
-    } else if (elevator.scoringLevel == "l2") {
-      scorel2();
-    } else {
-      elevator.setLevel("stow");
-    }
-  }
-
   // De-Reef algae
   public SequentialCommandGroup a1() {
     return new InstantCommand(() -> elevator.setLevel("a1"))
@@ -322,46 +322,6 @@ public class Robot extends TimedRobot {
         .andThen(new WaitCommand(0.75))
         .andThen(new InstantCommand(() -> elevator.setLevel("stow")))
         .andThen(new InstantCommand(() -> reeftake.coralStop()));
-  }
-
-  // Auto scoring for choosen level
-  public Command scorel4() {
-    return Commands.sequence(
-      Commands.runOnce(() -> elevator.scoringl4 = true),
-      Commands.runOnce(() -> elevator.setLevel("l4")),
-      Commands.waitUntil(() -> elevator.isAtSetpoint()),
-      Commands.runOnce(() -> score()),
-      Commands.runOnce(() -> elevator.scoringl4 = false)
-    );
-  }
-
-  public Command scorel3() {
-    return Commands.sequence(
-      Commands.runOnce(() -> elevator.scoringl3 = true),
-      Commands.runOnce(() -> elevator.setLevel("l3")),
-      Commands.waitUntil(() -> elevator.isAtSetpoint()),
-      Commands.runOnce(() -> score()),
-      Commands.runOnce(() -> elevator.scoringl3 = false)
-    );
-  }
-
-  public Command scorel2() {
-    return Commands.sequence(
-      Commands.runOnce(() -> elevator.scoringl2 = true),
-      Commands.runOnce(() -> elevator.setLevel("l2")),
-      Commands.waitUntil(() -> elevator.isAtSetpoint()),
-      Commands.runOnce(() -> score()),
-      Commands.runOnce(() -> elevator.scoringl2 = false)
-    );
-  }
-
-
-  public Command scorel1() {
-    return Commands.sequence(
-      Commands.runOnce(() -> elevator.setLevel("l1")),
-      Commands.waitUntil(() -> elevator.isAtSetpoint()),
-      Commands.runOnce(() -> score())
-    );
   }
 
   // Intake Coral
