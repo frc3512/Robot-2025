@@ -212,29 +212,19 @@ public class Robot extends TimedRobot {
         .onTrue(new InstantCommand(() -> reeftake.algaeOuttake()))
         .onFalse(new InstantCommand(() -> reeftake.algaeStop()));
 
-// Climber controls
+    // Climber controls
 
     // Full auto climbing
-    // contoller.povUp()
+    // controller.button(9)
     //     .onTrue(climber.autoClimb());
 
-    // Semi-automatic climbing
     controller.povUp()
-        .onTrue(climber.extendClimber());
+        .whileTrue(climber.setClimber(0.8))
+        .onFalse(climber.setClimber(0.0));
 
     controller.povDown()
-        .onTrue(climber.retractClimber());
-
-    // Manual climbing
-    // appendageJoystick.button(1)
-    //     .onTrue(climber.setClimber(0.8)
-    //         .until(() -> climber.climberAtTop() == false))
-    //     .onFalse(climber.setClimber(0.0));
-
-    // appendageJoystick.button(2)
-    //     .onTrue(climber.setClimber(-0.8)
-    //         .until(() -> climber.climberAtBottom() == false))
-    //     .onFalse(climber.setClimber(0.0));
+        .whileTrue(climber.setClimber(-0.8))
+        .onFalse(climber.setClimber(0.0));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }

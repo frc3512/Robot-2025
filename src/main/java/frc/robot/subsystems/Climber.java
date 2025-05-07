@@ -37,6 +37,10 @@ public class Climber extends SubsystemBase {
     return climberBottomSwitch.get();
   }
 
+  public void moveClimber(double speed) {
+    climbMotor.set(speed);
+  }
+
   public Command setClimber(Double speed) {
     return run(() -> climbMotor.set(speed));
   }
@@ -45,24 +49,24 @@ public class Climber extends SubsystemBase {
     return Commands.sequence(
       extendClimber(),
       Commands.waitUntil(() -> isBeamBroken()),
-      Commands.waitSeconds(1),
+      Commands.waitSeconds(0.2),
       retractClimber()
     );
   }
 
   public Command retractClimber() {
     return Commands.sequence(
-      Commands.runOnce(() -> setClimber(-0.8)),
-      Commands.waitUntil(() -> !climberAtBottom()),
-      Commands.runOnce(() -> setClimber(0.0))
+      Commands.runOnce(() -> moveClimber(-0.8)),
+      Commands.waitUntil(() -> climberAtBottom() == false),
+      Commands.runOnce(() -> moveClimber(0.0))
     );
   }
   
   public Command extendClimber() {
     return Commands.sequence(
-      Commands.runOnce(() -> setClimber(0.8)),
-      Commands.waitUntil(() -> !climberAtTop()),
-      Commands.runOnce(() -> setClimber(0.0))
+      Commands.runOnce(() -> moveClimber(0.8)),
+      Commands.waitUntil(() -> climberAtTop() == false),
+      Commands.runOnce(() -> moveClimber(0.0))
     );
   }
 
