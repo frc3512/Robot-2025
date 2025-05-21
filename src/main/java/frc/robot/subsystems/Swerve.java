@@ -165,12 +165,12 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
 
   public Command selectReef(String reef) {
     return Commands.runOnce(() -> this.selectedReef = reef)
-        .andThen(() -> DogLog.log("Swerve/AimingSelectedReef", reef));
+        .andThen(() -> DogLog.log("Vision/Selected Side", reef));
   }
 
   public Command selectPiece(String piece) {
     return Commands.runOnce(() -> selectedPiece = piece)
-        .andThen(() -> DogLog.log("Swerve/AimingSelectedPiece", piece));
+        .andThen(() -> DogLog.log("Vision/Selected Piece", piece));
   }
 
   public Pose2d getNearestReef() {

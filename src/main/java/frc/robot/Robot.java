@@ -148,8 +148,7 @@ public class Robot extends TimedRobot {
                     .withVelocityY(-controller.getLeftX() * maxSpeed)
                     .withRotationalRate(-controller.getRightX() * maxAngularRate)));
 
-    controller
-        .rightBumper()
+    controller.rightBumper()
         .whileTrue(
             drivetrain.applyRequest(
                 () ->
@@ -172,15 +171,12 @@ public class Robot extends TimedRobot {
     // Intake control for Groundtake
     controller
         .leftTrigger()
-        .onTrue(
-            new InstantCommand(() -> groundtake.extendPivot())
+        .onTrue(new InstantCommand(() -> groundtake.extendPivot())
                 .andThen(new InstantCommand(() -> groundtake.floorAlgaeIntake())))
-        .onFalse(
-            new InstantCommand(() -> groundtake.retractPivot())
+        .onFalse(new InstantCommand(() -> groundtake.retractPivot())
                 .andThen(new InstantCommand(() -> groundtake.keepAlgae())));
 
-    controller
-        .rightTrigger()
+    controller.rightTrigger()
         .onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()))
         .onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
 
@@ -218,23 +214,38 @@ public class Robot extends TimedRobot {
         .onFalse(retractAlgae());
 
     // Barge Scoring
-    appendageJoystick
-        .button(10)
+    appendageJoystick.button(10)
         .onTrue(new InstantCommand(() -> elevator.l4()))
         .onFalse(scoreBarge());
 
-    appendageJoystick
-        .button(11)
+    appendageJoystick.button(11)
         .onTrue(new InstantCommand(() -> reeftake.algaeOuttake()))
         .onFalse(new InstantCommand(() -> reeftake.algaeStop()));
 
     // Climber controls
+
+    // Full auto climbing
+    // appendageJoystick.button(1)
+    //     .onTrue(climber.autoClimb())
+
+    // Semi-automatic climbing
+    // appendageJoystick.button(1)
+    //     .onTrue(climber.extendClimber());
+
+    // appendageJoystick.button(2)
+    //     .onTrue(climber.retractClimber());
+
+    // Manual climbing
     appendageJoystick.button(1)
-        .onTrue(climber.setClimber(0.8))
+        .onTrue(climber.setClimber(0.8)
+            .until(() -> climber.climberAtTop() == false)
+            .andThen(climber.setClimber(0.0)))
         .onFalse(climber.setClimber(0.0));
 
     appendageJoystick.button(2)
-        .onTrue(climber.setClimber(-0.8))
+        .onTrue(climber.setClimber(-0.8)
+            .until(() -> climber.climberAtBottom() == false)
+            .andThen(climber.setClimber(0.0)))
         .onFalse(climber.setClimber(0.0));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -248,7 +259,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     elevator.setClampedGoal(Constants.ElevatorConstants.stowPos);
-    groundtake.setGoal(Constants.GroundtakeConstants.stowPos);
   }
 
   public void poseEstimation() {
@@ -307,7 +317,9 @@ public class Robot extends TimedRobot {
 
   public Command autoAim() {
     return Commands.sequence(
-        drivetrain.resetAutoAimPID(), drivetrain.goToPose(() -> drivetrain.getNearestReef()));
+        drivetrain.resetAutoAimPID(), 
+        drivetrain.goToPose(
+            () -> drivetrain.getNearestReef()));
   }
 
   public SequentialCommandGroup a1() {
