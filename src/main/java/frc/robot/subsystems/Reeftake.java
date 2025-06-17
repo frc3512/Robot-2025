@@ -56,10 +56,9 @@ public class Reeftake extends SubsystemBase {
 
   public Command autoIntake() {
     return Commands.sequence(
-      Commands.runOnce(() -> coralIntake()),
-      Commands.waitUntil(() -> !coralIn.get()),
-      Commands.runOnce(() -> coralStop())
-    );
+        Commands.runOnce(() -> coralIntake()),
+        Commands.waitUntil(() -> !coralIn.get()),
+        Commands.runOnce(() -> coralStop()));
   }
 
   @Override
