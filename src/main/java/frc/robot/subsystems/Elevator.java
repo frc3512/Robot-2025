@@ -19,8 +19,6 @@ public class Elevator extends ProfiledPIDSubsystem {
   // Use only a gravity constant
   private double gravity = 0.5;
 
-  boolean bypassStop = false;
-
   public Elevator() {
     super(
         new ProfiledPIDController(

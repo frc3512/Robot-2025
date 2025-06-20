@@ -26,7 +26,6 @@ import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Groundtake;
 import frc.robot.subsystems.LED;
-import frc.robot.subsystems.Reeftake;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 import org.opencv.core.Mat;
@@ -60,7 +59,6 @@ public class Robot extends TimedRobot {
   public final Elevator elevator = new Elevator();
   public final Groundtake groundtake = new Groundtake();
   public final LED leds = new LED();
-  public final Reeftake reeftake = new Reeftake();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
   public final Vision visionElevator =
       new Vision(
@@ -130,11 +128,11 @@ public class Robot extends TimedRobot {
             false,
             drivetrain);
 
-    autoFactory
-        .bind("Score l4", scorel4())
-        .bind("Score l2", scorel2())
-        .bind("De-reef a1", a1DeReef())
-        .bind("Intake", intake());
+    // autoFactory
+    //     .bind("Score l4", scorel4())
+    //     .bind("Score l2", scorel2())
+    //     .bind("De-reef a1", a1DeReef())
+    //     .bind("Intake", intake());
 
     autoChooser.addOption("Mid l4", midl4());
     autoChooser.addOption("Mid l4 - Barge", midl4Barge());
@@ -183,44 +181,40 @@ public class Robot extends TimedRobot {
     //  -- Bindings for the button box --
 
     // Elevator controls
-    appendageJoystick.button(6)
-        .onTrue(new InstantCommand(() -> elevator.l1()))
-        .onFalse(score());
+    // appendageJoystick.button(6)
+    //     .onTrue(new InstantCommand(() -> elevator.l1()))
+    //     .onFalse(score());
 
-    appendageJoystick.button(5)
-        .onTrue(new InstantCommand(() -> elevator.l2()))
-        .onFalse(score());
+    // appendageJoystick.button(5)
+    //     .onTrue(new InstantCommand(() -> elevator.l2()))
+    //     .onFalse(score());
 
-    appendageJoystick.button(4)
-        .onTrue(new InstantCommand(() -> elevator.l3()))
-        .onFalse(score());
+    // appendageJoystick.button(4)
+    //     .onTrue(new InstantCommand(() -> elevator.l3()))
+    //     .onFalse(score());
 
-    appendageJoystick.button(3)
-        .onTrue(new InstantCommand(() -> elevator.l4()))
-        .onFalse(score());
+    // appendageJoystick.button(3)
+    //     .onTrue(new InstantCommand(() -> elevator.l4()))
+    //     .onFalse(score());
 
     appendageJoystick.button(9)
         .onTrue(new InstantCommand(() -> elevator.stow()));
 
-    appendageJoystick.button(12).onTrue(intake());
+    // appendageJoystick.button(12).onTrue(intake());
 
     // Dereefing controls
-    appendageJoystick.button(8)
-        .onTrue(a1())
-        .onFalse(retractAlgae());
+    // appendageJoystick.button(8)
+    //     .onTrue(a1())
+    //     .onFalse(retractAlgae());
 
-    appendageJoystick.button(7)
-        .onTrue(a2())
-        .onFalse(retractAlgae());
+    // appendageJoystick.button(7)
+    //     .onTrue(a2())
+    //     .onFalse(retractAlgae());
 
     // Barge Scoring
-    appendageJoystick.button(10)
-        .onTrue(new InstantCommand(() -> elevator.l4()))
-        .onFalse(scoreBarge());
-
-    appendageJoystick.button(11)
-        .onTrue(new InstantCommand(() -> reeftake.algaeOuttake()))
-        .onFalse(new InstantCommand(() -> reeftake.algaeStop()));
+    // appendageJoystick.button(10)
+    //     .onTrue(new InstantCommand(() -> elevator.l4()))
+    //     .onFalse(scoreBarge());
 
     // Climber controls
 
@@ -297,10 +291,6 @@ public class Robot extends TimedRobot {
     // LEDs
     if (climber.isBeamBroken()) {
       leds.setPattern(leds.purple);
-    } else if (!reeftake.isCoralIn()) {
-      leds.setPattern(leds.scrollngRainbow);
-    } else if (reeftake.isCoralIn()) {
-      leds.setPattern(leds.red);
     } else {
       leds.setPattern(leds.black);
     }
@@ -320,59 +310,6 @@ public class Robot extends TimedRobot {
         drivetrain.resetAutoAimPID(), 
         drivetrain.goToPose(
             () -> drivetrain.getNearestReef()));
-  }
-
-  public SequentialCommandGroup a1() {
-    return new InstantCommand(() -> elevator.a1())
-        .andThen(new InstantCommand(() -> reeftake.algaeIntake()));
-  }
-
-  public SequentialCommandGroup a2() {
-    return new InstantCommand(() -> elevator.a2())
-        .andThen(new InstantCommand(() -> reeftake.algaeIntake()));
-  }
-
-  public SequentialCommandGroup scoreBarge() {
-    return new InstantCommand(() -> reeftake.algaeOuttake())
-        .andThen(new WaitCommand(0.375))
-        .andThen(new InstantCommand(() -> elevator.stow()))
-        .andThen(new InstantCommand(() -> reeftake.algaeStop()));
-  }
-
-  public SequentialCommandGroup retractAlgae() {
-    return new InstantCommand(() -> elevator.aStow())
-        .andThen(new InstantCommand(() -> reeftake.algaeStop()));
-  }
-
-  public SequentialCommandGroup score() {
-    return new InstantCommand(() -> reeftake.coralIntake())
-        .andThen(new WaitCommand(0.75))
-        .andThen(new InstantCommand(() -> elevator.hp()))
-        .andThen(new InstantCommand(() -> reeftake.coralStop()));
-  }
-
-  public SequentialCommandGroup intake() {
-    return new InstantCommand(() -> elevator.hp())
-        .andThen(reeftake.autoIntake());
-  }
-
-  public SequentialCommandGroup scorel4() {
-    return new InstantCommand(() -> elevator.l4())
-        .andThen(new WaitCommand(1.5))
-        .andThen(score());
-  }
-
-  public SequentialCommandGroup scorel2() {
-    return new InstantCommand(() -> elevator.l2())
-        .andThen(new WaitCommand(1))
-        .andThen(score());
-  }
-
-  public SequentialCommandGroup a1DeReef() {
-    return new InstantCommand(() -> elevator.a1())
-        .andThen(new InstantCommand(() -> reeftake.algaeIntake()))
-        .andThen(new WaitCommand(1))
-        .andThen(retractAlgae());
   }
 
   // Auto paths

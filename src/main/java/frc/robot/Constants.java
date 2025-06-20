@@ -51,11 +51,8 @@ public class Constants {
     public static final int climberBottomSwitch = 2;
   }
 
-  public static class ReeftakeConstants {
-    public static final int pivotMotorID = 17;
-    public static final int intakeMotorID = 18;
-
-    public static final int digitalInputChannel = 0;
+  public static class IntakeConstants {
+    public static final int intakeMotorID = 0;
   }
 
   public static class GroundtakeConstants {
