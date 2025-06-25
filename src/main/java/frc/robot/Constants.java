@@ -52,7 +52,27 @@ public class Constants {
   }
 
   public static class IntakeConstants {
-    public static final int intakeMotorID = 0;
+    public static final int intakeMotorID = 0; // Replace with actual motor ID
+  }
+
+  public static class ArmConstants {
+    public static final int armMotorID = 0; // Replace with actual motor ID
+
+    // TUNE ALL VALUES BELOW
+    public static final double kP = 0.5;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
+
+    public static final double tolerance = 0.002;
+
+    // TUNE ALL VALUES BELOW
+    public static final double stowPos = 0.0;
+    public static final double extendFrontPos = 5.5;
+    public static final double extendRearPos = -5.5;
+  }
+
+  public static class WristConstants {
+    public static final int wristMotorID = 0;
   }
 
   public static class GroundtakeConstants {
