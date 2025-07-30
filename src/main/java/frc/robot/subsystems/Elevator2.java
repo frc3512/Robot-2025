@@ -21,7 +21,7 @@
 //     public boolean scoringl3 = false;
 //     public boolean scoringl4 = false;
 
-//     private final ProfiledPIDController elevatorPID = 
+//     private final ProfiledPIDController elevatorPID =
 //         new ProfiledPIDController(
 //             Constants.ElevatorConstants.kP,
 //             Constants.ElevatorConstants.kI,
@@ -72,10 +72,12 @@
 //                 setpoint = Constants.ElevatorConstants.aStowPos;
 //                 break;
 //             default:
-//                 setpoint = Constants.ElevatorConstants.stowPos; // Fallback to stow if unknown level
+//                 setpoint = Constants.ElevatorConstants.stowPos; // Fallback to stow if unknown
+// level
 //                 break;
 //         }
-//         frontMotor.setVoltage(MathUtil.clamp(elevatorPID.calculate(getElevatorPos(), setpoint), 0.5, 47));
+//         frontMotor.setVoltage(MathUtil.clamp(elevatorPID.calculate(getElevatorPos(), setpoint),
+// 0.5, 47));
 
 //         DogLog.log("Elevator/Elevator Setpoint", level);
 //     }
@@ -96,7 +98,8 @@
 //         // PID Info
 //         DogLog.log("Elevator/Elevator Position", getElevatorPos());
 //         DogLog.log("Elevator/Elevator Setpoint", elevatorPID.getSetpoint().position);
-//         DogLog.log("Elevator/Front Motor Voltage", frontMotor.getMotorVoltage().getValueAsDouble());
+//         DogLog.log("Elevator/Front Motor Voltage",
+// frontMotor.getMotorVoltage().getValueAsDouble());
 
 //         // General Info
 //         DogLog.log("Elevator/Front Motor Temp", frontMotor.getDeviceTemp().getValueAsDouble());

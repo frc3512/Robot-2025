@@ -24,7 +24,6 @@ public class Climber extends SubsystemBase {
     climbMotor.setNeutralMode(NeutralModeValue.Brake);
   }
 
-
   public boolean isBeamBroken() {
     return climbBeamBreak.get();
   }
@@ -47,27 +46,24 @@ public class Climber extends SubsystemBase {
 
   public Command autoClimb() {
     return Commands.sequence(
-      extendClimber(),
-      Commands.waitUntil(() -> isBeamBroken()),
-      Commands.waitSeconds(0.2),
-      retractClimber()
-    );
+        extendClimber(),
+        Commands.waitUntil(() -> isBeamBroken()),
+        Commands.waitSeconds(0.2),
+        retractClimber());
   }
 
   public Command retractClimber() {
     return Commands.sequence(
-      Commands.runOnce(() -> moveClimber(-0.8)),
-      Commands.waitUntil(() -> climberAtBottom() == false),
-      Commands.runOnce(() -> moveClimber(0.0))
-    );
+        Commands.runOnce(() -> moveClimber(-0.8)),
+        Commands.waitUntil(() -> climberAtBottom() == false),
+        Commands.runOnce(() -> moveClimber(0.0)));
   }
-  
+
   public Command extendClimber() {
     return Commands.sequence(
-      Commands.runOnce(() -> moveClimber(0.8)),
-      Commands.waitUntil(() -> climberAtTop() == false),
-      Commands.runOnce(() -> moveClimber(0.0))
-    );
+        Commands.runOnce(() -> moveClimber(0.8)),
+        Commands.waitUntil(() -> climberAtTop() == false),
+        Commands.runOnce(() -> moveClimber(0.0)));
   }
 
   public void periodic() {
