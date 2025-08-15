@@ -104,29 +104,29 @@ public class Constants {
     }
 
     public static enum ReefPoses {
-      Reef_1(new Pose2d(5.825, 4.03, Rotation2d.fromDegrees(0))),
-      Reef_2(new Pose2d(5.163, 5.177484, Rotation2d.fromDegrees(60))),
-      Reef_3(new Pose2d(3.838, 5.177484, Rotation2d.fromDegrees(120))),
-      Reef_4(new Pose2d(3.175, 4.03, Rotation2d.fromDegrees(180))),
-      Reef_5(new Pose2d(3.8375, 2.882516, Rotation2d.fromDegrees(-120))),
-      Reef_6(new Pose2d(5.1625, 2.882516, Rotation2d.fromDegrees(-60)));
+      Reef_1(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
+      // Reef_2(new Pose2d(0, 0, Rotation2d.fromDegrees(0))),
+      // Reef_3(new Pose2d(0, 0, Rotation2d.fromDegrees(0))),
+      // Reef_4(new Pose2d(0, 0, Rotation2d.fromDegrees(0))),
+      // Reef_5(new Pose2d(0, 0, Rotation2d.fromDegrees(0))),
+      // Reef_6(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
 
       public ReefSlot blue;
       public ReefSlot red;
 
       // Shift the pose to the robot's left
       public Pose2d getLeftPose(Pose2d pose) {
-        return pose.transformBy(new Transform2d(0, -0.16, new Rotation2d()));
+        return pose.transformBy(new Transform2d(-0.2, -0.16, new Rotation2d()));
       }
 
       // Shift the pose to the robot's right
       public Pose2d getRightPose(Pose2d pose) {
-        return pose.transformBy(new Transform2d(0, 0.16, new Rotation2d()));
+        return pose.transformBy(new Transform2d(-0.2, 0.16, new Rotation2d()));
       }
 
       // Shift the pose to the center
       public Pose2d getAlgaePose(Pose2d pose) {
-        return pose.transformBy(new Transform2d(0.0, -0.0, new Rotation2d()));
+        return pose.transformBy(new Transform2d(-0.2, -0.0, new Rotation2d()));
       }
 
       ReefPoses(Pose2d pose) {

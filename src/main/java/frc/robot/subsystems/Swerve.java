@@ -181,21 +181,21 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
       reefSlots =
           new ReefSlot[] {
             Constants.FieldConstants.ReefPoses.Reef_1.red,
-            Constants.FieldConstants.ReefPoses.Reef_2.red,
-            Constants.FieldConstants.ReefPoses.Reef_3.red,
-            Constants.FieldConstants.ReefPoses.Reef_4.red,
-            Constants.FieldConstants.ReefPoses.Reef_5.red,
-            Constants.FieldConstants.ReefPoses.Reef_6.red
+            // Constants.FieldConstants.ReefPoses.Reef_2.red,
+            // Constants.FieldConstants.ReefPoses.Reef_3.red,
+            // Constants.FieldConstants.ReefPoses.Reef_4.red,
+            // Constants.FieldConstants.ReefPoses.Reef_5.red,
+            // Constants.FieldConstants.ReefPoses.Reef_6.red
           };
     } else {
       reefSlots =
           new ReefSlot[] {
             Constants.FieldConstants.ReefPoses.Reef_1.blue,
-            Constants.FieldConstants.ReefPoses.Reef_2.blue,
-            Constants.FieldConstants.ReefPoses.Reef_3.blue,
-            Constants.FieldConstants.ReefPoses.Reef_4.blue,
-            Constants.FieldConstants.ReefPoses.Reef_5.blue,
-            Constants.FieldConstants.ReefPoses.Reef_6.blue
+            // Constants.FieldConstants.ReefPoses.Reef_2.blue,
+            // Constants.FieldConstants.ReefPoses.Reef_3.blue,
+            // Constants.FieldConstants.ReefPoses.Reef_4.blue,
+            // Constants.FieldConstants.ReefPoses.Reef_5.blue,
+            // Constants.FieldConstants.ReefPoses.Reef_6.blue
           };
     }
 
