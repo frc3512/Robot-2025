@@ -15,86 +15,15 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
 public class Constants {
-  public static class ElevatorConstants {
-    public static final int frontMotorID = 13;
-    public static final int backMotorID = 14;
-
-    public static final double kP = 0.75;
-    public static final double kI = 0.0;
-    public static final double kD = 0.0;
-
-    public static final double tolerance = 0.002;
-    public static final double scoringTolerance = 0.1;
-
-    public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(1000, 1000);
-
-    public static final double stowPos = 1.0;
-    public static final double hpPos = 5.0;
-    public static final double l1Pos = 8.7;
-    public static final double l2Pos = 14.2;
-    public static final double l3Pos = 26;
-    public static final double l4Pos = 46;
-    public static final double a1Pos = 3.5;
-    public static final double a2Pos = 15.84;
-    public static final double aStowPos = 14.5;
-  }
-
-  public static class ClimberConstants {
-    public static final int climbMotorID = 11;
-    public static final int digitalInputChannel = 1;
-  }
-
-  public static class ReeftakeConstants {
-    public static final int pivotMotorID = 17;
-    public static final int intakeMotorID = 18;
-
-    public static final int digitalInputChannel = 0;
-
-    public static final double kP = 1;
-    public static final double kI = 0.0;
-    public static final double kD = 0.0;
-    public static final double kV = 0.1;
-    public static final double kG = 0.2;
-    public static final double kS = 0.0;
-
-    public static final double tolerance = 0.002;
-
-    public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(7, 5);
-
-    public static final double extendPivot = 1.5;
-    public static final double prossecer = 0.6;
-    public static final double retractPivot = 0.0;
-  }
-
-  public static class GroundtakeConstants {
-    public static final int floorAlgaeRollerMotorID = 15;
-    public static final int floorAlgaePivotMotorID = 16;
-
-    public static final int encoderID = 30;
-
-    public static final double kP = 9;
-    public static final double kI = 0.0;
-    public static final double kD = 0.0;
-
-    public static final double tolerance = 0.005;
-
-    public static final double stowPos = 0.297;
-    public static final double extendPivot = 0.135;
-
-    public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(5, 3);
-  }
 
   public static class VisionConstants {
-    public static final String elevatorCam = "ElevatorCam";
-    public static final String climberCam = "ClimberCam";
+    public static final String leftCam = "leftCam"; // Previously "ElevatorCam"
+    public static final String rightCam = "RightCam"; // Previously "ClimberCam"
 
     public static final AprilTagFieldLayout tagLayout =
         AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
-    public static final Transform3d elevatorCamOffset =
+    public static final Transform3d leftCameraOffset =
         new Transform3d(
             Units.inchesToMeters(10.0),
             Units.inchesToMeters(-6.0),
@@ -104,7 +33,7 @@ public class Constants {
                 Units.degreesToRadians(0.0),
                 Units.degreesToRadians(0.0)));
 
-    public static final Transform3d climberCamOffset =
+    public static final Transform3d rightCameraOffset =
         new Transform3d(
             Units.inchesToMeters(10),
             Units.inchesToMeters(-6.0),
