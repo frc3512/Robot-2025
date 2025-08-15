@@ -24,21 +24,24 @@ public class Constants {
         AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
     public static final Transform3d leftCameraOffset =
-        new Transform3d(
-            Units.inchesToMeters(10.0),
-            Units.inchesToMeters(-6.0),
-            Units.inchesToMeters(20),
-            new Rotation3d(
+        new Transform3d( // Always measure from center of the robot
+            Units.inchesToMeters(6.0), // Forward / Back
+            Units.inchesToMeters(-11), // Left / Right
+            Units.inchesToMeters(10.5), // Height
+            new Rotation3d( 
                 Units.degreesToRadians(90),
                 Units.degreesToRadians(0.0),
                 Units.degreesToRadians(0.0)));
 
     public static final Transform3d rightCameraOffset =
-        new Transform3d(
-            Units.inchesToMeters(10),
-            Units.inchesToMeters(-6.0),
-            Units.inchesToMeters(8),
-            new Rotation3d(0.0, Units.degreesToRadians(0.0), Units.degreesToRadians(0.0)));
+        new Transform3d( // Always measure from center of the robot
+            Units.inchesToMeters(6.0), // Forward / Back
+            Units.inchesToMeters(-11), // Left / Right
+            Units.inchesToMeters(10.5), // Height
+            new Rotation3d(
+              Units.degreesToRadians(0.0), 
+              Units.degreesToRadians(0.0), 
+              Units.degreesToRadians(0.0)));
 
     public static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(1, 1, 2);
     public static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.2, 0.2, 0.2);
@@ -123,7 +126,7 @@ public class Constants {
 
       // Shift the pose to the center
       public Pose2d getAlgaePose(Pose2d pose) {
-        return pose.transformBy(new Transform2d(0.25, -0.09, new Rotation2d()));
+        return pose.transformBy(new Transform2d(0.0, -0.0, new Rotation2d()));
       }
 
       ReefPoses(Pose2d pose) {

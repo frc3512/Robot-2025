@@ -55,10 +55,10 @@ public class Robot extends TimedRobot {
   // Subsystem Objects
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
 
-  public final Vision visionElevator =
+  public final Vision visionLeft =
       new Vision(
           Constants.VisionConstants.leftCam, Constants.VisionConstants.leftCameraOffset);
-  public final Vision visionClimber =
+  public final Vision visionRight =
       new Vision(
           Constants.VisionConstants.rightCam, Constants.VisionConstants.rightCameraOffset);
 
@@ -66,51 +66,12 @@ public class Robot extends TimedRobot {
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandJoystick appendageJoystick = new CommandJoystick(1);
 
-  // Driver camera Thread for crosshair
-  private final Thread m_visionThread;
-
   // Auton
   private final AutoFactory autoFactory;
 
   public Robot() {
 
     DogLog.setOptions(new DogLogOptions().withCaptureDs(true));
-
-    CameraServer.startAutomaticCapture();
-
-    m_visionThread =
-        new Thread(
-            () -> {
-              // Get the UsbCamera from CameraServer
-              UsbCamera camera = CameraServer.startAutomaticCapture();
-              // Set the resolution
-              camera.setResolution(640, 480);
-
-              CvSink cvSink = CameraServer.getVideo();
-              CvSource outputStream = CameraServer.putVideo("Drive Cam", 640, 480);
-
-              Mat mat = new Mat();
-              Point pt1 = new Point(0, 65);
-              Point pt2 = new Point(400, 65);
-              Point pt3 = new Point(0, 55);
-              Point pt4 = new Point(400, 55);
-              Scalar color = new Scalar(28, 239, 84);
-
-              while (!Thread.interrupted()) {
-
-                if (cvSink.grabFrame(mat) == 0) {
-                  outputStream.notifyError(cvSink.getError());
-                  continue;
-                }
-
-                Imgproc.line(mat, pt1, pt2, color, 2);
-                Imgproc.line(mat, pt3, pt4, color, 2);
-                outputStream.putFrame(mat);
-              }
-            });
-
-    m_visionThread.setDaemon(true);
-    m_visionThread.start();
 
     // Create Choreo
     autoFactory =
@@ -162,31 +123,6 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {}
 
-  public void poseEstimation() {
-    var visionElevatorEst = visionElevator.getEstimatedGlobalPose(visionElevator.getCamera());
-    var visionClimberEst = visionClimber.getEstimatedGlobalPose(visionClimber.getCamera());
-
-    visionElevatorEst.ifPresent(
-        est -> {
-          var estStdDevs = visionElevator.getEstimationStdDevs();
-          DogLog.log("Vision/Elevator Estimated Pose", est.estimatedPose);
-          drivetrain.addVisionMeasurement(
-              est.estimatedPose.toPose2d(),
-              Utils.fpgaToCurrentTime(est.timestampSeconds),
-              estStdDevs);
-        });
-
-    visionClimberEst.ifPresent(
-        est -> {
-          var estStdDevs = visionClimber.getEstimationStdDevs();
-          DogLog.log("Vision/Climber Estimated Pose", est.estimatedPose);
-          drivetrain.addVisionMeasurement(
-              est.estimatedPose.toPose2d(),
-              Utils.fpgaToCurrentTime(est.timestampSeconds),
-              estStdDevs);
-        });
-  }
-
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
@@ -202,6 +138,31 @@ public class Robot extends TimedRobot {
   public Command autoAim() {
     return Commands.sequence(
         drivetrain.resetAutoAimPID(), drivetrain.goToPose(() -> drivetrain.getNearestReef()));
+  }
+
+  public void poseEstimation() {
+    var visionElevatorEst = visionLeft.getEstimatedGlobalPose(visionLeft.getCamera());
+    var visionClimberEst = visionRight.getEstimatedGlobalPose(visionRight.getCamera());
+
+    visionElevatorEst.ifPresent(
+        est -> {
+          var estStdDevs = visionLeft.getEstimationStdDevs();
+          DogLog.log("Vision/LeftCam Estimated Pose", est.estimatedPose);
+          drivetrain.addVisionMeasurement(
+              est.estimatedPose.toPose2d(),
+              Utils.fpgaToCurrentTime(est.timestampSeconds),
+              estStdDevs);
+        });
+
+    visionClimberEst.ifPresent(
+        est -> {
+          var estStdDevs = visionRight.getEstimationStdDevs();
+          DogLog.log("Vision/RightCam Estimated Pose", est.estimatedPose);
+          drivetrain.addVisionMeasurement(
+              est.estimatedPose.toPose2d(),
+              Utils.fpgaToCurrentTime(est.timestampSeconds),
+              estStdDevs);
+        });
   }
 
   // Auto paths
