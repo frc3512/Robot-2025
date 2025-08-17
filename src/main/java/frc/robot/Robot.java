@@ -3,8 +3,6 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
-import dev.doglog.DogLog;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.cameraserver.CameraServer;
@@ -16,14 +14,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.LED;
+import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.Swerve;
-import frc.robot.subsystems.Vision;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
@@ -51,9 +47,10 @@ public class Robot extends TimedRobot {
           .withDriveRequestType(DriveRequestType.Velocity);
 
   // Subsystem Objects
+  public final Elevator elevator = new Elevator();
   public final LED leds = new LED();
+  public final Superstructure actions = new Superstructure();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
-  public final Vision vision = new Vision();
 
   // Controller Objects
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -135,8 +132,24 @@ public class Robot extends TimedRobot {
                         .withRotationalRate(-controller.getRightX() * slowAngularRate)));
 
 
-    // ---- Bindings for the button box ---
+    // --- Bindings for the button box ---
 
+    // Scoring
+    appendageJoystick.button(3)
+            .onTrue(actions.setl4())
+            .onFalse(actions.score());
+
+    appendageJoystick.button(4)
+            .onTrue(actions.setl3())
+            .onFalse(actions.score());
+    
+    appendageJoystick.button(5)
+            .onTrue(actions.setl2())
+            .onFalse(actions.score());
+
+    appendageJoystick.button(6)
+            .onTrue(actions.setl1())
+            .onFalse(actions.score());
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -152,13 +165,11 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-
-  
-    DogLog.setEnabled(Constants.GeneralConstants.tuningMode);
   }
 
   @Override
   public void teleopPeriodic() {}
+
   // Auto paths
   public AutoRoutine midl4() {
 
