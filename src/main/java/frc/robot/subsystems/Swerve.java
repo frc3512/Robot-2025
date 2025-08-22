@@ -12,6 +12,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
@@ -26,7 +27,9 @@ import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants.ReefSlot;
 import frc.robot.DriveConstants.TunerSwerveDrivetrain;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
@@ -153,6 +156,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     this.setControl(request);
   }
 
+  // Credit to 6657
   public Command resetAutoAimPID() {
     return Commands.runOnce(
         () -> {
@@ -162,7 +166,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
         });
   }
 
-  // Credit to 6657
   public Command selectReef(String reef) {
     return Commands.runOnce(() -> this.selectedReef = reef)
         .andThen(() -> DogLog.log("Swerve/AimingSelectedReef", reef));
@@ -181,21 +184,21 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
       reefSlots =
           new ReefSlot[] {
             Constants.FieldConstants.ReefPoses.Reef_1.red,
-            // Constants.FieldConstants.ReefPoses.Reef_2.red,
-            // Constants.FieldConstants.ReefPoses.Reef_3.red,
-            // Constants.FieldConstants.ReefPoses.Reef_4.red,
-            // Constants.FieldConstants.ReefPoses.Reef_5.red,
-            // Constants.FieldConstants.ReefPoses.Reef_6.red
+            Constants.FieldConstants.ReefPoses.Reef_2.red,
+            Constants.FieldConstants.ReefPoses.Reef_3.red,
+            Constants.FieldConstants.ReefPoses.Reef_4.red,
+            Constants.FieldConstants.ReefPoses.Reef_5.red,
+            Constants.FieldConstants.ReefPoses.Reef_6.red
           };
     } else {
       reefSlots =
           new ReefSlot[] {
             Constants.FieldConstants.ReefPoses.Reef_1.blue,
-            // Constants.FieldConstants.ReefPoses.Reef_2.blue,
-            // Constants.FieldConstants.ReefPoses.Reef_3.blue,
-            // Constants.FieldConstants.ReefPoses.Reef_4.blue,
-            // Constants.FieldConstants.ReefPoses.Reef_5.blue,
-            // Constants.FieldConstants.ReefPoses.Reef_6.blue
+            Constants.FieldConstants.ReefPoses.Reef_2.blue,
+            Constants.FieldConstants.ReefPoses.Reef_3.blue,
+            Constants.FieldConstants.ReefPoses.Reef_4.blue,
+            Constants.FieldConstants.ReefPoses.Reef_5.blue,
+            Constants.FieldConstants.ReefPoses.Reef_6.blue
           };
     }
 

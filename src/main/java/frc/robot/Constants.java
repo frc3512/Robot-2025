@@ -17,7 +17,7 @@ import edu.wpi.first.math.util.Units;
 public class Constants {
 
   public static class VisionConstants {
-    public static final String leftCam = "leftCam"; // Previously "ElevatorCam"
+    public static final String leftCam = "LeftCam"; // Previously "ElevatorCam"
     public static final String rightCam = "RightCam"; // Previously "ClimberCam"
 
     public static final AprilTagFieldLayout tagLayout =
@@ -26,10 +26,10 @@ public class Constants {
     public static final Transform3d leftCameraOffset =
         new Transform3d( // Always measure from center of the robot
             Units.inchesToMeters(6.0), // Forward / Back
-            Units.inchesToMeters(-11), // Left / Right
+            Units.inchesToMeters(11), // Left / Right
             Units.inchesToMeters(10.5), // Height
             new Rotation3d( 
-                Units.degreesToRadians(90),
+                Units.degreesToRadians(0),
                 Units.degreesToRadians(0.0),
                 Units.degreesToRadians(0.0)));
 
@@ -62,15 +62,15 @@ public class Constants {
   }
 
   public static class AimingConstants {
-    public static final double xP = 7.5;
+    public static final double xP = 5;
     public static final double xI = 0.0;
     public static final double xD = 0.0;
 
-    public static final double yP = 7.5;
+    public static final double yP = 5;
     public static final double yI = 0.0;
     public static final double yD = 0.0;
 
-    public static final double thetaP = 5;
+    public static final double thetaP = 2.5;
     public static final double thetaI = 0.0;
     public static final double thetaD = 0.0;
 
@@ -104,24 +104,24 @@ public class Constants {
     }
 
     public static enum ReefPoses {
-      Reef_1(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
-      // Reef_2(new Pose2d(0, 0, Rotation2d.fromDegrees(0))),
-      // Reef_3(new Pose2d(0, 0, Rotation2d.fromDegrees(0))),
-      // Reef_4(new Pose2d(0, 0, Rotation2d.fromDegrees(0))),
-      // Reef_5(new Pose2d(0, 0, Rotation2d.fromDegrees(0))),
-      // Reef_6(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
+      Reef_1(new Pose2d(3.22, 4.08, Rotation2d.fromDegrees(0))),
+      Reef_2(new Pose2d(3.88, 4.92, Rotation2d.fromDegrees(-60))),
+      Reef_3(new Pose2d(5.1, 5.13, Rotation2d.fromDegrees(-120))),
+      Reef_4(new Pose2d(0, 0, Rotation2d.fromDegrees(0))),
+      Reef_5(new Pose2d(0, 0, Rotation2d.fromDegrees(0))),
+      Reef_6(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
 
       public ReefSlot blue;
       public ReefSlot red;
 
       // Shift the pose to the robot's left
       public Pose2d getLeftPose(Pose2d pose) {
-        return pose.transformBy(new Transform2d(-0.2, -0.16, new Rotation2d()));
+        return pose.transformBy(new Transform2d(-0.2, 0.16, new Rotation2d()));
       }
 
       // Shift the pose to the robot's right
       public Pose2d getRightPose(Pose2d pose) {
-        return pose.transformBy(new Transform2d(-0.2, 0.16, new Rotation2d()));
+        return pose.transformBy(new Transform2d(-0.2, 0-.16, new Rotation2d()));
       }
 
       // Shift the pose to the center

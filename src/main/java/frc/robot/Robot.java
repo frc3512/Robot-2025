@@ -137,14 +137,16 @@ public class Robot extends TimedRobot {
 
   public Command autoAim() {
     return Commands.sequence(
-        drivetrain.resetAutoAimPID(), drivetrain.goToPose(() -> drivetrain.getNearestReef()));
+        drivetrain.resetAutoAimPID(), 
+        drivetrain.goToPose(
+          () -> drivetrain.getNearestReef()));
   }
 
   public void poseEstimation() {
-    var visionElevatorEst = visionLeft.getEstimatedGlobalPose(visionLeft.getCamera());
-    var visionClimberEst = visionRight.getEstimatedGlobalPose(visionRight.getCamera());
+    var visionLeftEst = visionLeft.getEstimatedGlobalPose(visionLeft.getCamera());
+    var visionRightEst = visionRight.getEstimatedGlobalPose(visionRight.getCamera());
 
-    visionElevatorEst.ifPresent(
+    visionLeftEst.ifPresent(
         est -> {
           var estStdDevs = visionLeft.getEstimationStdDevs();
           DogLog.log("Vision/LeftCam Estimated Pose", est.estimatedPose);
@@ -154,7 +156,7 @@ public class Robot extends TimedRobot {
               estStdDevs);
         });
 
-    visionClimberEst.ifPresent(
+    visionRightEst.ifPresent(
         est -> {
           var estStdDevs = visionRight.getEstimationStdDevs();
           DogLog.log("Vision/RightCam Estimated Pose", est.estimatedPose);
