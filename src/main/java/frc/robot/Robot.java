@@ -1,8 +1,5 @@
 package frc.robot;
 
-import choreo.auto.AutoFactory;
-import choreo.auto.AutoRoutine;
-import choreo.auto.AutoTrajectory;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -12,8 +9,6 @@ import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -40,8 +35,6 @@ public class Robot extends TimedRobot {
   private double maxAngularRate = DriveConstants.maxAngularRate;
   private double slowSpeed = DriveConstants.slowSpeed;
   private double slowAngularRate = DriveConstants.slowAngularRate;
-
-  private SendableChooser<AutoRoutine> autoChooser = new SendableChooser<>();
 
   private final SwerveRequest.FieldCentric drive =
       new SwerveRequest.FieldCentric()
@@ -75,9 +68,6 @@ public class Robot extends TimedRobot {
 
   // Driver Camera Thread for crosshair
   private final Thread m_visionThread;
-
-  // Auton
-  private final AutoFactory autoFactory;
 
   public Robot() {
 
@@ -120,24 +110,6 @@ public class Robot extends TimedRobot {
 
     m_visionThread.setDaemon(true);
     m_visionThread.start();
-
-    // Create Choreo
-    autoFactory =
-        new AutoFactory(
-            () -> drivetrain.getState().Pose,
-            drivetrain::resetPose,
-            drivetrain::followTrajectory,
-            false,
-            drivetrain);
-
-    autoFactory
-        .bind("Score l4", scorel4())
-        .bind("Score l2", scorel2())
-        .bind("De-reef a1", a1DeReef())
-        .bind("Intake", intake());
-
-    autoChooser.addOption("Mid l4", midl4());
-    autoChooser.addOption("Mid l4 - Barge", midl4Barge());
 
     //  -- Controler Bindings --
     drivetrain.setDefaultCommand(
@@ -248,13 +220,10 @@ public class Robot extends TimedRobot {
             .andThen(climber.setClimber(0.0)))
         .onFalse(climber.setClimber(0.0));
 
-    SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
   @Override
-  public void autonomousInit() {
-    autoChooser.getSelected().cmd().schedule();
-  }
+  public void autonomousInit() {}
 
   @Override
   public void teleopInit() {
@@ -375,21 +344,4 @@ public class Robot extends TimedRobot {
         .andThen(retractAlgae());
   }
 
-  // Auto paths
-  public AutoRoutine midl4() {
-    AutoRoutine routine = autoFactory.newRoutine("Mid l4");
-    AutoTrajectory trajectory = routine.trajectory("Mid l4");
-
-    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
-    return routine;
-  }
-
-  public AutoRoutine midl4Barge() {
-    AutoRoutine routine = autoFactory.newRoutine("Mid l4 - Barge");
-    AutoTrajectory trajectory = routine.trajectory("Mid l4 - Barge");
-    AutoTrajectory trajectory2 = routine.trajectory("De-reef");
-
-    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd(), trajectory2.resetOdometry(), trajectory2.cmd()));
-    return routine;
-  }
 }
