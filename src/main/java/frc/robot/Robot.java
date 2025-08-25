@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 import org.opencv.core.Mat;
@@ -54,6 +55,7 @@ public class Robot extends TimedRobot {
 
   // Subsystem Objects
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
+  public final LEDs leds = new LEDs();
 
   public final Vision visionLeft =
       new Vision(
@@ -95,6 +97,15 @@ public class Robot extends TimedRobot {
                     .withVelocityY(-controller.getLeftX() * maxSpeed)
                     .withRotationalRate(-controller.getRightX() * maxAngularRate)));
 
+    // Slow mode
+    controller.leftBumper().whileTrue(
+        drivetrain.applyRequest(
+            () ->
+                driveSlow
+                    .withVelocityX(-controller.getLeftY() * slowSpeed)
+                    .withVelocityY(-controller.getLeftX() * slowSpeed)
+                    .withRotationalRate(-controller.getRightX() * slowAngularRate)));
+
     // Re gyro
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
@@ -118,7 +129,10 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    CommandScheduler.getInstance().cancelAll();
+    drivetrain.getNearestReef();
+  }
 
   @Override
   public void disabledInit() {}
@@ -130,8 +144,24 @@ public class Robot extends TimedRobot {
 
     // Logging
     DogLog.log("Vision/Nearest Reef", drivetrain.getNearestReef());
-  }
 
+    // LED comms for selected peice 
+    if (drivetrain.getSelectedPiece().equals("Coral")) {
+      if (drivetrain.getSelectedReef().equals("Left")) {
+        leds.setPattern(leds.leftCoral);
+      } else if (drivetrain.getSelectedReef().equals("Right")) {
+        leds.setPattern(leds.rightCoral);
+      } else {
+        // No reef selected
+        leds.setPattern(leds.white);
+      }
+    } else if (drivetrain.getSelectedPiece().equals("Algae")) {
+      leds.setPattern(leds.cyan);
+    } else {
+      leds.setPattern(leds.black);
+    }
+  }
+    
   @Override
   public void teleopPeriodic() {}
 
