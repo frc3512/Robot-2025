@@ -147,13 +147,16 @@ public class Robot extends TimedRobot {
 
     // LED comms for selected peice 
     if (drivetrain.getSelectedPiece().equals("Coral")) {
-      if (drivetrain.getSelectedReef().equals("Left")) {
-        leds.setPattern(leds.leftCoral);
-      } else if (drivetrain.getSelectedReef().equals("Right")) {
-        leds.setPattern(leds.rightCoral);
-      } else {
-        // No reef selected
-        leds.setPattern(leds.white);
+      switch (drivetrain.getSelectedReef()) {
+        case "Left":
+          leds.setPattern(leds.leftCoral);
+          break;
+        case "Right":
+          leds.setPattern(leds.rightCoral);
+          break;
+        default:
+          leds.setPattern(leds.white);
+          break;
       }
     } else if (drivetrain.getSelectedPiece().equals("Algae")) {
       leds.setPattern(leds.cyan);
