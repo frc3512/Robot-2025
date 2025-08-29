@@ -118,7 +118,6 @@ public class Robot extends TimedRobot {
 
     // Drive to pose
     controller.rightBumper().whileTrue(autoAim());
-   
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }

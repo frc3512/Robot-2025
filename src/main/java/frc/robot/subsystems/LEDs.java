@@ -31,8 +31,8 @@ public class LEDs extends SubsystemBase {
   public final LEDPattern white = LEDPattern.solid(Color.kWhite);
   public final LEDPattern black = LEDPattern.solid(Color.kBlack);
 
-  public final LEDPattern left = LEDPattern.gradient(GradientType.kDiscontinuous, Color.kWhite, Color.kBlue);
-  public final LEDPattern right = LEDPattern.gradient(GradientType.kDiscontinuous, Color.kWhite, Color.kRed);
+  public final LEDPattern left = LEDPattern.gradient(GradientType.kDiscontinuous, Color.kWhite, Color.kRed);
+  public final LEDPattern right = LEDPattern.gradient(GradientType.kDiscontinuous, Color.kWhite, Color.kBlue);
   public final LEDPattern leftCoral = 
       left.scrollAtAbsoluteSpeed(Centimeters.per(Second).of(12.5), ledSpacing);
   public final LEDPattern rightCoral =
