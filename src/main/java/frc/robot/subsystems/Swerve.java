@@ -83,6 +83,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
           Constants.AimingConstants.thetaD,
           Constants.AimingConstants.aimingRotationConstraints);
 
+
   public Swerve(
       SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
     super(drivetrainConstants, modules);
@@ -230,29 +231,48 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
   }
 
   public void controlPosition(Pose2d targetPose) {
-    double x = aimXController.calculate(getState().Pose.getX(), targetPose.getX());
-    double y = aimYController.calculate(getState().Pose.getY(), targetPose.getY());
-    double rot =
-        aimThetaController.calculate(
-            getState().Pose.getRotation().getRadians(), targetPose.getRotation().getRadians());
+
+    aimThetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+    Pose2d currentPose = getState().Pose;
+
+    DogLog.log("Swerve/Aim Target", targetPose);
 
     ChassisSpeeds speeds =
-        ChassisSpeeds.fromFieldRelativeSpeeds(x, y, rot, getState().Pose.getRotation());
+        new ChassisSpeeds(
+          aimXController.calculate(currentPose.getX(), targetPose.getX()),
+          aimYController.calculate(currentPose.getY(), targetPose.getY()),
+          aimThetaController.calculate(
+              currentPose.getRotation().getRadians(), 
+              targetPose.getRotation().getRadians()));
 
     this.setControl(
         new SwerveRequest.FieldCentric()
             .withVelocityX(speeds.vxMetersPerSecond)
             .withVelocityY(speeds.vyMetersPerSecond)
             .withRotationalRate(speeds.omegaRadiansPerSecond));
-
-    DogLog.log("Swerve/Aim Target", targetPose);
   }
 
   public Command goToPose(Supplier<Pose2d> target) {
     return this.run(() -> controlPosition(target.get()))
-        .until(() -> false)
+        .until(() -> atSetpoint())
         .andThen(Commands.runOnce(() -> this.applyRequest(new SwerveRequest.RobotCentric())));
   }
+
+  public boolean atSetpoint() {
+
+    double xTol = aimXController.getPositionTolerance();
+    double yTol = aimYController.getPositionTolerance();
+    double thetaTol = aimThetaController.getPositionTolerance();
+    // double theatVolTol = aimThetaController.getVelocityTolerance();
+
+    if (Math.abs(aimXController.getPositionError()) > xTol) return false;
+    if (Math.abs(aimYController.getPositionError()) > yTol) return false;
+    if (Math.abs(aimThetaController.getPositionError()) > thetaTol) return false;
+    // if (Math.abs(aimThetaController.getVelocityError()) > theatVolTol) return false;
+
+    return true;
+ }  
 
   public String getSelectedPiece() {
     return selectedPiece;
@@ -269,8 +289,10 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     DogLog.log("Swerve/ModuleStateSetpoints", getState().ModuleTargets);
     DogLog.log("Swerve/OdometryPose", getState().Pose);
     DogLog.log("Swerve/ChassisSpeeds", getState().Speeds);
+
     // Module Name Keys
     String[] moduleNames = new String[] {"FrontLeft", "FrontRight", "BackLeft", "BackRight"};
+
     // Log Module Data
     for (int i = 0; i < 4; i++) {
       DogLog.log(
