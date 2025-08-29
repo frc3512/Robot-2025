@@ -105,8 +105,8 @@ public class Constants {
 
     public static enum ReefPoses {
       Reef_1(new Pose2d(3.22, 4.08, Rotation2d.fromDegrees(0))),
-      Reef_2(new Pose2d(3.88, 4.92, Rotation2d.fromDegrees(-60))),
-      Reef_3(new Pose2d(5.1, 5.13, Rotation2d.fromDegrees(-120))),
+      Reef_2(new Pose2d(3.78, 5.09, Rotation2d.fromDegrees(-60))),
+      Reef_3(new Pose2d(5.06, 5.12, Rotation2d.fromDegrees(-120))),
       Reef_4(new Pose2d(0, 0, Rotation2d.fromDegrees(0))),
       Reef_5(new Pose2d(0, 0, Rotation2d.fromDegrees(0))),
       Reef_6(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
