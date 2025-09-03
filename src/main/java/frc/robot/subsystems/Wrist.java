@@ -28,7 +28,7 @@ import edu.wpi.first.units.measure.*;
 /**
 * Pivot subsystem using TalonFX with Krakenx60 motor
 */
-@Logged(name = "ElevatorSubsystem")
+@Logged(name = "Wrist")
 public class Wrist extends SubsystemBase {
 // Constants
 private final int canID = 1;
@@ -40,7 +40,7 @@ private final double maxVelocity = 1; // rad/s
 private final double maxAcceleration = 1; // rad/s²
 private final boolean brakeMode = true;
  private final boolean enableStatorLimit = true;
- private final double statorCurrentLimit = 79;
+ private final double statorCurrentLimit = 80;
  private final boolean enableSupplyLimit = false;
  private final double supplyCurrentLimit = 40;
 

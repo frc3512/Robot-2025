@@ -21,7 +21,7 @@ import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import edu.wpi.first.units.measure.*;
 
 @SuppressWarnings("removal")
-@Logged(name = "ElevatorSubsystem")
+@Logged(name = "Elevator")
 public class Elevator extends SubsystemBase {
 
   // Motor controller

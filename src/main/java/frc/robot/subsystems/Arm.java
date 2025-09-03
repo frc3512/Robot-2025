@@ -8,28 +8,31 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.Notifier;
-import java.util.function.DoubleSupplier;
 
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
+
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
+import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
+import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
+import edu.wpi.first.units.measure.*;
 
 
 /**
-* Arm subsystem using SparkMAX with NEO motor
+* Arm subsystem using TalonFX with Krakenx60 motor
 */
-@Logged(name = "Arm")
+@Logged(name = "ArmSubsystem")
 public class Arm extends SubsystemBase {
  // Constants
  private final int canID = 1;
- private final double gearRatio = 15;
+ private final double gearRatio = 86.25;
   private final double kP = 1;
   private final double kI = 0;
   private final double kD = 0;
@@ -37,36 +40,30 @@ public class Arm extends SubsystemBase {
  private final double maxAcceleration = 1; // rad/s²
  private final boolean brakeMode = true;
  private final boolean enableStatorLimit = true;
- private final double statorCurrentLimit = 40;
+ private final double statorCurrentLimit = 80;
  private final boolean enableSupplyLimit = false;
  private final double supplyCurrentLimit = 40;
- private final double armLength = 0.8382; // meters
+ private final double armLength = 5.896696; // meters
  
  // Feedforward
  private final ArmFeedforward feedforward = new ArmFeedforward(
    0, // kS
-   6.41, // kG
+   6.4, // kG
    1.19, // kV
    1.92  // kA
  );
  
  // Motor controller
- private final SparkMax motor;
-private final RelativeEncoder encoder;
+ private final TalonFX motor;
+private final PositionVoltage positionRequest;
+private final VelocityVoltage velocityRequest;
+private final StatusSignal<Angle> positionSignal;
+private final StatusSignal<AngularVelocity> velocitySignal;
+private final StatusSignal<Voltage> voltageSignal;
+private final StatusSignal<Current> statorCurrentSignal;
+private final StatusSignal<Temperature> temperatureSignal;
+
  
- // Control mode
- private enum ControlMode {
-   OPEN_LOOP,
-   POSITION,
-   VELOCITY
- }
- private ControlMode currentControlMode = ControlMode.OPEN_LOOP;
- private double targetPosition = 0.0;
- private double targetVelocity = 0.0;
- 
- // Profiled PID Controller
- private ProfiledPIDController profiledPIDController;
- private TrapezoidProfile.Constraints constraints;
  
  // Simulation
  private final SingleJointedArmSim armSim;
@@ -76,27 +73,54 @@ private final RelativeEncoder encoder;
   */
  public Arm() {
    // Initialize motor controller
-   SparkMaxConfig motorConfig = new SparkMaxConfig();
-motor = new SparkMax(canID, MotorType.kBrushless);
-motorConfig.idleMode(brakeMode ? IdleMode.kBrake : IdleMode.kCoast);
+   motor = new TalonFX(canID);
 
-// Configure encoder
-encoder = motor.getEncoder();
-encoder.setPosition(0);
+// Create control requests
+positionRequest = new PositionVoltage(0).withSlot(0);
+velocityRequest = new VelocityVoltage(0).withSlot(0);
+
+// get status signals
+positionSignal = motor.getPosition();
+velocitySignal = motor.getVelocity();
+voltageSignal = motor.getMotorVoltage();
+statorCurrentSignal = motor.getStatorCurrent();
+temperatureSignal = motor.getDeviceTemp();
+
+TalonFXConfiguration config = new TalonFXConfiguration();
+
+// Configure PID for slot 0
+Slot0Configs slot0 = config.Slot0;
+slot0.kP = kP;
+slot0.kI = kI;
+slot0.kD = kD;
+
 
 
 // Set current limits
- motorConfig.smartCurrentLimit(statorCurrentLimit);
+CurrentLimitsConfigs currentLimits = config.CurrentLimits;
+currentLimits.StatorCurrentLimit = statorCurrentLimit;
+currentLimits.StatorCurrentLimitEnable = enableStatorLimit;
+currentLimits.SupplyCurrentLimit = supplyCurrentLimit;
+currentLimits.SupplyCurrentLimitEnable = enableSupplyLimit;
 
 
-// Save configuration
-motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+// Set brake mode
+config.MotorOutput.NeutralMode = brakeMode ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+
+// Apply gear ratio
+config.Feedback.SensorToMechanismRatio = gearRatio;
+
+// Apply configuration
+motor.getConfigurator().apply(config);
+
+// Reset encoder position
+motor.setPosition(0);
    
    // Initialize simulation
    armSim = new SingleJointedArmSim(
-     DCMotor.getNEO(1), // Motor type
+     DCMotor.getKrakenX60(1), // Motor type
      gearRatio,
-     SingleJointedArmSim.estimateMOI(armLength, 5.896696), // Arm moment of inertia
+     SingleJointedArmSim.estimateMOI(armLength, 13), // Arm moment of inertia
      armLength, // Arm length (m)
      Units.degreesToRadians(0), // Min angle (rad)
      Units.degreesToRadians(1.5707963267948966), // Max angle (rad)
@@ -104,65 +128,15 @@ motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersis
      Units.degreesToRadians(0) // Starting position (rad)
    );
    
-   // Initialize ProfiledPIDController
-   // Convert from radians to rotations for constraints
-   double maxVelocityRotations = maxVelocity / (2.0 * Math.PI);
-   double maxAccelerationRotations = maxAcceleration / (2.0 * Math.PI);
-   
-   constraints = new TrapezoidProfile.Constraints(maxVelocityRotations, maxAccelerationRotations);
-   profiledPIDController = new ProfiledPIDController(kP, kI, kD, constraints);
  }
  
- /**
-  * Control loop function that runs at a fixed frequency.
-  * This is used for SparkMAX and SparkFlex controllers to implement
-  * closed-loop control outside of the main robot loop.
-  */
- private void controlLoopFn() {
-   switch (currentControlMode) {
-     case POSITION:
-       double currentPos = getPosition();
-       double output = profiledPIDController.calculate(currentPos, targetPosition);
-       double velocity = profiledPIDController.getSetpoint().velocity;
-       double angle = getPositionRadians();
-       double feedforwardOutput = feedforward.calculate(angle, velocity);
-       setVoltage(output + feedforwardOutput);
-       break;
-       
-     case VELOCITY:
-       double currentVel = getVelocity();
-       double velOutput = profiledPIDController.calculate(currentVel, targetVelocity);
-       double accel = profiledPIDController.getSetpoint().velocity - currentVel;
-       double armAngle = getPositionRadians();
-       double velFeedforwardOutput = feedforward.calculate(armAngle, targetVelocity, accel);
-       
-       // Apply the combined PID output and feedforward to the motor
-       double velocityVoltage = velOutput + velFeedforwardOutput;
-       motor.setVoltage(velocityVoltage);
-       break;
-       
-     case OPEN_LOOP:
-     default:
-       // Do nothing, voltage is set directly
-       break;
-   }
- }
- 
- /**
-  * Clean up resources when the subsystem is destroyed.
-  */
-  public void close() {
-     motor.close();
-   }
- }
  
  /**
   * Update simulation and telemetry.
   */
  @Override
  public void periodic() {
-   
-   controlLoopFn();
+   BaseStatusSignal.refreshAll(positionSignal, velocitySignal, voltageSignal, statorCurrentSignal, temperatureSignal);
  }
  
  /**
@@ -184,9 +158,17 @@ motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersis
   @Logged(name = "Position/Rotations")
 public double getPosition() {
   // Rotations
-  return encoder.getPosition() / gearRatio;
+  return positionSignal.getValueAsDouble();
 }
 
+/**
+ * Get the current position in Radians.
+ * @return Position in Radians.
+ */
+  @Logged(name = "Position/Radians")
+public double getPositionRadians() {
+  return getPosition() * 2 * Math.PI;
+}
 
 /**
  * Get the current velocity in rotations per second.
@@ -194,7 +176,7 @@ public double getPosition() {
  */
   @Logged(name = "Velocity")
 public double getVelocity() {
-  return encoder.getVelocity() / gearRatio / 60.0; // Convert from RPM to RPS
+  return velocitySignal.getValueAsDouble();
 }
 
 /**
@@ -203,7 +185,7 @@ public double getVelocity() {
  */
   @Logged(name = "Voltage")
 public double getVoltage() {
-  return motor.getAppliedOutput() * motor.getBusVoltage();
+  return voltageSignal.getValueAsDouble();
 }
 
 /**
@@ -212,7 +194,7 @@ public double getVoltage() {
  */
   @Logged(name = "Current")
 public double getCurrent() {
-  return motor.getOutputCurrent();
+  return statorCurrentSignal.getValueAsDouble();
 }
 
 /**
@@ -221,7 +203,7 @@ public double getCurrent() {
  */
   @Logged(name = "Temperature")
 public double getTemperature() {
-  return motor.getMotorTemperature();
+  return temperatureSignal.getValueAsDouble();
 }
  
  /**
@@ -242,16 +224,9 @@ public double getTemperature() {
    double angleRadians = Units.degreesToRadians(angleDegrees);
    double positionRotations = angleRadians / (2.0 * Math.PI);
    
-   // Use the ProfiledPIDController
-   targetPosition = positionRotations;
-   currentControlMode = ControlMode.POSITION;
    
-   // If acceleration is specified, update constraints
-   if (acceleration > 0) {
-     double maxAccelRotations = acceleration / (2.0 * Math.PI);
-     constraints = new TrapezoidProfile.Constraints(constraints.maxVelocity, maxAccelRotations);
-     profiledPIDController.setConstraints(constraints);
-   }
+double ffVolts = feedforward.calculate(getVelocity(), acceleration);
+motor.setControl(positionRequest.withPosition(positionRotations).withFeedForward(ffVolts));
  }
  
  /**
@@ -272,22 +247,8 @@ public double getTemperature() {
    double velocityRadPerSec = Units.degreesToRadians(velocityDegPerSec);
    double velocityRotations = velocityRadPerSec / (2.0 * Math.PI);
    
-   // Use the ProfiledPIDController
-   targetVelocity = velocityRotations;
-   currentControlMode = ControlMode.VELOCITY;
-   
-   // If acceleration is specified, update constraints
-   if (acceleration > 0) {
-     double maxAccelRotations = Units.degreesToRadians(acceleration) / (2.0 * Math.PI);
-     constraints = new TrapezoidProfile.Constraints(constraints.maxVelocity, maxAccelRotations);
-     profiledPIDController.setConstraints(constraints);
-   }
-   
-   // Apply velocity directly to the motor controller as well
-   // This ensures immediate response while the control loop refines it
-   double armAngle = getPositionRadians();
-   double ffVolts = feedforward.calculate(armAngle, velocityRotations, 0);
-   motor.setVoltage(ffVolts);
+   double ffVolts = feedforward.calculate(getVelocity(), acceleration);
+motor.setControl(velocityRequest.withVelocity(velocityRotations).withFeedForward(ffVolts));
  }
  
  /**
@@ -295,7 +256,6 @@ public double getTemperature() {
   * @param voltage The voltage to apply
   */
  public void setVoltage(double voltage) {
-   currentControlMode = ControlMode.OPEN_LOOP;
    motor.setVoltage(voltage);
  }
  
@@ -323,8 +283,10 @@ public double getTemperature() {
   */
  public Command moveToAngleCommand(double angleDegrees) {
    return run(() -> {
-     // Just set the position and let the profiled controller handle it
-     setAngle(angleDegrees);
+     double currentAngle = Units.radiansToDegrees(getPositionRadians());
+     double error = angleDegrees - currentAngle;
+     double velocityDegPerSec = Math.signum(error) * Math.min(Math.abs(error) * 2.0, Units.radiansToDegrees(maxVelocity));
+     setVelocity(velocityDegPerSec);
    }).until(() -> {
      double currentAngle = Units.radiansToDegrees(getPositionRadians());
      return Math.abs(angleDegrees - currentAngle) < 2.0; // 2 degree tolerance
@@ -346,3 +308,4 @@ public double getTemperature() {
  public Command moveAtVelocityCommand(double velocityDegPerSec) {
    return run(() -> setVelocity(velocityDegPerSec));
  }
+}
