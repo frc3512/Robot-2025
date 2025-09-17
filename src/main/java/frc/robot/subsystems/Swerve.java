@@ -251,6 +251,14 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
         .andThen(Commands.runOnce(() -> this.applyRequest(new SwerveRequest.RobotCentric())));
   }
 
+  public String getSelectedPiece() {
+    return selectedPiece;
+  }
+
+  public String getSelectedReef() {
+    return selectedReef;
+  }
+
   @Override
   public void periodic() {
     // Log General Swerve Information

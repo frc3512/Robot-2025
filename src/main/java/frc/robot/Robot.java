@@ -292,13 +292,22 @@ public class Robot extends TimedRobot {
 
     CommandScheduler.getInstance().run();
 
-    // LEDs
     if (climber.isBeamBroken()) {
       leds.setPattern(leds.purple);
-    } else if (!reeftake.isCoralIn()) {
-      leds.setPattern(leds.scrollngRainbow);
-    } else if (reeftake.isCoralIn()) {
-      leds.setPattern(leds.red);
+    } else if (drivetrain.getSelectedPiece().equals("Coral")) {
+      switch (drivetrain.getSelectedReef()) {
+        case "Left":
+          leds.setPattern(leds.leftCoral);
+          break;
+        case "Right":
+          leds.setPattern(leds.rightCoral);
+          break;
+        default:
+          leds.setPattern(leds.white);
+          break;
+      }
+    } else if (drivetrain.getSelectedPiece().equals("Algae")) {
+      leds.setPattern(leds.cyan);
     } else {
       leds.setPattern(leds.black);
     }
