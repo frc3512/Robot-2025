@@ -101,7 +101,7 @@ public class Constants {
     public static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(1, 1, 2);
     public static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.2, 0.2, 0.2);
 
-    public static final double visionTurnP = 1; // TUNE THIS VALUE
+    public static final double visionTurnP = 1; // todo: TUNE THIS VALUE
   }
 
   public static class AutoConstants {
