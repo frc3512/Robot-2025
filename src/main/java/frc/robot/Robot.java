@@ -5,6 +5,7 @@ import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest.SwerveDriveBrake;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
@@ -52,6 +53,8 @@ public class Robot extends TimedRobot {
           .withDeadband(slowSpeed * 0.1)
           .withRotationalDeadband(slowAngularRate * 0.07) // Add a 7% deadband
           .withDriveRequestType(DriveRequestType.Velocity);
+
+  private final SwerveRequest.SwerveDriveBrake brake = new SwerveDriveBrake();
 
   // Subsystem Objects
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
@@ -108,7 +111,7 @@ public class Robot extends TimedRobot {
 
     // Re gyro
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-
+    
     // Aiming Controls
     controller.povUp().onTrue(drivetrain.selectPiece("Coral"));
     controller.povDown().onTrue(drivetrain.selectPiece("Algae"));
