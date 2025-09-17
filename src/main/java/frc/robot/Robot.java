@@ -159,12 +159,12 @@ public class Robot extends TimedRobot {
 
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-    // Aiming Controls
-    controller.povUp().onTrue(drivetrain.selectPiece("Coral"));
-    controller.povDown().onTrue(drivetrain.selectPiece("Algae"));
+    // // Aiming Controls
+    // controller.povUp().onTrue(drivetrain.selectPiece("Coral"));
+    // controller.povDown().onTrue(drivetrain.selectPiece("Algae"));
 
-    controller.povLeft().onTrue(drivetrain.selectReef("Left"));
-    controller.povRight().onTrue(drivetrain.selectReef("Right"));
+    // controller.povLeft().onTrue(drivetrain.selectReef("Left"));
+    // controller.povRight().onTrue(drivetrain.selectReef("Right"));
 
     // controller.leftBumper().whileTrue(autoAim());
 
