@@ -26,8 +26,439 @@
     {
       "name": "DATA",
       "grid_layout": {
-        "layouts": [],
-        "containers": []
+        "layouts": [
+          {
+            "title": "Elevator",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 320.0,
+            "height": 512.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": " Elevator Front Motor Encoder",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Robot/Elevator/ Elevator Front Motor Encoder",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Elevator Goal",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Graph",
+                "properties": {
+                  "topic": "/Robot/Elevator/Elevator Goal",
+                  "period": 0.033,
+                  "data_type": "double",
+                  "time_displayed": 10.0,
+                  "min_value": 0.0,
+                  "max_value": 50.0,
+                  "color": 4278238420,
+                  "line_width": 2.0
+                }
+              },
+              {
+                "title": "Elevator Voltage",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Voltage View",
+                "properties": {
+                  "topic": "/Robot/Elevator/Elevator Voltage",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "min_value": 4.0,
+                  "max_value": 13.0,
+                  "divisions": 5,
+                  "inverted": false,
+                  "orientation": "horizontal"
+                }
+              },
+              {
+                "title": "Front Motor Temp",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Robot/Elevator/Front Motor Temp",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Back Motor Temp",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Robot/Elevator/Back Motor Temp",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "Reeftake",
+            "x": 896.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 192.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": " Algae Motor Temp",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Robot/Reeftake/ Algae Motor Temp",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": " Coral Motor Temp",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Robot/Reeftake/ Coral Motor Temp",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "Climber",
+            "x": 640.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 512.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Climber Motor Temp",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Robot/Climber/Climber Motor Temp",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Climber Beam Break",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/Robot/Climber/Climber Beam Break",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294463813,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "Climber At Top",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/Robot/Climber/Climber At Top",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "Climber At Bottom",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/Robot/Climber/Climber At Bottom",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              }
+            ]
+          },
+          {
+            "title": "List Layout",
+            "x": 320.0,
+            "y": 0.0,
+            "width": 320.0,
+            "height": 512.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Pos",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Robot/Groundtake/Pos",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Goal",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Graph",
+                "properties": {
+                  "topic": "/Robot/Groundtake/Goal",
+                  "period": 0.033,
+                  "data_type": "double",
+                  "time_displayed": 5.0,
+                  "min_value": 0.0,
+                  "max_value": 0.5,
+                  "color": 4278238420,
+                  "line_width": 2.0
+                }
+              },
+              {
+                "title": "Grountake Pivot Temp",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Robot/Groundtake/Grountake Pivot Temp",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Grountake Roller Temp",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Robot/Groundtake/Grountake Roller Temp",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "CANBus",
+            "x": 896.0,
+            "y": 192.0,
+            "width": 256.0,
+            "height": 320.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "OffCount",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Robot/SystemStats/CANBus/OffCount",
+                  "period": 0.06,
+                  "data_type": "int",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "ReceiveErrorCount",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Robot/SystemStats/CANBus/ReceiveErrorCount",
+                  "period": 0.06,
+                  "data_type": "int",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "TransmitErrorCount",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Robot/SystemStats/CANBus/TransmitErrorCount",
+                  "period": 0.06,
+                  "data_type": "int",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "TxFullCount",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Robot/SystemStats/CANBus/TxFullCount",
+                  "period": 0.06,
+                  "data_type": "int",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Utilization",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Robot/SystemStats/CANBus/Utilization",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              }
+            ]
+          }
+        ],
+        "containers": [
+          {
+            "title": "BatteryVoltage",
+            "x": 1152.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "Voltage View",
+            "properties": {
+              "topic": "/Robot/SystemStats/BatteryVoltage",
+              "period": 0.06,
+              "data_type": "double",
+              "min_value": 4.0,
+              "max_value": 13.0,
+              "divisions": 5,
+              "inverted": false,
+              "orientation": "horizontal"
+            }
+          },
+          {
+            "title": "CPUTempCelcius",
+            "x": 1152.0,
+            "y": 128.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Robot/SystemStats/CPUTempCelcius",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "RSLState",
+            "x": 1344.0,
+            "y": 128.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Robot/SystemStats/RSLState",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "TeamNumber",
+            "x": 1152.0,
+            "y": 256.0,
+            "width": 192.0,
+            "height": 192.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Robot/SystemStats/TeamNumber",
+              "period": 0.06,
+              "data_type": "int",
+              "show_submit_button": false
+            }
+          }
+        ]
       }
     }
   ]

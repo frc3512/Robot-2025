@@ -66,5 +66,8 @@ public class Reeftake extends SubsystemBase {
     // General Info
     DogLog.log("Reeftake/ Coral Motor Temp", intakeMotor.getDeviceTemp().getValueAsDouble());
     DogLog.log("Reeftake/ Algae Motor Temp", algaeMotor.getDeviceTemp().getValueAsDouble());
+
+    // Coral Info
+    DogLog.log("Reeftake/Has Coral", !coralIn.get());
   }
 }
