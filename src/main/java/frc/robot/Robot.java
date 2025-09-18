@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.Swerve;
@@ -47,7 +46,6 @@ public class Robot extends TimedRobot {
           .withDriveRequestType(DriveRequestType.Velocity);
 
   // Subsystem Objects
-  public final Elevator elevator = new Elevator();
   public final LED leds = new LED();
   public final Superstructure actions = new Superstructure();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
@@ -133,23 +131,6 @@ public class Robot extends TimedRobot {
 
 
     // * -- Bindings for the button box --
-
-    // Scoring
-    appendageJoystick.button(3)
-            .onTrue(actions.setl4())
-            .onFalse(actions.score());
-
-    appendageJoystick.button(4)
-            .onTrue(actions.setl3())
-            .onFalse(actions.score());
-    
-    appendageJoystick.button(5)
-            .onTrue(actions.setl2())
-            .onFalse(actions.score());
-
-    appendageJoystick.button(6)
-            .onTrue(actions.setl1())
-            .onFalse(actions.score());
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
