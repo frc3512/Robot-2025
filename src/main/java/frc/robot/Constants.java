@@ -86,22 +86,22 @@ public class Constants {
 
     public static final Transform3d elevatorCamOffset =
         new Transform3d(
-            Units.inchesToMeters(10),
-            Units.inchesToMeters(6),
-            Units.inchesToMeters(16.5),
+            Units.inchesToMeters(-11), // Left to right
+            Units.inchesToMeters(-6), // Front to back
+            Units.inchesToMeters(17), // Bottom to top
             new Rotation3d(0.0, Units.degreesToRadians(0.0), Units.degreesToRadians(0)));
 
     public static final Transform3d climberCamOffset =
         new Transform3d(
             Units.inchesToMeters(8),
-            Units.inchesToMeters(-11),
+            Units.inchesToMeters(11),
             Units.inchesToMeters(6.5),
-            new Rotation3d(0.0, Units.degreesToRadians(0.0), Units.degreesToRadians(90)));
+            new Rotation3d(0.0, Units.degreesToRadians(0.0), Units.degreesToRadians(0)));
 
     public static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(1, 1, 2);
     public static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.2, 0.2, 0.2);
 
-    public static final double visionTurnP = 1; // TUNE THIS VALUE
+    public static final double visionTurnP = 1; // TODO: TUNE THIS VALUE
   }
 
   public static class AutoConstants {
@@ -137,7 +137,7 @@ public class Constants {
         new TrapezoidProfile.Constraints(Units.rotationsToRadians(1), Units.rotationsToRadians(2));
   }
 
-  // Credit to 6657
+// Credit to 6657
   public static class FieldConstants {
     private static Pose2d getRedReefPose(Pose2d reefPose) {
       return new Pose2d(
@@ -161,27 +161,29 @@ public class Constants {
     }
 
     public static enum ReefPoses {
-      Reef_1(new Pose2d(3.17, 4.70, Rotation2d.fromDegrees(0))),
-      Reef_2(new Pose2d(4.38, 5.32, Rotation2d.fromDegrees(-60))),
-      Reef_3(new Pose2d(5.12, 5.07, Rotation2d.fromDegrees(120))),
-      Reef_4(new Pose2d(5.67, 3.72, Rotation2d.fromDegrees(180))),
-      Reef_5(new Pose2d(4.72, 2.46, Rotation2d.fromDegrees(-120))),
-      Reef_6(new Pose2d(3.15, 3.31, Rotation2d.fromDegrees(60)));
+      Reef_1(new Pose2d(3.22, 4.08, Rotation2d.fromDegrees(0))),
+      Reef_2(new Pose2d(3.78, 5.09, Rotation2d.fromDegrees(-60))),
+      Reef_3(new Pose2d(5.16, 5.16, Rotation2d.fromDegrees(-120))),
+      Reef_4(new Pose2d(5.6, 4.03, Rotation2d.fromDegrees(-180))),
+      Reef_5(new Pose2d(5.11, 2.91, Rotation2d.fromDegrees(120))),
+      Reef_6(new Pose2d(3.84, 2.91, Rotation2d.fromDegrees(60)));
 
       public ReefSlot blue;
       public ReefSlot red;
 
-      // Shift the pose to the robot's left
+      // Shift the pose to the coral left node
       public Pose2d getLeftPose(Pose2d pose) {
-        return pose.transformBy(new Transform2d(0, 0.16, new Rotation2d()));
+        return pose.transformBy(new Transform2d(0.0, 0.0, new Rotation2d()));
       }
 
+      // Shift the pose to the coral right node
       public Pose2d getRightPose(Pose2d pose) {
-        return pose.transformBy(new Transform2d(0, -0.13, new Rotation2d()));
+        return pose.transformBy(new Transform2d(0.0, 0.0, new Rotation2d()));
       }
 
+      // Shift the pose to the algae
       public Pose2d getAlgaePose(Pose2d pose) {
-        return pose.transformBy(new Transform2d(0, 0, new Rotation2d()));
+        return pose.transformBy(new Transform2d(0.0, 0.0, new Rotation2d()));
       }
 
       ReefPoses(Pose2d pose) {

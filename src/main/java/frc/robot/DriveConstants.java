@@ -27,7 +27,13 @@ public class DriveConstants {
           .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
 
   private static final Slot0Configs driveGains =
-      new Slot0Configs().withKP(0.2).withKI(0).withKD(0).withKS(0).withKV(0.125).withKA(0);
+      new Slot0Configs()
+            .withKP(0.2)
+            .withKI(0)
+            .withKD(0)
+            .withKS(0)
+            .withKV(0.125)
+            .withKA(0);
 
   private static final ClosedLoopOutputType kSteerClosedLoopOutput = ClosedLoopOutputType.Voltage;
   private static final ClosedLoopOutputType kDriveClosedLoopOutput = ClosedLoopOutputType.Voltage;
@@ -55,11 +61,10 @@ public class DriveConstants {
 
   public static final CANBus kCANBus = new CANBus("Drivetrain", "./logs/example.hoot");
 
-  public static double maxSpeed = 5.2 * 0.80; // Drive velocity in meters per second
-  public static double maxAngularRate = 3.25; // Controls how fast the robot quick turns
-  public static double slowSpeed = 5.2 * 0.25; // Drive velocity for slow mode in meters per second
-  public static double slowAngularRate =
-      0.85; // Controls how fast the robot quick turns in slow mode
+  public static double maxSpeed = 5.2 * 0.80; // * Drive velocity in meters per second
+  public static double maxAngularRate = 3.25; // * Controls how fast the robot quick turns
+  public static double slowSpeed = 5.2 * 0.25; // * Drive velocity for slow mode in meters per second
+  public static double slowAngularRate = 0.85; // * Controls how fast the robot quick turns in slow mode
 
   private static final double kCoupleRatio = 3.5714285714285716;
   private static final double kDriveGearRatio = 6.122448979591837;
@@ -71,10 +76,12 @@ public class DriveConstants {
   private static final boolean kInvertRightSide = true;
 
   private static final int kPigeonId = 0;
-  // These are only used for simulation
+
+  // | These are only used for simulation
   private static final MomentOfInertia kSteerInertia = KilogramSquareMeters.of(0.00001);
   private static final MomentOfInertia kDriveInertia = KilogramSquareMeters.of(0.001);
-  // Simulated voltage necessary to overcome friction
+
+  // | Simulated voltage necessary to overcome friction
   private static final Voltage kSteerFrictionVoltage = Volts.of(0.25);
   private static final Voltage kDriveFrictionVoltage = Volts.of(0.25);
 
@@ -110,8 +117,8 @@ public class DriveConstants {
               .withSteerFrictionVoltage(kSteerFrictionVoltage)
               .withDriveFrictionVoltage(kDriveFrictionVoltage);
 
-  // Front Left
-  // Module # 0
+  // | Front Left
+  // | Module # 0
   private static final int kFrontLeftSteerMotorId = 1;
   private static final int kFrontLeftDriveMotorId = 2;
   private static final int kFrontLeftEncoderId = 27;
@@ -121,8 +128,8 @@ public class DriveConstants {
   private static final Distance kFrontLeftXPos = Inches.of(11.75);
   private static final Distance kFrontLeftYPos = Inches.of(11.75);
 
-  // Front Right
-  // Module # 1
+  // | Front Right
+  // | Module # 1
   private static final int kFrontRightSteerMotorId = 3;
   private static final int kFrontRightDriveMotorId = 4;
   private static final int kFrontRightEncoderId = 26;
@@ -132,8 +139,8 @@ public class DriveConstants {
   private static final Distance kFrontRightXPos = Inches.of(11.75);
   private static final Distance kFrontRightYPos = Inches.of(-11.75);
 
-  // Back Right
-  // Module # 3
+  // | Back Right
+  // | Module # 3
   private static final int kBackRightSteerMotorId = 5;
   private static final int kBackRightDriveMotorId = 6;
   private static final int kBackRightEncoderId = 25;
@@ -143,8 +150,8 @@ public class DriveConstants {
   private static final Distance kBackRightXPos = Inches.of(-11.75);
   private static final Distance kBackRightYPos = Inches.of(-11.75);
 
-  // Back Left
-  // Module # 2
+  // | Back Left
+  // | Module # 2
   private static final int kBackLeftSteerMotorId = 7;
   private static final int kBackLeftDriveMotorId = 8;
   private static final int kBackLeftEncoderId = 24;

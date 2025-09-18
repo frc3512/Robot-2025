@@ -34,6 +34,7 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+// TODO: Finish vision on sister branch and add in here
 public class Robot extends TimedRobot {
 
   private double maxSpeed = DriveConstants.maxSpeed;
@@ -46,16 +47,16 @@ public class Robot extends TimedRobot {
   private final SwerveRequest.FieldCentric drive =
       new SwerveRequest.FieldCentric()
           .withDeadband(maxSpeed * 0.1)
-          .withRotationalDeadband(maxAngularRate * 0.07) // Add a 7% deadband
+          .withRotationalDeadband(maxAngularRate * 0.07) // * Add a 7% deadband
           .withDriveRequestType(DriveRequestType.Velocity);
 
   private final SwerveRequest.FieldCentric driveSlow =
       new SwerveRequest.FieldCentric()
           .withDeadband(slowSpeed * 0.1)
-          .withRotationalDeadband(slowAngularRate * 0.07) // Add a 7% deadband
+          .withRotationalDeadband(slowAngularRate * 0.07) // * Add a 7% deadband
           .withDriveRequestType(DriveRequestType.Velocity);
 
-  // Subsystem Objects
+  // | | Subsystem Objects
   public final Climber climber = new Climber();
   public final Elevator elevator = new Elevator();
   public final Groundtake groundtake = new Groundtake();
@@ -68,14 +69,14 @@ public class Robot extends TimedRobot {
   public final Vision visionClimber =
       new Vision(Constants.VisionConstants.climberCam, Constants.VisionConstants.climberCamOffset);
 
-  // Controller Objects
+  // | Controller Objects
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandJoystick appendageJoystick = new CommandJoystick(1);
 
-  // Driver Camera Thread for crosshair
+  // | Driver Camera Thread for crosshair
   private final Thread m_visionThread;
 
-  // Auton
+  // | Auton
   private final AutoFactory autoFactory;
 
   public Robot() {
@@ -85,9 +86,9 @@ public class Robot extends TimedRobot {
     m_visionThread =
         new Thread(
             () -> {
-              // Get the UsbCamera from CameraServer
+              // * Get the UsbCamera from CameraServer
               UsbCamera camera = CameraServer.startAutomaticCapture();
-              // Set the resolution
+              // * Set the resolution
               camera.setResolution(320, 240);
 
               CvSink cvSink = CameraServer.getVideo();
@@ -120,7 +121,7 @@ public class Robot extends TimedRobot {
     m_visionThread.setDaemon(true);
     m_visionThread.start();
 
-    // Create Choreo
+    // | Create Choreo
     autoFactory =
         new AutoFactory(
             () -> drivetrain.getState().Pose,
@@ -138,7 +139,7 @@ public class Robot extends TimedRobot {
     autoChooser.addOption("Mid l4", midl4());
     autoChooser.addOption("Mid l4 - Barge", midl4Barge());
 
-    //  -- Controler Bindings --
+    // * -- Controler Bindings --
     drivetrain.setDefaultCommand(
         drivetrain.applyRequest(
             () ->
@@ -148,7 +149,7 @@ public class Robot extends TimedRobot {
                     .withRotationalRate(-controller.getRightX() * maxAngularRate)));
 
     controller
-        .rightBumper()
+        .a()
         .whileTrue(
             drivetrain.applyRequest(
                 () ->
@@ -159,16 +160,7 @@ public class Robot extends TimedRobot {
 
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-    // Aiming Controls
-    controller.povUp().onTrue(drivetrain.selectPiece("Coral"));
-    controller.povDown().onTrue(drivetrain.selectPiece("Algae"));
-
-    controller.povLeft().onTrue(drivetrain.selectReef("Left"));
-    controller.povRight().onTrue(drivetrain.selectReef("Right"));
-
-    // controller.leftBumper().whileTrue(autoAim());
-
-    // Intake control for Groundtake
+    // | Intake control for Groundtake
     controller
         .leftTrigger()
         .onTrue(
@@ -183,9 +175,9 @@ public class Robot extends TimedRobot {
         .onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()))
         .onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
 
-    //  -- Bindings for the button box --
+    // * -- Bindings for the button box --
 
-    // Elevator controls
+    // | Elevator controls
     appendageJoystick.button(6).onTrue(new InstantCommand(() -> elevator.l1())).onFalse(score());
 
     appendageJoystick.button(5).onTrue(new InstantCommand(() -> elevator.l2())).onFalse(score());
@@ -198,12 +190,12 @@ public class Robot extends TimedRobot {
 
     appendageJoystick.button(12).onTrue(intake());
 
-    // Dereefing controls
+    // | Dereefing controls
     appendageJoystick.button(8).onTrue(a1()).onFalse(retractAlgae());
 
     appendageJoystick.button(7).onTrue(a2()).onFalse(retractAlgae());
 
-    // Barge Scoring
+    // | Barge Scoring
     appendageJoystick
         .button(10)
         .onTrue(new InstantCommand(() -> elevator.l4()))
@@ -214,20 +206,20 @@ public class Robot extends TimedRobot {
         .onTrue(new InstantCommand(() -> reeftake.algaeOuttake()))
         .onFalse(new InstantCommand(() -> reeftake.algaeStop()));
 
-    // Climber controls
+    // | Climber controls
 
-    // Full auto climbing
+    // | Full auto climbing
     // appendageJoystick.button(1)
     //     .onTrue(climber.autoClimb())
 
-    // Semi-automatic climbing
+    // | Semi-automatic climbing
     // appendageJoystick.button(1)
     //     .onTrue(climber.extendClimber());
 
     // appendageJoystick.button(2)
     //     .onTrue(climber.retractClimber());
 
-    // Manual climbing
+    // | Manual climbing
     appendageJoystick
         .button(1)
         .onTrue(
@@ -303,14 +295,35 @@ public class Robot extends TimedRobot {
       leds.setPattern(leds.black);
     }
 
+    // ! Do not use until vision is working
+    // if (climber.isBeamBroken()) {
+    //   leds.setPattern(leds.purple);
+    // } else if (drivetrain.getSelectedPiece().equals("Coral")) {
+    //   switch (drivetrain.getSelectedReef()) {
+    //     case "Left":
+    //       leds.setPattern(leds.leftCoral);
+    //       break;
+    //     case "Right":
+    //       leds.setPattern(leds.rightCoral);
+    //       break;
+    //     default:
+    //       leds.setPattern(leds.white);
+    //       break;
+    //   }
+    // } else {
+    //   leds.setPattern(leds.cyan);
+    // }
+
     // Tuning mode
     DogLog.setEnabled(Constants.GeneralConstants.tuningMode);
+
+    // ! poseEstimation();
+
   }
 
   @Override
   public void teleopPeriodic() {
-    // poseEstimation();
-    // drivetrain.getNearestReef();
+    // ! drivetrain.getNearestReef();
   }
 
   public Command autoAim() {
@@ -366,7 +379,7 @@ public class Robot extends TimedRobot {
         .andThen(retractAlgae());
   }
 
-  // Auto paths
+  // | Auto paths
   public AutoRoutine midl4() {
     AutoRoutine routine = autoFactory.newRoutine("Mid l4");
     AutoTrajectory trajectory = routine.trajectory("Mid l4");

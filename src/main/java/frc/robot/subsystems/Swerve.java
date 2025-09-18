@@ -39,7 +39,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
   private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
   private boolean m_hasAppliedOperatorPerspective = false;
 
-  // Aiming
+  //  | Aiming
   private String selectedPiece = "Coral";
   private String selectedReef = "Left";
 
@@ -47,7 +47,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     return getState().Pose;
   }
 
-  // Choreo
+  // | Choreo
   private final PIDController choreoXController =
       new PIDController(
           Constants.AutoConstants.xP, Constants.AutoConstants.xI, Constants.AutoConstants.xD);
@@ -60,7 +60,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
           Constants.AutoConstants.thetaI,
           Constants.AutoConstants.thetaD);
 
-  // Aiming
+  // | Aiming
   private final ProfiledPIDController aimXController =
       new ProfiledPIDController(
           Constants.AimingConstants.xP,
@@ -153,7 +153,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     this.setControl(request);
   }
 
-  // Credit to 6657
+  // * Credit to 6657
   public Command resetAutoAimPID() {
     return Commands.runOnce(
         () -> {
@@ -221,7 +221,7 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
       return nearestReefSlot.algae;
     }
 
-    // If the selected reef is invalid return the robot's current pose.
+    // | If the selected reef is invalid return the robot's current pose.
     DogLog.log("Swerve/AimingErrors", "Invalid Reef Selected '" + selectedReef + "'");
     return nearestReefMiddle;
   }
@@ -249,6 +249,14 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     return this.run(() -> controlPosition(target.get()))
         .until(() -> false)
         .andThen(Commands.runOnce(() -> this.applyRequest(new SwerveRequest.RobotCentric())));
+  }
+
+  public String getSelectedPiece() {
+    return selectedPiece;
+  }
+
+  public String getSelectedReef() {
+    return selectedReef;
   }
 
   @Override

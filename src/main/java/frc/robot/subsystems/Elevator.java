@@ -16,7 +16,7 @@ public class Elevator extends ProfiledPIDSubsystem {
   private final TalonFX frontMotor = new TalonFX(Constants.ElevatorConstants.frontMotorID);
   private final TalonFX backMotor = new TalonFX(Constants.ElevatorConstants.backMotorID);
 
-  // Use only a gravity constant
+  // * Use only a gravity constant
   private double gravity = 0.5;
 
   boolean bypassStop = false;
