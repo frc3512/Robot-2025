@@ -15,7 +15,7 @@ public class Superstructure extends SubsystemBase{
 
     }
 
-    // --- Elevator Methods ---
+    // * --- Elevator Methods ---
 
     public Command setl4() {
         return runOnce(() -> elevator.setScoringLevel(Constants.ElevatorConstants.l4));
@@ -33,11 +33,11 @@ public class Superstructure extends SubsystemBase{
         return runOnce(() -> elevator.setScoringLevel(Constants.ElevatorConstants.l1));
     }
 
-    // --- Arm Methods ---
+    // * -- Arm Methods --
 
-    // --- Wrist Methods ---
+    // * -- Wrist Methods --
 
-    // --- Main Methods ---
+    // * -- Main Methods --
 
     // Turn into full sequence once other subsytems are added, make sure it follows the following order:
     // 1. Set wrist to vertical position

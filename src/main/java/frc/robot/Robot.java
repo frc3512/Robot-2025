@@ -110,7 +110,7 @@ public class Robot extends TimedRobot {
             drivetrain);
     autoChooser.addOption("Mid l4", midl4());
 
-    //  ---- Controller Bindings ----
+    //  * -- Controller Bindings --
 
     drivetrain.setDefaultCommand(
         drivetrain.applyRequest(
@@ -132,7 +132,7 @@ public class Robot extends TimedRobot {
                         .withRotationalRate(-controller.getRightX() * slowAngularRate)));
 
 
-    // --- Bindings for the button box ---
+    // * -- Bindings for the button box --
 
     // Scoring
     appendageJoystick.button(3)
