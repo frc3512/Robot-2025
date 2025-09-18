@@ -11,6 +11,8 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.net.WebServer;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -217,11 +219,11 @@ public class Robot extends TimedRobot {
 
     // | Climber controls
 
-    // Full auto climbing
+    // | Full auto climbing
     // appendageJoystick.button(1)
     //     .onTrue(climber.autoClimb())
 
-    // Semi-automatic climbing
+    // | Semi-automatic climbing
     // appendageJoystick.button(1)
     //     .onTrue(climber.extendClimber());
 
@@ -258,6 +260,11 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     elevator.setClampedGoal(Constants.ElevatorConstants.stowPos);
+  }
+
+  @Override
+  public void robotInit(){
+    WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
   }
 
   public void poseEstimation() {
