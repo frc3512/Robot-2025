@@ -150,7 +150,7 @@ public class Robot extends TimedRobot {
                     .withRotationalRate(-controller.getRightX() * maxAngularRate)));
 
     controller
-        .a()
+        .b()
         .whileTrue(
             drivetrain.applyRequest(
                 () ->
@@ -159,17 +159,16 @@ public class Robot extends TimedRobot {
                         .withVelocityY(-controller.getLeftX() * slowSpeed)
                         .withRotationalRate(-controller.getRightX() * slowAngularRate)));
 
-    controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+    // controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     // | Aiming Controls
     controller.leftBumper().onTrue(drivetrain.selectReef("Left"));
     controller.rightBumper().onTrue(drivetrain.selectReef("Right"));
 
-    // ! Removed by automation
-    // - controller.povUp().onTrue(drivetrain.selectPiece("Coral"));
-    // - controller.povDown().onTrue(drivetrain.selectPiece("Algae"));
+    controller.y().onTrue(drivetrain.selectPiece("Coral"));
+    controller.a().onTrue(drivetrain.selectPiece("Algae"));
 
-    controller.y().whileTrue(autoAim());
+    controller.x().whileTrue(autoAim());
 
     // | Intake control for Groundtake
     controller
@@ -268,18 +267,21 @@ public class Robot extends TimedRobot {
   }
 
   public void poseEstimation() {
-    var visionElevatorEst = visionElevator.getEstimatedGlobalPose(visionElevator.getCamera());
+
+    // ! Elevator camera is currently disabled due to bad pose estimations
+
+    // var visionElevatorEst = visionElevator.getEstimatedGlobalPose(visionElevator.getCamera());
     var visionClimberEst = visionClimber.getEstimatedGlobalPose(visionClimber.getCamera());
 
-    visionElevatorEst.ifPresent(
-        est -> {
-          var estStdDevs = visionElevator.getEstimationStdDevs();
-          DogLog.log("Vision/Elevator Estimated Pose", est.estimatedPose);
-          drivetrain.addVisionMeasurement(
-              est.estimatedPose.toPose2d(),
-              Utils.fpgaToCurrentTime(est.timestampSeconds),
-              estStdDevs);
-        });
+    // visionElevatorEst.ifPresent(
+    //     est -> {
+    //       var estStdDevs = visionElevator.getEstimationStdDevs();
+    //       DogLog.log("Vision/Elevator Estimated Pose", est.estimatedPose);
+    //       drivetrain.addVisionMeasurement(
+    //           est.estimatedPose.toPose2d(),
+    //           Utils.fpgaToCurrentTime(est.timestampSeconds),
+    //           estStdDevs);
+    //     });
 
     visionClimberEst.ifPresent(
         est -> {
@@ -302,13 +304,13 @@ public class Robot extends TimedRobot {
 
     if (climber.isBeamBroken()) {
       leds.setPattern(leds.purple);
-    } else if (drivetrain.getSelectedPiece().equals("Coral")) {
+    } else if (!reeftake.isCoralIn()) {
       switch (drivetrain.getSelectedReef()) {
         case "Left":
-          leds.setPattern(leds.leftCoral);
+          leds.setPattern(leds.blue);
           break;
         case "Right":
-          leds.setPattern(leds.rightCoral);
+          leds.setPattern(leds.red);
           break;
         default:
           leds.setPattern(leds.white);
@@ -321,7 +323,6 @@ public class Robot extends TimedRobot {
     DogLog.setEnabled(Constants.GeneralConstants.tuningMode);
 
     poseEstimation();
-    getPeice();
   }
 
   @Override

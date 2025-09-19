@@ -100,8 +100,6 @@ public class Constants {
 
     public static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(1, 1, 2);
     public static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.2, 0.2, 0.2);
-
-    public static final double visionTurnP = 1; // todo: TUNE THIS VALUE
   }
 
   public static class AutoConstants {
@@ -178,12 +176,12 @@ public class Constants {
 
       // Shift the pose to the coral right node
       public Pose2d getRightPose(Pose2d pose) {
-        return pose.transformBy(new Transform2d(0.0, 0.0, new Rotation2d()));
+        return pose.transformBy(new Transform2d(0, 0, new Rotation2d()));
       }
 
       // Shift the pose to the algae
       public Pose2d getAlgaePose(Pose2d pose) {
-        return pose.transformBy(new Transform2d(0.0, 0.0, new Rotation2d()));
+        return pose.transformBy(new Transform2d(-0.08, 0.18, new Rotation2d()));
       }
 
       ReefPoses(Pose2d pose) {
