@@ -70,8 +70,8 @@ public class Climber extends SubsystemBase {
   public void periodic() {
     // Cimber Data
     DogLog.log("Climber/Climber Beam Break", isBeamBroken());
-    DogLog.log("Climber/Climber At Top", climberAtTop());
-    DogLog.log("Climber/Climber At Bottom", climberAtBottom());
+    DogLog.log("Climber/Climber At Top", !climberAtTop());
+    DogLog.log("Climber/Climber At Bottom", !climberAtBottom());
 
     // General Info
     DogLog.log("Climber/Climber Motor Temp", climbMotor.getDeviceTemp().getValueAsDouble());
