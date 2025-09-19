@@ -1,19 +1,20 @@
 package frc.robot.subsystems.Elevator;
 
-import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class Elevator extends SubsystemBase{
+import org.littletonrobotics.junction.Logger;
 
+public class Elevator extends SubsystemBase {
     private final ElevatorIO io;
     private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
     private ElevatorStates targetLevel = ElevatorStates.STOW;
     public ElevatorStates driverDesiredElevatorStates;
 
-    public static Elevator instance;
+    private static Elevator instance;
 
     private final TrapezoidProfile elevatorProfile;
 
@@ -45,7 +46,6 @@ public class Elevator extends SubsystemBase{
 
         this.elevatorProfile = new TrapezoidProfile(new TrapezoidProfile.Constraints(900, 1300));
         this.elevatorCurrentPoint = new TrapezoidProfile.State(getPosition(), 0);
-        
     }
 
     public ElevatorIO getElevatorIo() {
@@ -56,10 +56,10 @@ public class Elevator extends SubsystemBase{
     public void periodic() {
 
         io.updateInputs(inputs);
-        elevatorCurrentPoint = elevatorProfile.calculate(Constants.GeneralConstants.LOOP_TIME, evatorCurrentPoint, elevatorGoal);
+        elevatorCurrentPoint = elevatorProfile.calculate(Constants.GeneralConstants.LOOP_TIME, elevatorCurrentPoint, elevatorGoal);
         manualSetTargetPosistion(elevatorCurrentPoint.position);
 
-        DogLog.log("Elevator", inputs);
+        Logger.processInputs("Elevator", inputs);
     }
 
     public void setState(ElevatorStates state) {
@@ -99,4 +99,3 @@ public class Elevator extends SubsystemBase{
         io.updateSim();
     }
 }
-    
