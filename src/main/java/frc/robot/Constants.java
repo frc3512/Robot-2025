@@ -12,6 +12,8 @@ public class Constants {
     public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
     
     public static double LOOP_TIME = 0.02;
+
+    public static double mainLoopFrequency = 50d; // Hz
   }
 
   public static enum Mode {
