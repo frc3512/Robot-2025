@@ -15,5 +15,4 @@ public class setElevatorState extends InstantCommand {
   public void initialize() {
     Elevator.getInstance().setState(targetState);
   }
-
 }

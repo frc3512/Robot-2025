@@ -1,11 +1,10 @@
 package frc.robot;
 
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.swerve.SwerveRequest;
-
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -13,10 +12,10 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.Swerve;
-import frc.robot.subsystems.Elevator.Elevator;
 
 public class Robot extends TimedRobot {
 
@@ -57,7 +56,8 @@ public class Robot extends TimedRobot {
 
   public Robot() {
 
-    Elevator.setInstance(Constants.ElevatorConstants.leadID, Constants.ElevatorConstants.followerID);
+    Elevator.setInstance(
+        Constants.ElevatorConstants.leadID, Constants.ElevatorConstants.followerID);
     elevator = Elevator.getInstance();
 
     leds = new LED();
@@ -93,40 +93,31 @@ public class Robot extends TimedRobot {
                         .withVelocityY(-controller.getLeftX() * slowSpeed)
                         .withRotationalRate(-controller.getRightX() * slowAngularRate)));
 
-
     // * -- Bindings for the button box --
 
     // | Elevator Control |
 
     // Coral
-    appendageJoystick.button(3)
-        .onTrue(actions.L4());
+    appendageJoystick.button(3).onTrue(actions.L4());
 
-    appendageJoystick.button(4)
-        .onTrue(actions.L3());
+    appendageJoystick.button(4).onTrue(actions.L3());
 
-    appendageJoystick.button(5)
-        .onTrue(actions.L2());
+    appendageJoystick.button(5).onTrue(actions.L2());
 
-    appendageJoystick.button(6)
-        .onTrue(actions.L1());
+    appendageJoystick.button(6).onTrue(actions.L1());
 
     // Algae
-    appendageJoystick.button(7)
-        .onTrue(actions.ALGAE_L1());
-    
-    appendageJoystick.button(8)
-        .onTrue(actions.ALGAE_L2());
+    appendageJoystick.button(7).onTrue(actions.ALGAE_L1());
 
-    appendageJoystick.button(10)
-        .onTrue(actions.BARGE());
+    appendageJoystick.button(8).onTrue(actions.ALGAE_L2());
+
+    appendageJoystick.button(10).onTrue(actions.BARGE());
 
     // appendageJoystick.button(11)
     //     .onTrue(actions.SPIT_ALGAE());
 
     // Defaults
-    appendageJoystick.button(9)
-        .onTrue(actions.STOW());
+    appendageJoystick.button(9).onTrue(actions.STOW());
 
     // appendageJoystick.button(12)
     //     .onTrue(actions.INTAKE_CORAL());

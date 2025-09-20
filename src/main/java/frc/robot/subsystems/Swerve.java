@@ -1,13 +1,10 @@
 package frc.robot.subsystems;
 
-import java.util.function.Supplier;
-
+import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
-import choreo.trajectory.SwerveSample;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
@@ -21,6 +18,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.DriveConstants.TunerSwerveDrivetrain;
+import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
