@@ -268,20 +268,18 @@ public class Robot extends TimedRobot {
 
   public void poseEstimation() {
 
-    // ! Elevator camera is currently disabled due to bad pose estimations
-
-    // var visionElevatorEst = visionElevator.getEstimatedGlobalPose(visionElevator.getCamera());
+    var visionElevatorEst = visionElevator.getEstimatedGlobalPose(visionElevator.getCamera());
     var visionClimberEst = visionClimber.getEstimatedGlobalPose(visionClimber.getCamera());
 
-    // visionElevatorEst.ifPresent(
-    //     est -> {
-    //       var estStdDevs = visionElevator.getEstimationStdDevs();
-    //       DogLog.log("Vision/Elevator Estimated Pose", est.estimatedPose);
-    //       drivetrain.addVisionMeasurement(
-    //           est.estimatedPose.toPose2d(),
-    //           Utils.fpgaToCurrentTime(est.timestampSeconds),
-    //           estStdDevs);
-    //     });
+    visionElevatorEst.ifPresent(
+        est -> {
+          var estStdDevs = visionElevator.getEstimationStdDevs();
+          DogLog.log("Vision/Elevator Estimated Pose", est.estimatedPose);
+          drivetrain.addVisionMeasurement(
+              est.estimatedPose.toPose2d(),
+              Utils.fpgaToCurrentTime(est.timestampSeconds),
+              estStdDevs);
+        });
 
     visionClimberEst.ifPresent(
         est -> {

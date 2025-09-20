@@ -36,7 +36,7 @@ public class Constants {
     public static final double hpPos = 5;
     public static final double l1Pos = 8.7;
     public static final double l2Pos = 14.2;
-    public static final double l3Pos = 26;
+    public static final double l3Pos = 26.5;
     public static final double l4Pos = 46;
     public static final double a1Pos = 3.5;
     public static final double a2Pos = 15.84;
@@ -86,7 +86,7 @@ public class Constants {
 
     public static final Transform3d elevatorCamOffset =
         new Transform3d(
-            Units.inchesToMeters(-11), // Left to right
+            Units.inchesToMeters(11), // Left to right
             Units.inchesToMeters(-6), // Front to back
             Units.inchesToMeters(17), // Bottom to top
             new Rotation3d(0.0, Units.degreesToRadians(0.0), Units.degreesToRadians(0)));
@@ -164,24 +164,24 @@ public class Constants {
       Reef_3(new Pose2d(5.16, 5.16, Rotation2d.fromDegrees(-120))),
       Reef_4(new Pose2d(5.6, 4.03, Rotation2d.fromDegrees(-180))),
       Reef_5(new Pose2d(5.11, 2.91, Rotation2d.fromDegrees(120))),
-      Reef_6(new Pose2d(3.84, 2.91, Rotation2d.fromDegrees(60)));
+      Reef_6(new Pose2d(3.73, 2.89, Rotation2d.fromDegrees(60)));
 
       public ReefSlot blue;
       public ReefSlot red;
 
       // Shift the pose to the coral left node
       public Pose2d getLeftPose(Pose2d pose) {
-        return pose.transformBy(new Transform2d(0.0, 0.0, new Rotation2d()));
+        return pose.transformBy(new Transform2d(-0.01, 0.38, new Rotation2d()));
       }
 
       // Shift the pose to the coral right node
       public Pose2d getRightPose(Pose2d pose) {
-        return pose.transformBy(new Transform2d(0, 0, new Rotation2d()));
+        return pose.transformBy(new Transform2d(-0.01, 0, new Rotation2d()));
       }
 
       // Shift the pose to the algae
       public Pose2d getAlgaePose(Pose2d pose) {
-        return pose.transformBy(new Transform2d(-0.08, 0.18, new Rotation2d()));
+        return pose.transformBy(new Transform2d(-0.067, 0.2, new Rotation2d()));
       }
 
       ReefPoses(Pose2d pose) {
