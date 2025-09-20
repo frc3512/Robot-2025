@@ -1,13 +1,12 @@
 package frc.robot.subsystems.Elevator;
 
-public interface ElevatorIO {
-    class ElevatorIOInputs {
-        public ElevatorIOData data = new ElevatorIOData(0.0);
-    }
-
-    record ElevatorIOData(double positionRad) {}
-
-    default void updateInputs(ElevatorIOInputs inputs) {}
-
-    default void runOpenLoop(double output) {}
+public interface ElevatorIO{
+    void setVoltage(double volts);
+    void setPosition(double position);
+    double getPosition();
+    double getVelocityMetersPerSec();
+    void updateInputs(ElevatorIOInputs inputs);
+    boolean atSetpoint();
+    void configurePID(double kP, double kI, double kD);
+    void updateSim();
 }

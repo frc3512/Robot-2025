@@ -1,14 +1,11 @@
 package frc.robot;
 
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest;
+
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.swerve.SwerveRequest;
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.CvSink;
-import edu.wpi.first.cscore.CvSource;
-import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,10 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.Swerve;
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
+import frc.robot.subsystems.Elevator.Elevator;
 
 public class Robot extends TimedRobot {
 
@@ -46,57 +40,27 @@ public class Robot extends TimedRobot {
           .withDriveRequestType(DriveRequestType.Velocity);
 
   // Subsystem Objects
-  public final LED leds = new LED();
   public final Superstructure actions = new Superstructure();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
+
+  public final LED leds;
+  public final Elevator elevator;
+
+  // Commands
 
   // Controller Objects
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandJoystick appendageJoystick = new CommandJoystick(1);
-
-  // Driver Camera Thread for crosshair
-  private final Thread m_visionThread;
 
   // Auton
   private final AutoFactory autoFactory;
 
   public Robot() {
 
-    CameraServer.startAutomaticCapture();
+    Elevator.setInstance(Constants.ElevatorConstants.leadID, Constants.ElevatorConstants.followerID);
+    elevator = Elevator.getInstance();
 
-    m_visionThread =
-        new Thread(
-            () -> {
-              // Get the UsbCamera from CameraServer
-              UsbCamera camera = CameraServer.startAutomaticCapture();
-              // Set the resolution
-              camera.setResolution(640, 480);
-
-              CvSink cvSink = CameraServer.getVideo();
-              CvSource outputStream = CameraServer.putVideo("Drive Cam", 640, 480);
-
-              Mat mat = new Mat();
-              Point pt1 = new Point(0, 65);
-              Point pt2 = new Point(400, 65);
-              Point pt3 = new Point(0, 55);
-              Point pt4 = new Point(400, 55);
-              Scalar color = new Scalar(28, 239, 84);
-
-              while (!Thread.interrupted()) {
-
-                if (cvSink.grabFrame(mat) == 0) {
-                  outputStream.notifyError(cvSink.getError());
-                  continue;
-                }
-
-                Imgproc.line(mat, pt1, pt2, color, 2);
-                Imgproc.line(mat, pt3, pt4, color, 2);
-                outputStream.putFrame(mat);
-              }
-            });
-
-    m_visionThread.setDaemon(true);
-    m_visionThread.start();
+    leds = new LED();
 
     // Create Choreo
     autoFactory =
@@ -131,6 +95,41 @@ public class Robot extends TimedRobot {
 
 
     // * -- Bindings for the button box --
+
+    // | Elevator Control |
+
+    // Coral
+    appendageJoystick.button(3)
+        .onTrue(actions.L4());
+
+    appendageJoystick.button(4)
+        .onTrue(actions.L3());
+
+    appendageJoystick.button(5)
+        .onTrue(actions.L2());
+
+    appendageJoystick.button(6)
+        .onTrue(actions.L1());
+
+    // Algae
+    appendageJoystick.button(7)
+        .onTrue(actions.ALGAE_L1());
+    
+    appendageJoystick.button(8)
+        .onTrue(actions.ALGAE_L2());
+
+    appendageJoystick.button(10)
+        .onTrue(actions.BARGE());
+
+    // appendageJoystick.button(11)
+    //     .onTrue(actions.SPIT_ALGAE());
+
+    // Defaults
+    appendageJoystick.button(9)
+        .onTrue(actions.STOW());
+
+    // appendageJoystick.button(12)
+    //     .onTrue(actions.INTAKE_CORAL());
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }

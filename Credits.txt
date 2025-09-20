@@ -1,4 +1,4 @@
+All of our new, revised subsytem code has been based on team FRC 9084, 6328, 6657
 
 
-All of our new, revised subsytem code has been based on team FRC 9084, credit to them
-
+Credit for stucture goes to these teams above

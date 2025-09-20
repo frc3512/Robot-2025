@@ -9,20 +9,20 @@ public enum ElevatorStates {
     HP(5),
     
     // | Coral Scoring Positions |
-    L1(8.7),
-    L2(14.2),
-    L3(26),
-    L4(46),
+    L1(1),
+    L2(3),
+    L3(6),
+    L4(9),
 
     // | Algae Positions |
-    ALGAE_L1(3.5),
-    ALGAE_L2(15.84),
-    ALGAE_STOW(14.5);
+    ALGAE_L1(2),
+    ALGAE_L2(4),
+    ALGAE_STOW(2),
+    BARGE(9);
 
     public double position;
 
     ElevatorStates(double totalPosition) {
         this.position = totalPosition;
     }
-
 }
