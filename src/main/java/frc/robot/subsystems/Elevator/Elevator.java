@@ -2,6 +2,7 @@ package frc.robot.subsystems.Elevator;
 
 import org.littletonrobotics.junction.Logger;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Elevator extends SubsystemBase {
@@ -27,6 +28,13 @@ public class Elevator extends SubsystemBase {
         io.updateInputs(inputs);
 
         Logger.processInputs("Elevator", inputs);
+
+        DogLog.log("Elevator/Position", io.getPosition());
+        DogLog.log("Elevator/Velocity", io.getVelocityMetersPerSec());
+        DogLog.log("Elevator/Current", io.getCurrent());
+
+        DogLog.log("Elevator/State", state.toString());
+        DogLog.log("Elevator/TargetState", targetLevel.toString());
     }
 
     public void setVoltage(double volts) {

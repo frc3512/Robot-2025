@@ -4,6 +4,7 @@ public interface ElevatorIO{
     void setVoltage(double volts);
     void setPosition(double position);
     double getPosition();
+    double getCurrent();
     double getVelocityMetersPerSec();
     void updateInputs(ElevatorIOInputs inputs);
     boolean atSetpoint();

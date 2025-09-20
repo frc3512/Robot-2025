@@ -60,6 +60,11 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     }
 
     @Override
+    public double getCurrent() {
+        return leadMotor.getStatorCurrent().getValueAsDouble();
+    }
+
+    @Override
     public boolean atSetpoint() {
         double positionError = Math.abs(leadMotor.getClosedLoopError().getValueAsDouble());
         return positionError < 0.1;

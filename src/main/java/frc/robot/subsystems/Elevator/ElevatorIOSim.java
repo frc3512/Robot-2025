@@ -54,4 +54,8 @@ public class ElevatorIOSim implements ElevatorIO {
     public void setVoltage(double volts) {
         motorSim.setInputVoltage(volts);
     }
+
+    public double getCurrent() {
+        return motorSim.getCurrentDrawAmps();
+    }
 }
