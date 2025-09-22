@@ -1,8 +1,10 @@
 package frc.robot.subsystems.Elevator;
 
-import dev.doglog.DogLog;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.Elevator.ElevatorIO.ElevatorIOInputs;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 public class Elevator extends SubsystemBase {
   private final ElevatorIO io;
@@ -13,27 +15,37 @@ public class Elevator extends SubsystemBase {
 
   public static Elevator instance;
 
-  public static Elevator setInstance(int leadID, int followerID) {
-    instance = new Elevator(leadID, followerID);
+  private final TrapezoidProfile elevatorProfile;
+
+  private TrapezoidProfile.State elevatorGoal;
+  private TrapezoidProfile.State elevatorCurrentPoint;
+
+  public static Elevator setInstance(ElevatorIO io) {
+    instance = new Elevator(io);
     return instance;
   }
 
-  public Elevator(int leadID, int followerID) {
-    this.io = new ElevatorIOTalonFX(leadID, followerID);
+  public Elevator(ElevatorIO io) {
+    this.io = io;
+
+    this.elevatorProfile = new TrapezoidProfile(new TrapezoidProfile.Constraints(1000, 1000));
+    this.elevatorCurrentPoint = new TrapezoidProfile.State(getPosition(), 0);
+
+    manualSetPosition(elevatorCurrentPoint.position);
   }
 
   @Override
   public void periodic() {
-    io.updateInputs(inputs);
+    Logger.processInputs("Elevator", (LoggableInputs) inputs);
 
-    Logger.processInputs("Elevator", inputs);
+    Logger.recordOutput("ELevator/Position", inputs.position);
+    Logger.recordOutput("Elevator/Velocity", inputs.velocityMetersPerSec);
+    Logger.recordOutput("Elevator/Current", inputs.currentAmps);
+    Logger.recordOutput("Elevator/AtSetpoint", inputs.isAtSetpoint);
+  }
 
-    DogLog.log("Elevator/Position", io.getPosition());
-    DogLog.log("Elevator/Velocity", io.getVelocityMetersPerSec());
-    DogLog.log("Elevator/Current", io.getCurrent());
-
-    DogLog.log("Elevator/State", state.toString());
-    DogLog.log("Elevator/TargetState", targetLevel.toString());
+  public void manualSetPosition(double position) {
+    io.setPosition(position);
   }
 
   public void setVoltage(double volts) {
@@ -82,5 +94,9 @@ public class Elevator extends SubsystemBase {
 
   public void setState(ElevatorStates newState) {
     state = newState;
+  }
+
+  public void updateSim() {
+    io.updateSim();
   }
 }

@@ -3,64 +3,85 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.swerve.SwerveRequest;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Elevator.Elevator;
-import frc.robot.subsystems.LED;
-import frc.robot.subsystems.Superstructure;
+import frc.robot.subsystems.Elevator.ElevatorIO;
+import frc.robot.subsystems.Elevator.ElevatorIOSim;
+import frc.robot.subsystems.Elevator.ElevatorIOTalonFX;
 import frc.robot.subsystems.Swerve;
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-public class Robot extends TimedRobot {
-
-  private double maxSpeed = DriveConstants.maxSpeed;
-  private double maxAngularRate = DriveConstants.maxAngularRate;
-  private double slowSpeed = DriveConstants.slowSpeed;
-  private double slowAngularRate = DriveConstants.slowAngularRate;
+public class Robot extends LoggedRobot {
 
   private SendableChooser<AutoRoutine> autoChooser = new SendableChooser<>();
 
-  private final SwerveRequest.FieldCentric drive =
-      new SwerveRequest.FieldCentric()
-          .withDeadband(maxSpeed * 0.1)
-          .withRotationalDeadband(maxAngularRate * 0.07) // Add a 7% deadband
-          .withDriveRequestType(DriveRequestType.Velocity);
-
-  private final SwerveRequest.FieldCentric driveSlow =
-      new SwerveRequest.FieldCentric()
-          .withDeadband(slowSpeed * 0.1)
-          .withRotationalDeadband(slowAngularRate * 0.07) // Add a 7% deadband
-          .withDriveRequestType(DriveRequestType.Velocity);
-
-  // Subsystem Objects
-  public final Superstructure actions = new Superstructure();
-  public final Swerve drivetrain = DriveConstants.createDrivetrain();
-
-  public final LED leds;
-  public final Elevator elevator;
-
-  // Commands
-
-  // Controller Objects
-  private final CommandXboxController controller = new CommandXboxController(0);
-  private final CommandJoystick appendageJoystick = new CommandJoystick(1);
+  // Drivetrain
+  private final Swerve drivetrain = DriveConstants.createDrivetrain();
 
   // Auton
   private final AutoFactory autoFactory;
 
+  // Subsystems
+  private Elevator elevator;
+
   public Robot() {
 
-    Elevator.setInstance(
-        Constants.ElevatorConstants.leadID, Constants.ElevatorConstants.followerID);
-    elevator = Elevator.getInstance();
+    switch (Constants.GeneralConstants.currentMode) {
+      case REAL:
 
-    leds = new LED();
+        // Running on a real robot, log to a USB stick ("/U/logs")
+        Logger.addDataReceiver(new WPILOGWriter());
+        Logger.addDataReceiver(new NT4Publisher());
+
+        break;
+
+      case SIM:
+
+        // Running a physics simulator, log to NT
+        Logger.addDataReceiver(new NT4Publisher());
+
+        break;
+
+      case REPLAY:
+
+        // Replaying a log, set up replay source
+        setUseTiming(false); // Run as fast as possible
+        String logPath = LogFileUtil.findReplayLog();
+        Logger.setReplaySource(new WPILOGReader(logPath));
+        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+
+        break;
+    }
+
+    switch (Constants.GeneralConstants.currentMode) {
+      case REAL:
+        Elevator.setInstance(
+            new ElevatorIOTalonFX(
+                Constants.ElevatorConstants.leadID, Constants.ElevatorConstants.followerID));
+        elevator = Elevator.getInstance();
+
+        break;
+
+      case SIM:
+        Elevator.setInstance(new ElevatorIOSim());
+        elevator = Elevator.getInstance();
+
+        break;
+
+      case REPLAY:
+        Elevator.setInstance(new ElevatorIO() {});
+        elevator = Elevator.getInstance();
+
+        break;
+    }
 
     // Create Choreo
     autoFactory =
@@ -70,59 +91,12 @@ public class Robot extends TimedRobot {
             drivetrain::followTrajectory,
             false,
             drivetrain);
+
     autoChooser.addOption("Mid l4", midl4());
 
-    //  * -- Controller Bindings --
-
-    drivetrain.setDefaultCommand(
-        drivetrain.applyRequest(
-            () ->
-                drive
-                    .withVelocityX(-controller.getLeftY() * maxSpeed)
-                    .withVelocityY(-controller.getLeftX() * maxSpeed)
-                    .withRotationalRate(-controller.getRightX() * maxAngularRate)));
-
-    // Slow drive button
-    controller
-        .rightBumper()
-        .whileTrue(
-            drivetrain.applyRequest(
-                () ->
-                    driveSlow
-                        .withVelocityX(-controller.getLeftY() * slowSpeed)
-                        .withVelocityY(-controller.getLeftX() * slowSpeed)
-                        .withRotationalRate(-controller.getRightX() * slowAngularRate)));
-
-    // * -- Bindings for the button box --
-
-    // | Elevator Control |
-
-    // Coral
-    appendageJoystick.button(3).onTrue(actions.L4());
-
-    appendageJoystick.button(4).onTrue(actions.L3());
-
-    appendageJoystick.button(5).onTrue(actions.L2());
-
-    appendageJoystick.button(6).onTrue(actions.L1());
-
-    // Algae
-    appendageJoystick.button(7).onTrue(actions.ALGAE_L1());
-
-    appendageJoystick.button(8).onTrue(actions.ALGAE_L2());
-
-    appendageJoystick.button(10).onTrue(actions.BARGE());
-
-    // appendageJoystick.button(11)
-    //     .onTrue(actions.SPIT_ALGAE());
-
-    // Defaults
-    appendageJoystick.button(9).onTrue(actions.STOW());
-
-    // appendageJoystick.button(12)
-    //     .onTrue(actions.INTAKE_CORAL());
-
     SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    Logger.start();
   }
 
   @Override

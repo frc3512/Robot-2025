@@ -1,4 +1,5 @@
-All of our new, revised subsytem code has been based on team FRC 9084, 6328, 6657
+Credit to:
 
-
-Credit for stucture goes to these teams above
+9084
+6657
+6328

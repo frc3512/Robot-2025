@@ -30,6 +30,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     config.Slot0.kD = 0.0;
     config.Slot0.kS = 0.0;
     config.Slot0.kV = 0.0;
+    config.Slot0.kG = 0.5;
+    config.Slot0.kA = 0.0;
 
     leadMotor.getConfigurator().apply(config);
     followerMotor.getConfigurator().apply(config);
@@ -48,24 +50,32 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   @Override
   public double getPosition() {
-    StatusSignal<Angle> posSignal = leadMotor.getRotorPosition();
-    return posSignal.getValueAsDouble();
+    StatusSignal<Angle> fontSignal = leadMotor.getRotorPosition();
+    StatusSignal<Angle> backSignal = followerMotor.getRotorPosition();
+    var posSignal = (fontSignal.getValueAsDouble() + backSignal.getValueAsDouble()) / 2.0;
+    return posSignal;
   }
 
   @Override
   public double getVelocityMetersPerSec() {
-    StatusSignal<AngularVelocity> velSignal = leadMotor.getVelocity();
-    return velSignal.getValueAsDouble();
+    StatusSignal<AngularVelocity> fontVel = leadMotor.getVelocity();
+    StatusSignal<AngularVelocity> backVel = followerMotor.getVelocity();
+    var velSignal = (fontVel.getValueAsDouble() + backVel.getValueAsDouble()) / 2.0;
+    return velSignal;
   }
 
   @Override
   public double getCurrent() {
-    return leadMotor.getStatorCurrent().getValueAsDouble();
+    return (leadMotor.getStatorCurrent().getValueAsDouble()
+            + followerMotor.getStatorCurrent().getValueAsDouble()) / 2.0;
   }
 
   @Override
   public boolean atSetpoint() {
-    double positionError = Math.abs(leadMotor.getClosedLoopError().getValueAsDouble());
+    double positionError = 
+        Math.abs(
+                (leadMotor.getClosedLoopError().getValueAsDouble()
+                + followerMotor.getClosedLoopError().getValueAsDouble())) / 2.0;
     return positionError < 0.1;
   }
 
@@ -75,6 +85,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     config.Slot0.kI = kI;
     config.Slot0.kD = kD;
     leadMotor.getConfigurator().apply(config);
+    followerMotor.getConfigurator().apply(config);
   }
 
   @Override
@@ -85,6 +96,4 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     inputs.currentAmps = leadMotor.getStatorCurrent().getValueAsDouble();
     inputs.temp = leadMotor.getDeviceTemp().getValueAsDouble();
   }
-
-  public void updateSim() {} // No simulation for real hardware
 }
