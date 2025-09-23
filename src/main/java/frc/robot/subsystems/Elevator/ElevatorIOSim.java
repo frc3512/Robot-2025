@@ -9,7 +9,8 @@ public class ElevatorIOSim implements ElevatorIO {
 
   DCMotorSim motorSim =
       new DCMotorSim(
-          LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60(2), 0.025, 50 / 11), DCMotor.getKrakenX60(1));
+          LinearSystemId.createDCMotorSystem(
+            DCMotor.getKrakenX60(2), 0.025, 50 / 11), DCMotor.getKrakenX60(1));
   PIDController simController = new PIDController(0.75, 0, 0);
   double targetPosition = 0;
 

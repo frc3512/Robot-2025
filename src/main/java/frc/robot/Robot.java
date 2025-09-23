@@ -63,6 +63,7 @@ public class Robot extends LoggedRobot {
 
     switch (Constants.GeneralConstants.currentMode) {
       case REAL:
+
         Elevator.setInstance(
             new ElevatorIOTalonFX(
                 Constants.ElevatorConstants.leadID, Constants.ElevatorConstants.followerID));
@@ -71,12 +72,14 @@ public class Robot extends LoggedRobot {
         break;
 
       case SIM:
+
         Elevator.setInstance(new ElevatorIOSim());
         elevator = Elevator.getInstance();
 
         break;
 
       case REPLAY:
+
         Elevator.setInstance(new ElevatorIO() {});
         elevator = Elevator.getInstance();
 
@@ -117,7 +120,6 @@ public class Robot extends LoggedRobot {
 
   // Auto paths
   public AutoRoutine midl4() {
-
     AutoRoutine routine = autoFactory.newRoutine("Mid l4");
     AutoTrajectory trajectory = routine.trajectory("Mid l4");
 
