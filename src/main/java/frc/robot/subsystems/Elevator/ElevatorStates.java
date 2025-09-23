@@ -2,6 +2,8 @@ package frc.robot.subsystems.Elevator;
 
 public enum ElevatorStates {
 
+  // TODO: TUNE ALL POSITIONS, THESE ARE JUST ROUGH ESTIMATES
+
   // * Positions for the elevator using encoder ticks *
 
   // | Defualt Positions |
