@@ -50,9 +50,9 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   @Override
   public double getPosition() {
-    StatusSignal<Angle> fontSignal = leadMotor.getRotorPosition();
+    StatusSignal<Angle> frontSignal = leadMotor.getRotorPosition();
     StatusSignal<Angle> backSignal = followerMotor.getRotorPosition();
-    var posSignal = (fontSignal.getValueAsDouble() + backSignal.getValueAsDouble()) / 2.0;
+    var posSignal = (frontSignal.getValueAsDouble() + backSignal.getValueAsDouble()) / 2.0;
     return posSignal;
   }
 
