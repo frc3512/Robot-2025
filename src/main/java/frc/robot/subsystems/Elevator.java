@@ -96,7 +96,8 @@ public class Elevator extends ProfiledPIDSubsystem {
     DogLog.log(
         "Elevator/ Elevator Front Motor Encoder", frontMotor.getPosition().getValueAsDouble());
     DogLog.log("Elevator/Elevator Goal", getController().getSetpoint().position);
-    DogLog.log("Elevator/Elevator Voltage", frontMotor.getMotorVoltage().getValueAsDouble());
+    DogLog.log("Elevator/Elevator Front Voltage", frontMotor.getMotorVoltage().getValueAsDouble());
+    DogLog.log("Elevator/Elevator Back Voltage", backMotor.getMotorVoltage().getValueAsDouble());
 
     // General Info
     DogLog.log("Elevator/Front Motor Temp", frontMotor.getDeviceTemp().getValueAsDouble());

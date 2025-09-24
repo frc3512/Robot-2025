@@ -71,14 +71,32 @@
                 }
               },
               {
-                "title": "Elevator Voltage",
+                "title": "Elevator Front Voltage",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Voltage View",
                 "properties": {
-                  "topic": "/Robot/Elevator/Elevator Voltage",
+                  "topic": "/Robot/Elevator/Elevator Front Voltage",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "min_value": 4.0,
+                  "max_value": 13.0,
+                  "divisions": 5,
+                  "inverted": false,
+                  "orientation": "horizontal"
+                }
+              },
+              {
+                "title": "Elevator Back Voltage",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Voltage View",
+                "properties": {
+                  "topic": "/Robot/Elevator/Elevator Back Voltage",
                   "period": 0.06,
                   "data_type": "double",
                   "min_value": 4.0,
