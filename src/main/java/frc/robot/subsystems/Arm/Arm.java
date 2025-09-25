@@ -9,9 +9,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Arm.ArmIO.ArmIOInputs;
 
-// TODO:
-// Tune Trapazoid Profile values
-
 public class Arm extends SubsystemBase{
 
     private final ArmIO io;
@@ -49,6 +46,7 @@ public class Arm extends SubsystemBase{
     public Arm(ArmIO io) {
         this.io = io;
 
+        // * TUNE THESE VALUES *
         this.armProfile = new TrapezoidProfile(new TrapezoidProfile.Constraints(200, 500));
         this.armCurrentPoint = new TrapezoidProfile.State(getPosition(), 0);
     }

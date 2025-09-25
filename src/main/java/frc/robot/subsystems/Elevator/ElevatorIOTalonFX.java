@@ -93,10 +93,10 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
-    inputs.position = getPosition();
-    inputs.velocityMetersPerSec = getVelocityMetersPerSec();
-    inputs.appliedVolts = leadMotor.getMotorVoltage().getValueAsDouble();
-    inputs.currentAmps = leadMotor.getStatorCurrent().getValueAsDouble();
-    inputs.temp = leadMotor.getDeviceTemp().getValueAsDouble();
+    inputs.position               = getPosition();
+    inputs.velocityMetersPerSec   = getVelocityMetersPerSec();
+    inputs.appliedVolts           = leadMotor.getMotorVoltage().getValueAsDouble();
+    inputs.currentAmps            = leadMotor.getStatorCurrent().getValueAsDouble();
+    inputs.temp                   = leadMotor.getDeviceTemp().getValueAsDouble();
   }
 }
