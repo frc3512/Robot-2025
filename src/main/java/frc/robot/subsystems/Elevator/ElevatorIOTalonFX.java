@@ -25,12 +25,15 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     config.Feedback.SensorToMechanismRatio = 50 / 11;
+  
+    // TODO: TUNE THESE VALUES
+    // Current PID Used is from other robot
     config.Slot0.kP = 0.75;
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 0.0;
     config.Slot0.kS = 0.0;
     config.Slot0.kV = 0.0;
-    config.Slot0.kG = 0.5;
+    config.Slot0.kG = 0.0;
     config.Slot0.kA = 0.0;
 
     leadMotor.getConfigurator().apply(config);

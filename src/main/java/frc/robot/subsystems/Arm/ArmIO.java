@@ -35,7 +35,7 @@ public interface ArmIO {
     return 0;
   }
 
-  public default boolean atSetpoint() {
+  public default boolean atSetpoint(ArmStates state) {
     return false;
   }
 }

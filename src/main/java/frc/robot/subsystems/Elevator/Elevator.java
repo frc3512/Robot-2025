@@ -1,13 +1,13 @@
 package frc.robot.subsystems.Elevator;
 
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Elevator.ElevatorIO.ElevatorIOInputs;
-
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 public class Elevator extends SubsystemBase {
   private final ElevatorIO io;
@@ -59,6 +59,7 @@ public class Elevator extends SubsystemBase {
 
     elevatorCurrentPoint = 
         elevatorProfile.calculate(Constants.GeneralConstants.LOOP_TIME, elevatorCurrentPoint, elevatorGoal);
+        
     manualSetPosition(elevatorCurrentPoint.position);
 
     Logger.processInputs("Elevator", (LoggableInputs) inputs);

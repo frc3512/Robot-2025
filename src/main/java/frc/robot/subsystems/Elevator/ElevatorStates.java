@@ -5,16 +5,18 @@ public enum ElevatorStates {
   // TODO: TUNE ALL POSITIONS, THESE ARE JUST ROUGH ESTIMATES
 
   // * Positions for the elevator using encoder ticks *
+  // * Gear Ratio applied to config, positions will be different than main branch *
 
   // | Defualt Positions |
   STOW(1),
-  HP(5),
+  HP(1.7),
+  INTAKE(1.5),
 
   // | Coral Scoring Positions |
   L1(1),
   L2(3),
   L3(6),
-  L4(9),
+  L4(8),
 
   // | Algae Positions |
   ALGAE_L1(2),

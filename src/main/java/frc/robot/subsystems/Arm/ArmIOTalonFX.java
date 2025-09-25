@@ -1,12 +1,14 @@
 package frc.robot.subsystems.Arm;
 
+import java.lang.annotation.ElementType;
+
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.reduxrobotics.sensors.canandmag.Canandmag;
 
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 
@@ -17,6 +19,9 @@ public class ArmIOTalonFX implements ArmIO {
 
   private final TalonFX motor;
 
+  // Encoder attached to Carridge
+  private final Canandmag encoder = new Canandmag(2);
+
   private final TalonFXConfiguration config = new TalonFXConfiguration();
 
   public ArmIOTalonFX(int leadID) {
@@ -25,6 +30,7 @@ public class ArmIOTalonFX implements ArmIO {
 
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     config.Feedback.SensorToMechanismRatio = 1.0 / 1.0; // 1:1 gearing
+    // TODO: TUNE THESE VALUES
     config.Slot0.kP = 0.1;
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 0.0;
@@ -43,9 +49,7 @@ public class ArmIOTalonFX implements ArmIO {
 
   @Override
   public double getPosition() {
-    StatusSignal<Angle> rawSignal = motor.getRotorPosition();
-    var posSignal = rawSignal.getValueAsDouble();
-    return posSignal;
+    return encoder.getAbsPosition();
   }
 
   @Override
@@ -63,10 +67,17 @@ public class ArmIOTalonFX implements ArmIO {
   }
 
   @Override
-  public boolean atSetpoint() {
-    double positionError = 
-        Math.abs(motor.getClosedLoopError().getValueAsDouble());
-    return positionError < 0.1;
+  public boolean atSetpoint(ArmStates state) {
+    boolean atSetpoint = false;
+
+    if (encoder.getAbsPosition() - 0.1 <= state.position 
+    || encoder.getAbsPosition() + 0.1 >= state.position) {
+      atSetpoint    = true;
+    } else {
+      atSetpoint    = false;
+    }
+
+    return atSetpoint;
   }
 
   @Override
