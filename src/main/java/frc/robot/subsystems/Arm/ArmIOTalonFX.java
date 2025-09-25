@@ -1,7 +1,5 @@
 package frc.robot.subsystems.Arm;
 
-import java.lang.annotation.ElementType;
-
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
@@ -11,9 +9,6 @@ import com.reduxrobotics.sensors.canandmag.Canandmag;
 
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
-
-// TODO:
-// Tune PID values
 
 public class ArmIOTalonFX implements ArmIO {
 
@@ -64,24 +59,17 @@ public class ArmIOTalonFX implements ArmIO {
     StatusSignal<Current> rawSignal = motor.getStatorCurrent();
     var currentSignal = rawSignal.getValueAsDouble();
     return currentSignal;
-  }
-
-  @Override
-  public boolean atSetpoint(ArmStates state) {
-    boolean atSetpoint = false;
-
-    if (encoder.getAbsPosition() - 0.1 <= state.position 
-    || encoder.getAbsPosition() + 0.1 >= state.position) {
-      atSetpoint    = true;
-    } else {
-      atSetpoint    = false;
     }
 
-    return atSetpoint;
-  }
+    @Override
+    public boolean atSetpoint(ArmStates state) {
+    double tolerance = 0.1;
+    double position = encoder.getAbsPosition();
+    return Math.abs(position - state.position) <= tolerance;
+    }
 
-  @Override
-  public void configurePID(double kP, double kI, double kD) {
+    @Override
+    public void configurePID(double kP, double kI, double kD) {
     config.Slot0.kP = kP;
     config.Slot0.kI = kI;
     config.Slot0.kD = kD;
