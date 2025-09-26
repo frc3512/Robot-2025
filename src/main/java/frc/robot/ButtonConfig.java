@@ -55,31 +55,9 @@ public class ButtonConfig {
 
     // * -- Bindings for the button box --
 
-    // | Elevator Control |
-
     // Coral
-    appendageJoystick.button(3).onTrue(actions.L4());
-
-    appendageJoystick.button(4).onTrue(actions.L3());
-
-    appendageJoystick.button(5).onTrue(actions.L2());
-
-    appendageJoystick.button(6).onTrue(actions.L1());
 
     // Algae
-    appendageJoystick.button(7).onTrue(actions.ALGAE_L1());
 
-    appendageJoystick.button(8).onTrue(actions.ALGAE_L2());
-
-    appendageJoystick.button(10).onTrue(actions.BARGE());
-
-    // appendageJoystick.button(11)
-    //     .onTrue(actions.SPIT_ALGAE());
-
-    // Defaults
-    appendageJoystick.button(9).onTrue(actions.STOW());
-
-    // appendageJoystick.button(12)
-    //     .onTrue(actions.INTAKE_CORAL());
   }
 }

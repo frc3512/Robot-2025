@@ -14,7 +14,7 @@ public class Wrist extends SubsystemBase{
     private final WristIO io;
     private final WristIOInputs inputs = new WristIOInputs();
 
-    private WristStates targetLevel = WristStates.HOLD;
+    private WristStates targetLevel = WristStates.VERTICAL;
 
     public static Wrist instance;
 
@@ -71,6 +71,10 @@ public class Wrist extends SubsystemBase{
 
         this.wristGoal = new TrapezoidProfile.State(targetLevel.position, 0);
         targetLevel = state;
+    }
+
+    public boolean atSetpoint() {
+        return io.atSetpoint();
     }
 
     public WristStates getTargetState() {

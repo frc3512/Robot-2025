@@ -73,6 +73,10 @@ public class Arm extends SubsystemBase{
         targetLevel = state;
     }
 
+    public boolean atSetpoint(ArmStates state) {
+        return io.atSetpoint(state);
+    }
+
     public ArmStates getTargetState() {
         return targetLevel;
     }

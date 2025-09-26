@@ -5,8 +5,8 @@ public enum WristStates {
     // * Positions for the wrist using encoder ticks *
     // * TUNE ALL POSITIONS, THESE ARE JUST ROUGH ESTIMATES *
 
-    GRAB(0.0),
-    HOLD(1);
+    VERTICAL(0.0),
+    HORIZONTAL(1);
 
     public double position;
 

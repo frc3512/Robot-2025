@@ -10,12 +10,11 @@ public enum ArmStates {
     STOW(0.4),
 
     // | Coral Scoring Positions |
-    FRONTSCORE(0.6),
-    BACKSCORE(0.37),
+    FRONT_SCORE(0.6),
 
     // | Intake Positions |
-    REARINTAKE(0.1),
-    FRONTINTAKE(0.7),
+    REAR_INTAKE(0.1),
+    FRONT_INTAKE(0.7),
 
     // | Algae Positions |
     ALGAE_STOW(0.42),

@@ -59,17 +59,17 @@ public class ArmIOTalonFX implements ArmIO {
     StatusSignal<Current> rawSignal = motor.getStatorCurrent();
     var currentSignal = rawSignal.getValueAsDouble();
     return currentSignal;
-    }
+  }
 
-    @Override
-    public boolean atSetpoint(ArmStates state) {
+  @Override
+  public boolean atSetpoint(ArmStates state) {
     double tolerance = 0.1;
     double position = encoder.getAbsPosition();
     return Math.abs(position - state.position) <= tolerance;
-    }
+  }
 
-    @Override
-    public void configurePID(double kP, double kI, double kD) {
+  @Override
+  public void configurePID(double kP, double kI, double kD) {
     config.Slot0.kP = kP;
     config.Slot0.kI = kI;
     config.Slot0.kD = kD;

@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Elevator;
 
+import java.util.function.BooleanSupplier;
+
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
@@ -76,6 +78,10 @@ public class Elevator extends SubsystemBase {
     return targetLevel;
   }
 
+  public boolean atSetpoint() {
+    return io.atSetpoint();
+  }
+
   public void manualSetPosition(double position) {
     if (position < 0) position = 0;
 
@@ -89,4 +95,5 @@ public class Elevator extends SubsystemBase {
   public void updateSim() {
     io.updateSim();
   }
+
 }
