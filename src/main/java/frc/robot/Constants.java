@@ -31,4 +31,12 @@ public class Constants {
     public static final int leadID = 13;
     public static final int followerID = 14;
   }
+
+  public static class ArmConstants {
+    public static final int motorID = 15;
+  }
+
+  public static class WristConstants {
+    public static final int motorID = 16;
+  }
 }

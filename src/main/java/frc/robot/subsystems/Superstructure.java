@@ -9,7 +9,8 @@ import frc.lib.command.Complex.intakeCoral;
 import frc.lib.command.Complex.prepAlgae;
 import frc.lib.command.Complex.prepCoral;
 import frc.lib.command.Complex.reset;
-import frc.lib.command.Complex.AutoScoreCoral.autoL4;
+import frc.lib.command.Complex.scoreBarge;
+import frc.lib.command.Complex.scoreCoral;
 import frc.lib.command.Elevator.setElevatorState;
 import frc.lib.command.Wrist.setWristState;
 import frc.robot.subsystems.Arm.ArmStates;
@@ -107,9 +108,8 @@ public class Superstructure extends SubsystemBase {
   }
 
   // * -- Complex Methods --
-
-  public Command AUTO_L4() {
-    return new autoL4();
+  public Command SCORE(ElevatorStates state) {
+    return new scoreCoral(state);
   }
 
   public Command INTAKE_CORAL() {
@@ -134,6 +134,14 @@ public class Superstructure extends SubsystemBase {
 
   public Command GRAB_ALGAE_L2() {
     return new grabAlgaeReef(ElevatorStates.ALGAE_L2);
+  }
+
+  public Command PREP_BARGE() {
+    return new prepAlgae();
+  }
+
+  public Command SCORE_BARGE() {
+    return new scoreBarge();
   }
 
   public Command RESET() {

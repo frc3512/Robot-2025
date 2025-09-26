@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Elevator.ElevatorStates;
 
 public class ButtonConfig {
 
@@ -36,7 +37,7 @@ public class ButtonConfig {
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
   public final Intake intake = new Intake();
 
-  public void telopInit() {
+  public void teleopInit() {
 
     drivetrain.setDefaultCommand(
         drivetrain.applyRequest(
@@ -71,31 +72,62 @@ public class ButtonConfig {
 
     // * -- Bindings for the button box --
 
-    // Coral
-    appendageJoystick.button(3)
-        .onTrue(actions.AUTO_L4());
+    // * Coral
+    // appendageJoystick.button(3)
+    //     .onTrue(actions.SCORE(ElevatorStates.L4));
 
-    // Algae
-
-    appendageJoystick.button(8)
-        .onTrue(actions.GRAB_ALGAE_L1());
+    // appendageJoystick.button(4)
+    //     .onTrue(actions.SCORE(ElevatorStates.L3));
     
-    appendageJoystick.button(7)
-        .onTrue(actions.GRAB_ALGAE_L2());
+    // appendageJoystick.button(5)
+    //     .onTrue(actions.SCORE(ElevatorStates.L2));
+
+    // * Algae
+    // appendageJoystick.button(8)
+    //     .onTrue(actions.GRAB_ALGAE_L1());
+    
+    // appendageJoystick.button(7)
+    //     .onTrue(actions.GRAB_ALGAE_L2());
+
+    // appendageJoystick.button(10)
+    //     .onTrue(actions.PREP_BARGE())
+    //      .onFalse(actions.SCORE_BARGE());
 
     // Reset
     // Function in case drivers press wrong button and need a kill switch
-    appendageJoystick.button(12)
-        .onTrue(actions.RESET());
+    // appendageJoystick.button(12)
+    //     .onTrue(actions.RESET());
 
     // ! TESTING PURPOSES ONLY
     // ! COMMENT OUT WHEN NOT TESTING
 
-    // Elevator
+    // * Elevator * 
+    // appendageJoystick.button(3)
+    //     .onTrue(actions.L4());
+    
+    // appendageJoystick.button(4)
+    //     .onTrue(actions.L3());
+    
+    // appendageJoystick.button(5)
+    //     .onTrue(actions.L2());
+    
+    // appendageJoystick.button(6)
+    //     .onTrue(actions.L1());
 
-    // Arm
+    // appendageJoystick.button(8)
+    //     .onTrue(actions.ALGAE_L1());
+    
+    // appendageJoystick.button(7)
+    //     .onTrue(actions.ALGAE_L2());
+    
+    // * Arm *
 
-    // Wrist
+    // * Wrist *
+    // appendageJoystick.button(1)
+    //     .onTrue(actions.WRIST_VERTICAL());
+
+    // appendageJoystick.button(2)
+    //     .onTrue(actions.WRIST_HORIZONTAL());
 
   }
 }

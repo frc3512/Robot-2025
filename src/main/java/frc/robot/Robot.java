@@ -1,5 +1,12 @@
 package frc.robot;
 
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
@@ -7,17 +14,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Arm.Arm;
+import frc.robot.subsystems.Arm.ArmIO;
+import frc.robot.subsystems.Arm.ArmIOSim;
+import frc.robot.subsystems.Arm.ArmIOTalonFX;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Elevator.ElevatorIO;
 import frc.robot.subsystems.Elevator.ElevatorIOSim;
 import frc.robot.subsystems.Elevator.ElevatorIOTalonFX;
-import frc.robot.subsystems.Swerve;
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.LogFileUtil;
-import org.littletonrobotics.junction.LoggedRobot;
-import org.littletonrobotics.junction.networktables.NT4Publisher;
-import org.littletonrobotics.junction.wpilog.WPILOGReader;
-import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import frc.robot.subsystems.Wrist.Wrist;
+import frc.robot.subsystems.Wrist.WristIO;
+import frc.robot.subsystems.Wrist.WristIOSim;
+import frc.robot.subsystems.Wrist.WristIOTalonFX;
 
 public class Robot extends LoggedRobot {
 
@@ -31,6 +41,10 @@ public class Robot extends LoggedRobot {
 
   // Subsystems
   private Elevator elevator;
+  private Arm arm;
+  private Wrist wrist;
+
+  private Intake intake;
 
   public Robot() {
 
@@ -69,6 +83,16 @@ public class Robot extends LoggedRobot {
                 Constants.ElevatorConstants.leadID, Constants.ElevatorConstants.followerID));
         elevator = Elevator.getInstance();
 
+        Arm.setInstance(
+            new ArmIOTalonFX(Constants.ArmConstants.motorID));
+        arm = Arm.getInstance();
+
+        Wrist.setInstance(
+          new WristIOTalonFX(Constants.WristConstants.motorID));
+        wrist = Wrist.getInstance();
+
+        intake = new Intake();
+
         break;
 
       case SIM:
@@ -76,12 +100,26 @@ public class Robot extends LoggedRobot {
         Elevator.setInstance(new ElevatorIOSim());
         elevator = Elevator.getInstance();
 
+        Arm.setInstance(new ArmIOSim());
+        arm = Arm.getInstance();
+
+        Wrist.setInstance(new WristIOSim());
+        wrist = Wrist.getInstance();
+
+        intake = new Intake();
+
         break;
 
       case REPLAY:
 
         Elevator.setInstance(new ElevatorIO() {});
         elevator = Elevator.getInstance();
+
+        Arm.setInstance(new ArmIO() {});
+        arm = Arm.getInstance();
+
+        Wrist.setInstance(new WristIO() {});
+        wrist = Wrist.getInstance();
 
         break;
     }
