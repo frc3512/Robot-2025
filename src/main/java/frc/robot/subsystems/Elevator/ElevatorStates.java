@@ -18,10 +18,13 @@ public enum ElevatorStates {
   L3(6),
   L4(8),
 
+  // | Prep Positions |
+  PREP_CORAL(1.8),
+  ALGAE_STOW(2),
+
   // | Algae Positions |
   ALGAE_L1(2),
   ALGAE_L2(4),
-  ALGAE_STOW(2),
   BARGE(9);
 
   public double position;

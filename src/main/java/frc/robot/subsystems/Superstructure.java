@@ -3,10 +3,18 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.command.Arm.setArmState;
+import frc.lib.command.Complex.grabAlgaeReef;
+import frc.lib.command.Complex.intakeAlgae;
+import frc.lib.command.Complex.intakeCoral;
+import frc.lib.command.Complex.prepAlgae;
+import frc.lib.command.Complex.prepCoral;
+import frc.lib.command.Complex.reset;
+import frc.lib.command.Complex.AutoScoreCoral.autoL4;
 import frc.lib.command.Elevator.setElevatorState;
 import frc.lib.command.Wrist.setWristState;
 import frc.robot.subsystems.Arm.ArmStates;
 import frc.robot.subsystems.Elevator.ElevatorStates;
+import frc.robot.subsystems.Wrist.WristStates;
 
 public class Superstructure extends SubsystemBase {
 
@@ -61,11 +69,11 @@ public class Superstructure extends SubsystemBase {
   }
 
   public Command SET_REAR_INTAKE() {
-    return new setArmState(ArmStates.REAR_INTAKE);
+    return new setArmState(ArmStates.INTAKE_CORAL);
   }
 
-  public Command SET_FRONT_INTAKE() {
-    return new setArmState(ArmStates.FRONT_INTAKE);
+  public Command SET_ALGAE_INTAKE() {
+    return new setArmState(ArmStates.INTAKE_ALGAE);
   }
 
   public Command SET_STOW() {
@@ -91,12 +99,44 @@ public class Superstructure extends SubsystemBase {
   // * -- Wrist Methods --
 
   public Command WRIST_VERTICAL() {
-    return new setWristState(frc.robot.subsystems.Wrist.WristStates.VERTICAL);
+    return new setWristState(WristStates.VERTICAL);
   }
 
   public Command WRIST_HORIZONTAL() {
-    return new setWristState(frc.robot.subsystems.Wrist.WristStates.HORIZONTAL);
+    return new setWristState(WristStates.HORIZONTAL);
   }
 
   // * -- Complex Methods --
+
+  public Command AUTO_L4() {
+    return new autoL4();
+  }
+
+  public Command INTAKE_CORAL() {
+    return new intakeCoral();
+  }
+
+  public Command PREP_CORAL() {
+    return new prepCoral();
+  }
+
+  public Command INTAKE_ALGAE() {
+    return new intakeAlgae();
+  }
+
+  public Command PREP_ALGAE() {
+    return new prepAlgae();
+  }
+
+  public Command GRAB_ALGAE_L1() {
+    return new grabAlgaeReef(ElevatorStates.ALGAE_L1);
+  }
+
+  public Command GRAB_ALGAE_L2() {
+    return new grabAlgaeReef(ElevatorStates.ALGAE_L2);
+  }
+
+  public Command RESET() {
+    return new reset();
+  }
 }

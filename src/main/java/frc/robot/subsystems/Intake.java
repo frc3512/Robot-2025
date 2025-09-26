@@ -9,6 +9,7 @@ import com.reduxrobotics.sensors.canandcolor.CanandcolorSettings;
 import com.reduxrobotics.sensors.canandcolor.ColorData;
 import com.reduxrobotics.sensors.canandcolor.ProximityPeriod;
 
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Colors.Colors;
 
@@ -68,6 +69,22 @@ public class Intake extends SubsystemBase {
         }
     }
 
+    public void autoGrabCoral() {
+        Commands.sequence(
+            Commands.runOnce(() -> intakeCoral()),
+            Commands.waitUntil(() -> hasCoral()),
+            Commands.runOnce(() -> stop())        
+        );
+    }
+
+    public void autoGrabAlgae() {
+        Commands.sequence(
+            Commands.runOnce(() -> intakeAlgae()),
+            Commands.waitUntil(() -> hasAlgae()),
+            Commands.runOnce(() -> hold())        
+        );
+    }
+
     public double getObjectDistance() {
         return sensor.getProximity();
     }
@@ -76,12 +93,24 @@ public class Intake extends SubsystemBase {
         return sensor.getColor();
     }
 
-    public void intake() {
+    public void intakeCoral() {
         motor.set(0.5);
+    }
+
+    public void intakeAlgae() {
+        motor.set(0.6);
     }
 
     public void outtake() {
         motor.set(-0.5);
+    }
+
+    public void hold() {
+        motor.set(0.1);
+    }
+
+    public void setSpeed(double speed) {
+        motor.set(speed);
     }
 
     public void stop() {

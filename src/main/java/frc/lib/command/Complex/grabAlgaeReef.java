@@ -35,8 +35,7 @@ public class grabAlgaeReef extends InstantCommand{
             Commands.waitUntil(() -> Elevator.getInstance().atSetpoint()),
             Commands.waitUntil(() -> Arm.getInstance().atSetpoint(ArmStates.ALGAE_REMOVE)),
             Commands.waitUntil(() -> Wrist.getInstance().atSetpoint()),
-            Commands.runOnce(() -> intake.intake()),
-            Commands.waitUntil(() -> intake.hasAlgae()),
+            Commands.runOnce(() -> intake.intakeAlgae()),
             Commands.runOnce(() -> new setElevatorState(ElevatorStates.ALGAE_STOW)),
             Commands.runOnce(() -> new setArmState(ArmStates.STOW))
         );

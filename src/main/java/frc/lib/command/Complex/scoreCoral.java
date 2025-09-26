@@ -13,6 +13,8 @@ import frc.robot.subsystems.Elevator.ElevatorStates;
 import frc.robot.subsystems.Wrist.Wrist;
 import frc.robot.subsystems.Wrist.WristStates;
 
+// * Scoring logic for levels l2, l3, and l4 *
+// * L1 has its own command due to the different arm position *
 public class scoreCoral extends InstantCommand {
 
     private Intake intake;
@@ -33,7 +35,7 @@ public class scoreCoral extends InstantCommand {
             Commands.waitUntil(() -> Arm.getInstance().atSetpoint(ArmStates.FRONT_SCORE)),
             Commands.waitUntil(() -> Wrist.getInstance().atSetpoint()),
             Commands.runOnce(() -> intake.outtake()),
-            Commands.waitSeconds(1),
+            Commands.waitUntil(() -> !intake.hasCoral()),
             Commands.runOnce(() -> new setElevatorState(ElevatorStates.STOW)),
             Commands.runOnce(() -> new setArmState(ArmStates.STOW)),
             Commands.runOnce(() -> intake.stop())

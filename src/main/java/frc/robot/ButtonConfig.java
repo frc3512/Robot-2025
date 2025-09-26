@@ -2,8 +2,10 @@ package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.Swerve;
 
@@ -29,8 +31,10 @@ public class ButtonConfig {
           .withRotationalDeadband(slowAngularRate * 0.07) // Add a 7% deadband
           .withDriveRequestType(DriveRequestType.Velocity);
 
+
   public final Superstructure actions = new Superstructure();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
+  public final Intake intake = new Intake();
 
   public void telopInit() {
 
@@ -44,7 +48,7 @@ public class ButtonConfig {
 
     // Slow drive button
     controller
-        .rightBumper()
+        .b()
         .whileTrue(
             drivetrain.applyRequest(
                 () ->
@@ -53,11 +57,45 @@ public class ButtonConfig {
                         .withVelocityY(-controller.getLeftX() * slowSpeed)
                         .withRotationalRate(-controller.getRightX() * slowAngularRate)));
 
+    controller.leftTrigger()
+        .whileTrue(actions.INTAKE_CORAL()
+            .until(() -> intake.hasCoral())
+            .andThen(actions.PREP_CORAL()))
+        .onFalse(actions.RESET());
+
+    controller.rightTrigger()
+        .whileTrue(actions.INTAKE_ALGAE()
+            .until(() -> intake.hasAlgae())
+            .andThen(actions.PREP_ALGAE()))
+        .onFalse(actions.RESET());
+
     // * -- Bindings for the button box --
 
     // Coral
+    appendageJoystick.button(3)
+        .onTrue(actions.AUTO_L4());
 
     // Algae
+
+    appendageJoystick.button(8)
+        .onTrue(actions.GRAB_ALGAE_L1());
+    
+    appendageJoystick.button(7)
+        .onTrue(actions.GRAB_ALGAE_L2());
+
+    // Reset
+    // Function in case drivers press wrong button and need a kill switch
+    appendageJoystick.button(12)
+        .onTrue(actions.RESET());
+
+    // ! TESTING PURPOSES ONLY
+    // ! COMMENT OUT WHEN NOT TESTING
+
+    // Elevator
+
+    // Arm
+
+    // Wrist
 
   }
 }
