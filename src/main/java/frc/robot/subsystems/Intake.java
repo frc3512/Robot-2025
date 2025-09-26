@@ -10,6 +10,7 @@ import com.reduxrobotics.sensors.canandcolor.ColorData;
 import com.reduxrobotics.sensors.canandcolor.ProximityPeriod;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.Colors.Colors;
 
 // * Algae HSV -> 165, 51, 80 *
 // * Coral HSV -> 27, 4, 87 *
@@ -45,7 +46,19 @@ public class Intake extends SubsystemBase {
 
     public boolean hasAlgae(){
         if (getObjectDistance() >= 0.9 && getObjectDistance() <= 0.99){
-            if (getColor().toString().equals("Teal")) {
+            if (getColor().toString().equals(Colors.kAlgae.toString())) {
+                return true;
+            } else {
+            return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    public boolean hasCoral(){
+        if (getObjectDistance() >= 0.9 && getObjectDistance() <= 0.99){
+            if (getColor().toString().equals(Colors.kCoral.toString())) {
                 return true;
             } else {
             return false;

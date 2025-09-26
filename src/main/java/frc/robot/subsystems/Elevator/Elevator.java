@@ -1,7 +1,5 @@
 package frc.robot.subsystems.Elevator;
 
-import java.util.function.BooleanSupplier;
-
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
