@@ -31,7 +31,7 @@ public class intakeCoral extends InstantCommand{
                     Arm.getInstance().atSetpoint(ArmStates.INTAKE_CORAL) && 
                     Wrist.getInstance().atSetpoint()),
                     
-            Commands.runOnce(() -> intake.intakeCoral())
+            Commands.runOnce(() -> intake.autoGrabCoral())
         );
     }
 

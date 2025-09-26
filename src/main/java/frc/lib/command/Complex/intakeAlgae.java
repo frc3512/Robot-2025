@@ -31,7 +31,7 @@ public class intakeAlgae extends InstantCommand{
                     Arm.getInstance().atSetpoint(ArmStates.INTAKE_ALGAE) && 
                     Wrist.getInstance().atSetpoint()),
                     
-            Commands.runOnce(() -> intake.intakeAlgae())
+            Commands.runOnce(() -> intake.autoGrabAlgae())
         );
     }
 
