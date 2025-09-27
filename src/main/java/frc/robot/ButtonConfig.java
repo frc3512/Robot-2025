@@ -3,6 +3,8 @@ package frc.robot;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Intake;
@@ -37,6 +39,13 @@ public class ButtonConfig {
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
   public final Intake intake = new Intake();
 
+  public Command autoAim() {
+    return Commands.sequence(
+        drivetrain.resetAutoAimPID(), 
+        drivetrain.goToPose(
+          () -> drivetrain.getNearestReef()));
+  }
+
   public void teleopInit() {
 
     drivetrain.setDefaultCommand(
@@ -69,6 +78,20 @@ public class ButtonConfig {
             .until(() -> intake.hasAlgae())
             .andThen(actions.PREP_ALGAE()))
         .onFalse(actions.RESET());
+
+    // * Manual Vision * 
+    // controller.y()
+    //     .onTrue(drivetrain.selectPiece("Coral"));
+    // controller.a()
+    //     .onTrue(drivetrain.selectPiece("Algae"));
+
+    // controller.leftBumper()
+    //     .onTrue(drivetrain.selectReef("Left"));
+    // controller.rightBumper()
+    //     .onTrue(drivetrain.selectReef("Right"));
+
+    // controller.x()
+    //     .onTrue(autoAim());
 
     // * -- Bindings for the button box --
 

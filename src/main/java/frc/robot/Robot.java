@@ -7,15 +7,21 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.ctre.phoenix6.Utils;
+
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Arm.ArmIO;
 import frc.robot.subsystems.Arm.ArmIOSim;
@@ -45,6 +51,14 @@ public class Robot extends LoggedRobot {
   private Wrist wrist;
 
   private Intake intake;
+  private LED leds;
+
+  public final Vision visionLeft =
+      new Vision(
+          Constants.VisionConstants.leftCam, Constants.VisionConstants.leftCameraOffset);
+  public final Vision visionRight =
+      new Vision(
+          Constants.VisionConstants.rightCam, Constants.VisionConstants.rightCameraOffset);
 
   public Robot() {
 
@@ -92,6 +106,7 @@ public class Robot extends LoggedRobot {
         wrist = Wrist.getInstance();
 
         intake = new Intake();
+        leds = new LED();
 
         break;
 
@@ -107,6 +122,7 @@ public class Robot extends LoggedRobot {
         wrist = Wrist.getInstance();
 
         intake = new Intake();
+        leds = new LED();
 
         break;
 
@@ -151,7 +167,54 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    poseEstimation();
+
+    DogLog.log("Vision/Nearest Reef", drivetrain.getNearestReef());
+
+    if (intake.hasCoral()){
+      drivetrain.selectPiece("Coral");
+      
+      if (drivetrain.getSelectedReef() == "Left") {
+        leds.setPattern(leds.left);
+      } else if (drivetrain.getSelectedReef() == "Right") {
+        leds.setPattern(leds.right);
+      } else {
+        leds.setPattern(leds.white);
+      }
+    } else if (intake.hasAlgae()){
+      drivetrain.selectPiece("Algae");
+      leds.setPattern(leds.cyan);
+    } else {
+      leds.setPattern(leds.black);
+    }
+  } 
+
+
+  public void poseEstimation() {
+    var visionLeftEst = visionLeft.getEstimatedGlobalPose(visionLeft.getCamera());
+    var visionRightEst = visionRight.getEstimatedGlobalPose(visionRight.getCamera());
+
+    visionLeftEst.ifPresent(
+        est -> {
+          var estStdDevs = visionLeft.getEstimationStdDevs();
+          DogLog.log("Vision/LeftCam Estimated Pose", est.estimatedPose);
+          drivetrain.addVisionMeasurement(
+              est.estimatedPose.toPose2d(),
+              Utils.fpgaToCurrentTime(est.timestampSeconds),
+              estStdDevs);
+        });
+
+    visionRightEst.ifPresent(
+        est -> {
+          var estStdDevs = visionRight.getEstimationStdDevs();
+          DogLog.log("Vision/RightCam Estimated Pose", est.estimatedPose);
+          drivetrain.addVisionMeasurement(
+              est.estimatedPose.toPose2d(),
+              Utils.fpgaToCurrentTime(est.timestampSeconds),
+              estStdDevs);
+        });
   }
+
 
   @Override
   public void teleopPeriodic() {}
