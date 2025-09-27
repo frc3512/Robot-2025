@@ -46,7 +46,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     return getState().Pose;
   }
 
-
   // | Aiming
   private final ProfiledPIDController aimXController =
       new ProfiledPIDController(
@@ -293,5 +292,15 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
               updateSimState(deltaTime, RobotController.getBatteryVoltage());
             });
     m_simNotifier.startPeriodic(kSimLoopPeriod);
+  }
+
+  public void resetOdometry(Pose2d pose) {
+    aimXController.reset(pose.getX());
+    aimYController.reset(pose.getY());
+    aimThetaController.reset(pose.getRotation().getRadians());
+  }
+
+  public ChassisSpeeds getRobotRelativeSpeeds() {
+    return getState().Speeds; // Assuming getState().Speeds provides the robot-relative speeds
   }
 }
