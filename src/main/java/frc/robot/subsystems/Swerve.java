@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
@@ -47,18 +46,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     return getState().Pose;
   }
 
-  // | Choreo
-  private final PIDController choreoXController =
-      new PIDController(
-          Constants.AutoConstants.xP, Constants.AutoConstants.xI, Constants.AutoConstants.xD);
-  private final PIDController choreoYController =
-      new PIDController(
-          Constants.AutoConstants.yP, Constants.AutoConstants.xI, Constants.AutoConstants.xD);
-  private final PIDController choreoThetaController =
-      new PIDController(
-          Constants.AutoConstants.thetaP,
-          Constants.AutoConstants.thetaI,
-          Constants.AutoConstants.thetaD);
 
   // | Aiming
   private final ProfiledPIDController aimXController =
@@ -83,7 +70,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
   public Swerve(
       SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
     super(drivetrainConstants, modules);
-    choreoThetaController.enableContinuousInput(-Math.PI, Math.PI);
     if (Utils.isSimulation()) {
       startSimThread();
     }
@@ -98,7 +84,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     aimYController.setTolerance(Units.inchesToMeters(0.5), Units.inchesToMeters(0.125));
     aimThetaController.setTolerance(Units.degreesToRadians(2.0), Units.degreesToRadians(1));
 
-    choreoThetaController.enableContinuousInput(-Math.PI, Math.PI);
     aimThetaController.enableContinuousInput(-Math.PI, Math.PI);
     if (Utils.isSimulation()) {
       startSimThread();
@@ -121,28 +106,10 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     aimYController.setTolerance(Units.inchesToMeters(0.5));
     aimThetaController.setTolerance(Units.degreesToRadians(2.0));
 
-    choreoThetaController.enableContinuousInput(-Math.PI, Math.PI);
     aimThetaController.enableContinuousInput(-Math.PI, Math.PI);
     if (Utils.isSimulation()) {
       startSimThread();
     }
-  }
-
-  public void followTrajectory(SwerveSample sample) {
-    Pose2d pose = getState().Pose;
-
-    ChassisSpeeds speeds =
-        new ChassisSpeeds(
-            sample.vx + choreoXController.calculate(pose.getX(), sample.x),
-            sample.vy + choreoYController.calculate(pose.getY(), sample.y),
-            sample.omega
-                + choreoThetaController.calculate(pose.getRotation().getRadians(), sample.heading));
-
-    this.setControl(
-        new SwerveRequest.FieldCentric()
-            .withVelocityX(speeds.vxMetersPerSecond)
-            .withVelocityY(speeds.vyMetersPerSecond)
-            .withRotationalRate(speeds.omegaRadiansPerSecond));
   }
 
   public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
