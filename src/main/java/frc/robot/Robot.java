@@ -65,11 +65,8 @@ public class Robot extends TimedRobot {
   
   public final Autos autos = new Autos(drivetrain);
 
-
   // | Driver Camera Thread for crosshair
   private final Thread m_visionThread;
-
-  private final SendableChooser<Command> autoChooser;
 
   public Robot() {
 
@@ -220,16 +217,10 @@ public class Robot extends TimedRobot {
         .button(2)
         .onTrue(new InstantCommand(() -> actions.climbDown()))
         .onFalse(new InstantCommand(() -> actions.stopClimb()));
-
-    autoChooser = AutoBuilder.buildAutoChooser();
-
-    SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
   @Override
-  public void autonomousInit() {
-    autoChooser.getSelected().schedule();
-  }
+  public void autonomousInit() {}
 
   @Override
   public void teleopInit() {}

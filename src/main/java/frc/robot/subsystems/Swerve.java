@@ -303,4 +303,10 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
   public ChassisSpeeds getRobotRelativeSpeeds() {
     return getState().Speeds; // Assuming getState().Speeds provides the robot-relative speeds
   }
+
+  public void driveRobotRelative(ChassisSpeeds speeds) {
+    SwerveRequest.ApplyRobotSpeeds request = new SwerveRequest.ApplyRobotSpeeds();
+    request.Speeds = speeds;
+    this.setControl(request);
+  }
 }
