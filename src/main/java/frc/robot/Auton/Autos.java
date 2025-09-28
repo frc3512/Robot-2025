@@ -30,7 +30,7 @@ public class Autos {
         swerve::getPose,                // Pose supplier
         swerve::resetOdometry,          // Reset pose
         swerve::getRobotRelativeSpeeds, // Robot-relative chassis speeds
-        swerve::driveRobotRelative,       // Drive method
+        swerve::driveRobotRelative,     // Drive method
         new PPHolonomicDriveController(
             new PIDConstants(Constants.AutoConstants.xP, Constants.AutoConstants.xI, Constants.AutoConstants.xD), // Translation PID
             new PIDConstants(Constants.AutoConstants.thetaP, Constants.AutoConstants.thetaI, Constants.AutoConstants.thetaD)  // Rotation PID

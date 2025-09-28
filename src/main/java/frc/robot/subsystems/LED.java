@@ -44,7 +44,6 @@ public class LED extends SubsystemBase {
       rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), ledSpacing);
 
   public LED() {
-
     led.setLength(ledBuffer.getLength());
 
     led.setData(ledBuffer);
