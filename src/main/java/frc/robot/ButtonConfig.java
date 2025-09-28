@@ -45,7 +45,7 @@ public class ButtonConfig {
           () -> drivetrain.getNearestReef()));
   }
 
-  public void teleopInit() {
+  public void configureButtons() {
 
     drivetrain.setDefaultCommand(
         drivetrain.applyRequest(

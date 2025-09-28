@@ -8,15 +8,13 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.ctre.phoenix6.Utils;
+import com.pathplanner.lib.auto.AutoBuilder;
 
-import choreo.auto.AutoFactory;
-import choreo.auto.AutoRoutine;
-import choreo.auto.AutoTrajectory;
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Swerve;
@@ -36,15 +34,11 @@ import frc.robot.subsystems.Wrist.WristIOTalonFX;
 
 public class Robot extends LoggedRobot {
 
-  private SendableChooser<AutoRoutine> autoChooser = new SendableChooser<>();
-
-  // Drivetrain
-  private final Swerve drivetrain = DriveConstants.createDrivetrain();
-
-  // Auton
-  private final AutoFactory autoFactory;
+  private final SendableChooser<Command> autoChooser;
 
   // Subsystems
+  private Swerve swerve;
+
   private Elevator elevator;
   private Arm arm;
   private Wrist wrist;
@@ -107,6 +101,9 @@ public class Robot extends LoggedRobot {
         intake = new Intake();
         leds = new LED();
 
+        swerve = DriveConstants.createDrivetrain();
+        swerve.configurePathplanner();
+
         break;
 
       case SIM:
@@ -122,6 +119,9 @@ public class Robot extends LoggedRobot {
 
         intake = new Intake();
         leds = new LED();
+
+        swerve = DriveConstants.createDrivetrain();
+        swerve.configurePathplanner();
 
         break;
 
@@ -139,26 +139,17 @@ public class Robot extends LoggedRobot {
         break;
     }
 
-    // Create Choreo
-    autoFactory =
-        new AutoFactory(
-            () -> drivetrain.getState().Pose,
-            drivetrain::resetPose,
-            drivetrain::followTrajectory,
-            false,
-            drivetrain);
-
-    autoChooser.addOption("Mid l4", midl4());
-
+    autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
     Logger.start();
+
+    ButtonConfig buttons = new ButtonConfig();
+    buttons.configureButtons();
   }
 
   @Override
-  public void autonomousInit() {
-    autoChooser.getSelected().cmd().schedule();
-  }
+  public void autonomousInit() {}
 
   @Override
   public void disabledInit() {}
@@ -168,20 +159,20 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
     poseEstimation();
 
-    DogLog.log("Vision/Nearest Reef", drivetrain.getNearestReef());
+    DogLog.log("Vision/Nearest Reef", swerve.getNearestReef());
 
     if (intake.hasCoral()){
-      drivetrain.selectPiece("Coral");
+      swerve.selectPiece("Coral");
       
-      if (drivetrain.getSelectedReef() == "Left") {
+      if (swerve.getSelectedReef() == "Left") {
         leds.setPattern(leds.left);
-      } else if (drivetrain.getSelectedReef() == "Right") {
+      } else if (swerve.getSelectedReef() == "Right") {
         leds.setPattern(leds.right);
       } else {
         leds.setPattern(leds.white);
       }
     } else if (intake.hasAlgae()){
-      drivetrain.selectPiece("Algae");
+      swerve.selectPiece("Algae");
       leds.setPattern(leds.cyan);
     } else {
       leds.setPattern(leds.black);
@@ -197,7 +188,7 @@ public class Robot extends LoggedRobot {
         est -> {
           var estStdDevs = visionLeft.getEstimationStdDevs();
           DogLog.log("Vision/LeftCam Estimated Pose", est.estimatedPose);
-          drivetrain.addVisionMeasurement(
+          swerve.addVisionMeasurement(
               est.estimatedPose.toPose2d(),
               Utils.fpgaToCurrentTime(est.timestampSeconds),
               estStdDevs);
@@ -207,7 +198,7 @@ public class Robot extends LoggedRobot {
         est -> {
           var estStdDevs = visionRight.getEstimationStdDevs();
           DogLog.log("Vision/RightCam Estimated Pose", est.estimatedPose);
-          drivetrain.addVisionMeasurement(
+          swerve.addVisionMeasurement(
               est.estimatedPose.toPose2d(),
               Utils.fpgaToCurrentTime(est.timestampSeconds),
               estStdDevs);
@@ -217,13 +208,4 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopPeriodic() {}
-
-  // Auto paths
-  public AutoRoutine midl4() {
-    AutoRoutine routine = autoFactory.newRoutine("Mid l4");
-    AutoTrajectory trajectory = routine.trajectory("Mid l4");
-
-    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
-    return routine;
-  }
 }

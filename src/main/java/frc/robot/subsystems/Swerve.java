@@ -1,11 +1,15 @@
 
 package frc.robot.subsystems;
 
-import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+
 import dev.doglog.DogLog;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
@@ -24,9 +28,12 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.lib.command.Complex.scoreCoral;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants.ReefSlot;
 import frc.robot.DriveConstants.TunerSwerveDrivetrain;
+import frc.robot.subsystems.Elevator.ElevatorStates;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -50,19 +57,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
   public Pose2d getPose() {
     return getState().Pose;
   }
-
-  // Choreo
-  private final PIDController choreoXController =
-      new PIDController(
-          Constants.AutoConstants.xP, Constants.AutoConstants.xI, Constants.AutoConstants.xD);
-  private final PIDController choreoYController =
-      new PIDController(
-          Constants.AutoConstants.yP, Constants.AutoConstants.xI, Constants.AutoConstants.xD);
-  private final PIDController choreoThetaController =
-      new PIDController(
-          Constants.AutoConstants.thetaP,
-          Constants.AutoConstants.thetaI,
-          Constants.AutoConstants.thetaD);
 
   // Aiming
   private final ProfiledPIDController aimXController =
@@ -88,7 +82,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
   public Swerve(
       SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
     super(drivetrainConstants, modules);
-    choreoThetaController.enableContinuousInput(-Math.PI, Math.PI);
     if (Utils.isSimulation()) {
       startSimThread();
     }
@@ -103,7 +96,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     aimYController.setTolerance(Units.inchesToMeters(0.5), Units.inchesToMeters(0.125));
     aimThetaController.setTolerance(Units.degreesToRadians(2.0), Units.degreesToRadians(1));
 
-    choreoThetaController.enableContinuousInput(-Math.PI, Math.PI);
     aimThetaController.enableContinuousInput(-Math.PI, Math.PI);
     if (Utils.isSimulation()) {
       startSimThread();
@@ -125,29 +117,10 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     aimXController.setTolerance(Units.inchesToMeters(0.5));
     aimYController.setTolerance(Units.inchesToMeters(0.5));
     aimThetaController.setTolerance(Units.degreesToRadians(2.0));
-
-    choreoThetaController.enableContinuousInput(-Math.PI, Math.PI);
     aimThetaController.enableContinuousInput(-Math.PI, Math.PI);
     if (Utils.isSimulation()) {
       startSimThread();
     }
-  }
-
-  public void followTrajectory(SwerveSample sample) {
-    Pose2d pose = getState().Pose;
-
-    ChassisSpeeds speeds =
-        new ChassisSpeeds(
-            sample.vx + choreoXController.calculate(pose.getX(), sample.x),
-            sample.vy + choreoYController.calculate(pose.getY(), sample.y),
-            sample.omega
-                + choreoThetaController.calculate(pose.getRotation().getRadians(), sample.heading));
-
-    this.setControl(
-        new SwerveRequest.FieldCentric()
-            .withVelocityX(speeds.vxMetersPerSecond)
-            .withVelocityY(speeds.vyMetersPerSecond)
-            .withRotationalRate(speeds.omegaRadiansPerSecond));
   }
 
   public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
@@ -156,6 +129,42 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
 
   public void applyRequest(SwerveRequest request) {
     this.setControl(request);
+  }
+
+  public void configurePathplanner() {
+    try {
+
+          registerNamedCommands();
+            
+          RobotConfig config = RobotConfig.fromGUISettings();
+
+          // Configure AutoBuilder
+          AutoBuilder.configure(
+                this::getPose,
+                this::resetPose,
+                this::getSpeeds,
+                (speeds, feedforwards) -> driveRobotRelative(speeds),
+                  new PPHolonomicDriveController(
+                      Constants.AutoConstants.translationConstants, Constants.AutoConstants.rotationConstants),
+                    config,
+                    () -> {
+                        // Boolean supplier that controls when the path will be mirrored for the red
+                        // alliance
+                        // This will flip the path being followed to the red side of the field.
+                        // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+                        var alliance = DriverStation.getAlliance();
+                        if (alliance.isPresent()) {
+                            return alliance.get() == DriverStation.Alliance.Red;
+                        }
+                        return false;
+                    },
+                    this);
+
+        } catch (Exception e) {
+            DriverStation.reportError(
+                    "Failed to load PathPlanner config and configure AutoBuilder", e.getStackTrace());
+        }
   }
 
   // Credit to 6657
@@ -341,6 +350,11 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     }
   }
 
+  public void registerNamedCommands() {
+    NamedCommands
+      .registerCommand("Score L4", new scoreCoral(ElevatorStates.L4));
+  }
+
   private void startSimThread() {
     m_lastSimTime = Utils.getCurrentTimeSeconds();
     m_simNotifier =
@@ -352,5 +366,15 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
               updateSimState(deltaTime, RobotController.getBatteryVoltage());
             });
     m_simNotifier.startPeriodic(kSimLoopPeriod);
+  }
+
+  public ChassisSpeeds getSpeeds() {
+    return getState().Speeds;
+  }
+
+  public void driveRobotRelative(ChassisSpeeds speeds) {
+    SwerveRequest.ApplyRobotSpeeds request = new SwerveRequest.ApplyRobotSpeeds();
+    request.Speeds = speeds;
+    this.setControl(request);
   }
 }
