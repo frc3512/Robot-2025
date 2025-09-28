@@ -32,7 +32,7 @@ public class Intake extends SubsystemBase {
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-        sensor = new Canandcolor(1);
+        sensor = new Canandcolor(2);
         settings = new CanandcolorSettings();
 
         settings.setColorFramePeriod(0.040);
