@@ -33,14 +33,17 @@ public class Constants {
         new TrapezoidProfile.Constraints(1000, 1000);
 
     public static final double stowPos = 1.0;
-    public static final double hpPos = 5;
-    public static final double l1Pos = 8.7;
+    public static final double intakePos = 9.2;
+    public static final double l1Pos = 13.8;
     public static final double l2Pos = 14.2;
     public static final double l3Pos = 26.5;
-    public static final double l4Pos = 46;
+    public static final double l4Pos = 37.8;
     public static final double a1Pos = 3.5;
     public static final double a2Pos = 15.84;
     public static final double aStowPos = 14.5;
+
+    //temporary
+
   }
 
   public static class ClimberConstants {
