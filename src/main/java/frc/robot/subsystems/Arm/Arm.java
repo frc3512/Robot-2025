@@ -67,8 +67,6 @@ public class Arm extends SubsystemBase{
     }
 
     public void setState(ArmStates state) {
-        if (state.position < 0) state.position = 0;
-
         this.armGoal = new TrapezoidProfile.State(targetLevel.position, 0);
         targetLevel = state;
     }

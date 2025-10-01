@@ -66,8 +66,6 @@ public class Elevator extends SubsystemBase {
   }
 
   public void setState(ElevatorStates state) {
-    if (state.position < 0) state.position = 0;
-
     this.elevatorGoal = new TrapezoidProfile.State(targetLevel.position, 0);
     targetLevel = state;
   }

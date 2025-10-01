@@ -67,8 +67,6 @@ public class Wrist extends SubsystemBase{
     }
 
     public void setState(WristStates state) {
-        if (state.position < 0) state.position = 0;
-
         this.wristGoal = new TrapezoidProfile.State(targetLevel.position, 0);
         targetLevel = state;
     }
