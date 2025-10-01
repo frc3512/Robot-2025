@@ -15,7 +15,7 @@ public class ArmIOTalonFX implements ArmIO {
   private final TalonFX motor;
 
   // Encoder attached to Carridge
-  private final Canandmag encoder = new Canandmag(2);
+  private final Canandmag encoder = new Canandmag(30);
 
   private final TalonFXConfiguration config = new TalonFXConfiguration();
 

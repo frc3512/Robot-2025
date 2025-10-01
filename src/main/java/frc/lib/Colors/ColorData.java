@@ -1,7 +1,7 @@
 // Copyright (c) Redux Robotics and other contributors.
 // This is open source and can be modified and shared under the 3-clause BSD license.
 
-package frc.lib.Colors;
+package frc.lib.colors;
 
 import com.reduxrobotics.sensors.canandcolor.CanandcolorDetails;
 import com.reduxrobotics.sensors.canandcolor.wpistruct.CanandcolorColorDataStruct;

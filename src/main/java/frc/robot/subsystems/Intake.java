@@ -11,7 +11,7 @@ import com.reduxrobotics.sensors.canandcolor.ProximityPeriod;
 
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.Colors.Colors;
+import frc.lib.colors.Colors;
 
 // * Algae HSV -> 165, 51, 80 *
 // * Coral HSV -> 27, 4, 87 *
@@ -32,7 +32,7 @@ public class Intake extends SubsystemBase {
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-        sensor = new Canandcolor(2);
+        sensor = new Canandcolor(31);
         settings = new CanandcolorSettings();
 
         settings.setColorFramePeriod(0.040);
