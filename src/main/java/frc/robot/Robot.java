@@ -8,14 +8,10 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.ctre.phoenix6.Utils;
-import com.pathplanner.lib.auto.AutoBuilder;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
@@ -35,8 +31,6 @@ import frc.robot.subsystems.Wrist.WristIOSim;
 import frc.robot.subsystems.Wrist.WristIOTalonFX;
 
 public class Robot extends LoggedRobot {
-
-  private final SendableChooser<Command> autoChooser;
 
   // Subsystems
   private Swerve swerve;
@@ -104,7 +98,7 @@ public class Robot extends LoggedRobot {
         leds = new LED();
 
         swerve = DriveConstants.createDrivetrain();
-        swerve.configurePathplanner();
+        // swerve.configurePathplanner();
 
         break;
 
@@ -123,7 +117,7 @@ public class Robot extends LoggedRobot {
         leds = new LED();
 
         swerve = DriveConstants.createDrivetrain();
-        swerve.configurePathplanner();
+        // swerve.configurePathplanner();
 
         break;
 
@@ -140,9 +134,6 @@ public class Robot extends LoggedRobot {
 
         break;
     }
-
-    autoChooser = AutoBuilder.buildAutoChooser();
-    SmartDashboard.putData("Auto Chooser", autoChooser);
 
     Logger.start();
 

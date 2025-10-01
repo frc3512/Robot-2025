@@ -1,7 +1,5 @@
 package frc.robot;
 
-import com.pathplanner.lib.config.PIDConstants;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
@@ -87,11 +85,6 @@ public class Constants {
   }
 
   public static class AutoConstants {
-    public static final PIDConstants translationConstants = 
-        new PIDConstants(7.5, 0, 0);
-    public static final PIDConstants rotationConstants =
-        new PIDConstants(5, 0, 0);
-
     public static final double xP = 7.5;
     public static final double xI = 0.0;
     public static final double xD = 0.0;

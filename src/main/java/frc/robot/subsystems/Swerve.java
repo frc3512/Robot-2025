@@ -5,10 +5,6 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.math.Matrix;
@@ -131,41 +127,41 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     this.setControl(request);
   }
 
-  public void configurePathplanner() {
-    try {
+  // public void configurePathplanner() {
+  //   try {
 
-          registerNamedCommands();
+  //         registerNamedCommands();
             
-          RobotConfig config = RobotConfig.fromGUISettings();
+  //         RobotConfig config = RobotConfig.fromGUISettings();
 
-          // Configure AutoBuilder
-          AutoBuilder.configure(
-                this::getPose,
-                this::resetPose,
-                this::getSpeeds,
-                (speeds, feedforwards) -> driveRobotRelative(speeds),
-                  new PPHolonomicDriveController(
-                      Constants.AutoConstants.translationConstants, Constants.AutoConstants.rotationConstants),
-                    config,
-                    () -> {
-                        // Boolean supplier that controls when the path will be mirrored for the red
-                        // alliance
-                        // This will flip the path being followed to the red side of the field.
-                        // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+  //         // Configure AutoBuilder
+  //         AutoBuilder.configure(
+  //               this::getPose,
+  //               this::resetPose,
+  //               this::getSpeeds,
+  //               (speeds, feedforwards) -> driveRobotRelative(speeds),
+  //                 new PPHolonomicDriveController(
+  //                     Constants.AutoConstants.translationConstants, Constants.AutoConstants.rotationConstants),
+  //                   config,
+  //                   () -> {
+  //                       // Boolean supplier that controls when the path will be mirrored for the red
+  //                       // alliance
+  //                       // This will flip the path being followed to the red side of the field.
+  //                       // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
-                        var alliance = DriverStation.getAlliance();
-                        if (alliance.isPresent()) {
-                            return alliance.get() == DriverStation.Alliance.Red;
-                        }
-                        return false;
-                    },
-                    this);
+  //                       var alliance = DriverStation.getAlliance();
+  //                       if (alliance.isPresent()) {
+  //                           return alliance.get() == DriverStation.Alliance.Red;
+  //                       }
+  //                       return false;
+  //                   },
+  //                   this);
 
-        } catch (Exception e) {
-            DriverStation.reportError(
-                    "Failed to load PathPlanner config and configure AutoBuilder", e.getStackTrace());
-        }
-  }
+  //       } catch (Exception e) {
+  //           DriverStation.reportError(
+  //                   "Failed to load PathPlanner config and configure AutoBuilder", e.getStackTrace());
+  //       }
+  // }
 
   // Credit to 6657
   public Command resetAutoAimPID() {
@@ -350,10 +346,10 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     }
   }
 
-  public void registerNamedCommands() {
-    NamedCommands
-      .registerCommand("Score L4", new scoreCoral(ElevatorStates.L4));
-  }
+  // public void registerNamedCommands() {
+  //   NamedCommands
+  //     .registerCommand("Score L4", new scoreCoral(ElevatorStates.L4));
+  // }
 
   private void startSimThread() {
     m_lastSimTime = Utils.getCurrentTimeSeconds();
