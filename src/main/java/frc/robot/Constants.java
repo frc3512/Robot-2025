@@ -19,6 +19,26 @@ public class Constants {
     public static final boolean tuningMode = true;
   }
 
+  public static class ArmConstants {
+    public static double kP = 0.1;
+    public static double kI = 0.0;
+    public static double kD = 0.0;
+
+    public static TrapezoidProfile.Constraints constraints = 
+      new TrapezoidProfile.Constraints(100, 200);
+
+    public static double tolerance = 0.01;
+
+    // ! Tune all these and add as needed
+    public static double stow = 0.0;
+    public static double prepScore = 0.0;
+    public static double intake = 0.0;
+    public static double algae = 0.0;
+    public static double score = 0.0;
+    public static double barge = 0.0;
+    public static double processor = 0.0;
+  }
+
   public static class ElevatorConstants {
     public static final int frontMotorID = 13;
     public static final int backMotorID = 14;
@@ -32,52 +52,36 @@ public class Constants {
     public static final TrapezoidProfile.Constraints constraints =
         new TrapezoidProfile.Constraints(1000, 1000);
 
-    public static final double stowPos = 1.0;
-    public static final double intakePos = 9.2;
-    public static final double l1Pos = 13.8;
-    public static final double l2Pos = 14.2;
-    public static final double l3Pos = 26.5;
-    public static final double l4Pos = 37.8;
-    public static final double a1Pos = 3.5;
-    public static final double a2Pos = 15.84;
-    public static final double aStowPos = 14.5;
+    // ! Needs tuning
+    // Reset due to added gear rario in config for better acuracy
+    public static final double stow = 0;
+    public static final double intake = 0;
+    public static final double prepCoral = 0.0;
 
-    //temporary
+    public static final double l1 = 0;
+    public static final double l2 = 0;
+    public static final double l3 = 0;
+    public static final double l4 = 0;
+
+    // public static final double a1 = tuneMe
+    // public static final double a2 = tuneMe
+    // public static final double aStow = tuneMe
+    // public static final double barge = tuneMe
 
   }
 
-  public static class ClimberConstants {
-    public static final int climbMotorID = 11;
+  public static class WristConstants {
+    public static double kP = 0.1;
+    public static double kI = 0.0;
+    public static double kD = 0.0;
 
-    public static final int beamBreak = 1;
-    public static final int climberTopSwitch = 3;
-    public static final int climberBottomSwitch = 2;
-  }
+    public static double tolerance = 0.01;
 
-  public static class ReeftakeConstants {
-    public static final int pivotMotorID = 17;
-    public static final int intakeMotorID = 18;
+    public static TrapezoidProfile.Constraints constraints = 
+      new TrapezoidProfile.Constraints(50, 50);
 
-    public static final int digitalInputChannel = 0;
-  }
-
-  public static class GroundtakeConstants {
-    public static final int floorAlgaeRollerMotorID = 15;
-    public static final int floorAlgaePivotMotorID = 16;
-
-    public static final int encoderID = 30;
-
-    public static final double kP = 9;
-    public static final double kI = 0.0;
-    public static final double kD = 0.005;
-
-    public static final double tolerance = 0.002;
-
-    public static final double stowPos = 0.297;
-    public static final double extendPivot = 0.135;
-
-    public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(5, 3);
+    public static double horizontal = 0.0;
+    public static double vertical = 0.0;
   }
 
   public static class VisionConstants {

@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -18,10 +19,10 @@ public class Elevator extends ProfiledPIDSubsystem {
   private final TalonFX frontMotor = new TalonFX(Constants.ElevatorConstants.frontMotorID);
   private final TalonFX backMotor = new TalonFX(Constants.ElevatorConstants.backMotorID);
 
+  private final TalonFXConfiguration config = new TalonFXConfiguration();
+
   // * Use only a gravity constant
   private double gravity = 0.5;
-
-  boolean bypassStop = false;
 
   public Elevator() {
     super(
@@ -39,6 +40,11 @@ public class Elevator extends ProfiledPIDSubsystem {
     backMotor.setPosition(0.000);
 
     backMotor.setControl(new Follower(frontMotor.getDeviceID(), false));
+
+    config.Feedback.SensorToMechanismRatio = 50 / 11;
+
+    frontMotor.getConfigurator().apply(config);
+    backMotor.getConfigurator().apply(config);
 
     enable();
   }
@@ -59,6 +65,13 @@ public class Elevator extends ProfiledPIDSubsystem {
     StatusSignal<Angle> frontPos = frontMotor.getRotorPosition();
     StatusSignal<Angle> backPos = backMotor.getRotorPosition();
     return (Math.abs(backPos.getValueAsDouble()) + Math.abs(frontPos.getValueAsDouble())) / 2;
+  }
+
+  public boolean atGoal() {
+    double posError = 
+      Math.abs(getController().getPositionError());
+
+    return posError < 0.1;
   }
 
   @Override

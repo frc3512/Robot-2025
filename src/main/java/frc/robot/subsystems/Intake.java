@@ -9,9 +9,7 @@ import com.reduxrobotics.sensors.canandcolor.CanandcolorSettings;
 import com.reduxrobotics.sensors.canandcolor.ColorData;
 import com.reduxrobotics.sensors.canandcolor.ProximityPeriod;
 
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.colors.Colors;
 
 // * Algae HSV -> 165, 51, 80 *
 // * Coral HSV -> 27, 4, 87 *
@@ -36,7 +34,7 @@ public class Intake extends SubsystemBase {
         settings = new CanandcolorSettings();
 
         settings.setColorFramePeriod(0.040);
-        settings.setLampLEDBrightness(1.0);
+        settings.setLampLEDBrightness(0.35);
         settings.setAlignColorFramesToIntegrationPeriod(true);
         settings.setProximityIntegrationPeriod(ProximityPeriod.k20ms);
 
@@ -45,52 +43,24 @@ public class Intake extends SubsystemBase {
 
     }
 
-    public boolean hasAlgae(){
-        if (getObjectDistance() >= 0.9 && getObjectDistance() <= 0.99){
-            if (getColor().toString().equals(Colors.kAlgae.toString())) {
-                return true;
-            } else {
-            return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    public boolean hasCoral(){
-        if (getObjectDistance() >= 0.9 && getObjectDistance() <= 0.99){
-            if (getColor().toString().equals(Colors.kCoral.toString())) {
-                return true;
-            } else {
-            return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    public void autoGrabCoral() {
-        Commands.sequence(
-            Commands.runOnce(() -> intakeCoral()),
-            Commands.waitUntil(() -> hasCoral()),
-            Commands.runOnce(() -> stop())        
-        );
-    }
-
-    public void autoGrabAlgae() {
-        Commands.sequence(
-            Commands.runOnce(() -> intakeAlgae()),
-            Commands.waitUntil(() -> hasAlgae()),
-            Commands.runOnce(() -> hold())        
-        );
-    }
-
     public double getObjectDistance() {
         return sensor.getProximity();
     }
 
     public ColorData getColor() {
         return sensor.getColor();
+    }
+
+    public double getR() {
+        return sensor.getRed();
+    }
+
+    public double getG() {
+        return sensor.getGreen();
+    }
+
+    public double getB() {
+        return sensor.getBlue();
     }
 
     public void intakeCoral() {
@@ -103,6 +73,10 @@ public class Intake extends SubsystemBase {
 
     public void outtake() {
         motor.set(-0.5);
+    }
+
+    public void placeCoral() {
+        motor.set(-0.15);
     }
 
     public void hold() {

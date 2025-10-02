@@ -21,9 +21,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.LED;
-import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 import org.opencv.core.Mat;
@@ -53,9 +51,7 @@ public class Robot extends TimedRobot {
           .withDriveRequestType(DriveRequestType.Velocity);
 
   // | | Subsystem Objects
-  public final Elevator elevator = new Elevator();
   public final LED leds = new LED();
-  public final Intake reeftake = new Intake();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
   public final Vision visionElevator =
       new Vision(
@@ -157,25 +153,7 @@ public class Robot extends TimedRobot {
 
     controller.x().whileTrue(autoAim());
 
-    // | Intake control for Groundtake
-
     // * -- Bindings for the button box --
-
-    // | Barge Scoring
-
-
-    // | Climber controls
-
-    // | Full auto climbing
-    // appendageJoystick.button(1)
-    //     .onTrue(climber.autoClimb())
-
-    // | Semi-automatic climbing
-    // appendageJoystick.button(1)
-    //     .onTrue(climber.extendClimber());
-
-    // appendageJoystick.button(2)
-    //     .onTrue(climber.retractClimber());
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -186,9 +164,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopInit() {
-    elevator.setClampedGoal(Constants.ElevatorConstants.stowPos);
-  }
+  public void teleopInit() {}
 
   @Override
   public void robotInit(){
