@@ -20,29 +20,31 @@ public class Constants {
   }
 
   public static class ArmConstants {
-    public static double kP = 0.1;
-    public static double kI = 0.0;
-    public static double kD = 0.0;
+    // Todo: TUNE PID
+    public static final double kP = 0.1;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
 
     public static TrapezoidProfile.Constraints constraints = 
       new TrapezoidProfile.Constraints(100, 200);
 
-    public static double tolerance = 0.01;
+    public static final double tolerance = 0.01;
 
     // ! Tune all these and add as needed
-    public static double stow = 0.0;
-    public static double prepScore = 0.0;
-    public static double intake = 0.0;
-    public static double algae = 0.0;
-    public static double score = 0.0;
-    public static double barge = 0.0;
-    public static double processor = 0.0;
+    public static final double stow = 0.0;
+    public static final double prepScore = 0.0;
+    public static final double intake = 0.0;
+    public static final double algae = 0.0;
+    public static final double score = 0.0;
+    public static final double barge = 0.0;
+    public static final double processor = 0.0;
   }
 
   public static class ElevatorConstants {
     public static final int frontMotorID = 13;
     public static final int backMotorID = 14;
 
+    // ? Check if PID needs ajustments first
     public static final double kP = 0.75;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
@@ -63,25 +65,27 @@ public class Constants {
     public static final double l3 = 0;
     public static final double l4 = 0;
 
-    // public static final double a1 = tuneMe
-    // public static final double a2 = tuneMe
-    // public static final double aStow = tuneMe
-    // public static final double barge = tuneMe
+    public static final double a1 = 0;
+    public static final double a2 = 0;
+    public static final double aStow = 0;
+    public static final double barge = 0;
 
   }
 
   public static class WristConstants {
-    public static double kP = 0.1;
-    public static double kI = 0.0;
-    public static double kD = 0.0;
+    // Todo: TUNE PID
+    public static final double kP = 0.1;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
 
-    public static double tolerance = 0.01;
+    public static final double tolerance = 0.01;
 
-    public static TrapezoidProfile.Constraints constraints = 
+    public static final TrapezoidProfile.Constraints constraints = 
       new TrapezoidProfile.Constraints(50, 50);
 
-    public static double horizontal = 0.0;
-    public static double vertical = 0.0;
+    // ! Tune all these
+    public static final double horizontal = 0.0;
+    public static final double vertical = 0.0;
   }
 
   public static class VisionConstants {
