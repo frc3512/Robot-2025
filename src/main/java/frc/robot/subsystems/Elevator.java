@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -8,6 +9,7 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -22,7 +24,7 @@ public class Elevator extends SubsystemBase{
 
   private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(ElevatorStates.STOW.position);
 
-  private ElevatorStates desiredState;
+  private double desiredState;
 
   // * Use only a gravity constant
   private double gravity = 0.5;
@@ -55,9 +57,7 @@ public class Elevator extends SubsystemBase{
   }
 
   public void setClampedGoal(ElevatorStates goal) {
-    frontMotor.setControl(positionRequest.withPosition(clampHeight(goal.position)));
-
-    desiredState = goal;
+    desiredState = clampHeight(goal.position);
   }
 
   public boolean atSetpoint() {
@@ -67,14 +67,25 @@ public class Elevator extends SubsystemBase{
                 + backMotor.getClosedLoopError().getValueAsDouble())) / 2.0;
     return positionError < 0.1;
   }
+  
+  public double getPosition() {
+    StatusSignal<Angle> frontSignal = frontMotor.getRotorPosition();
+    StatusSignal<Angle> backSignal = backMotor.getRotorPosition();
+    var posSignal = (frontSignal.getValueAsDouble() + backSignal.getValueAsDouble()) / 2.0;
+    return posSignal;
+  }
 
   @Override
   public void periodic() {
+    frontMotor.setControl(positionRequest.withPosition(desiredState / 1.8798));
+
 
     // Values for PID graphing
     DogLog.log("Elevator/ Elevator Front Motor Encoder", frontMotor.getPosition().getValueAsDouble());
-    DogLog.log("Elevator/Elevator Voltage", frontMotor.getMotorVoltage().getValueAsDouble());
+    DogLog.log("Elevator/Elevator Front Voltage", frontMotor.getMotorVoltage().getValueAsDouble());
+    DogLog.log("Elevator/Elevator Rear Voltage", backMotor.getMotorVoltage().getValueAsDouble());
     DogLog.log("Elevator/ELevator Goal", desiredState);
+    DogLog.log("Elevator/Elevator Pos", getPosition() * 1.8798);
 
     // General Info
     DogLog.log("Elevator/Front Motor Temp", frontMotor.getDeviceTemp().getValueAsDouble());
