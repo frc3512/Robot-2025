@@ -66,8 +66,8 @@ public class Constants {
 
     public static final double a1 = 28.75;
     public static final double a2 = 39.12;
-    public static final double aStow = 43.6;
-    public static final double barge = 0;
+    public static final double aStow = 5.3;
+    public static final double barge = 43.6;
 
   }
 

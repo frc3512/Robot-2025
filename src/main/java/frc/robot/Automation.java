@@ -1,5 +1,7 @@
 package frc.robot;
 
+import com.ctre.phoenix6.signals.ConnectedMotorValue;
+
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -8,6 +10,7 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.States.ElevatorStates;
 
 public class Automation extends SubsystemBase{
     
@@ -32,72 +35,72 @@ public class Automation extends SubsystemBase{
     }
 
     // * Reset / Defualt
-    public Command reset() {
-        return Commands.sequence(
-            Commands.runOnce(() -> intake.stop()), 
-            Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.stow)),
-            Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.stow)),
-            Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.vertical)),
-            Commands.runOnce(() -> coralReady = false),
-            Commands.runOnce(() -> bargeReady = false),
-            Commands.runOnce(() -> processorReady = false)
-        );
-    }
+    // public Command reset() {
+    //     return Commands.sequence(
+    //         Commands.runOnce(() -> intake.stop()), 
+    //         Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.stow)),
+    //         Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.stow)),
+    //         Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.vertical)),
+    //         Commands.runOnce(() -> coralReady = false),
+    //         Commands.runOnce(() -> bargeReady = false),
+    //         Commands.runOnce(() -> processorReady = false)
+    //     );
+    // }
 
     // * Full Auto
 
     // | Coral
-    public Command autoScore(double pos) {
-        return Commands.sequence(
-            prepScore(pos),
-            Commands.waitUntil(() -> coralReady == true),
-            score()
-        );
-    }
+    // public Command autoScore(double pos) {
+    //     return Commands.sequence(
+    //         prepScore(pos),
+    //         Commands.waitUntil(() -> coralReady == true),
+    //         score()
+    //     );
+    // }
 
     // * Coral 
 
     // | L2 ^
-    public Command score() {
-        return Commands.sequence(
-            Commands.parallel(setPlace(), placeCoral()),
-            Commands.waitUntil(() -> getPiece() == '!'), 
-            Commands.runOnce(() -> reset())
-        );
-    }
+    // public Command score() {
+    //     return Commands.sequence(
+    //         Commands.parallel(setPlace(), placeCoral()),
+    //         Commands.waitUntil(() -> getPiece() == '!'), 
+    //         Commands.runOnce(() -> reset())
+    //     );
+    // }
 
     // | L1
-    public Command trough() {
-        return Commands.sequence(
-            Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.l1)),
-            Commands.waitUntil(() -> elevator.atGoal()),
-            Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.trough)),
-            Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
-            Commands.waitUntil(() -> arm.atGoal()),
-            Commands.waitUntil(() -> wrist.atGoal()),
-            Commands.runOnce(() -> intake.placeCoral()),
-            Commands.waitSeconds(0.5),
-            Commands.runOnce(() -> intake.stop()),
-            reset()
-            // * Command is Automatic!!
-        );
-    }   
+    // public Command trough() {
+    //     return Commands.sequence(
+    //         Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.l1)),
+    //         Commands.waitUntil(() -> elevator.atGoal()),
+    //         Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.trough)),
+    //         Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
+    //         Commands.waitUntil(() -> arm.atGoal()),
+    //         Commands.waitUntil(() -> wrist.atGoal()),
+    //         Commands.runOnce(() -> intake.placeCoral()),
+    //         Commands.waitSeconds(0.5),
+    //         Commands.runOnce(() -> intake.stop()),
+    //         reset()
+    //         // * Command is Automatic!!
+    //     );
+    // }   
 
     // | Intake
-    public Command intakeCoral() {
-        if (getPiece() == '!') {
-            return Commands.sequence(
-                Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
-                Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.intake)),
-                Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.intake)),
-                Commands.waitUntil(() -> arm.atGoal()),
-                Commands.waitUntil(() -> wrist.atGoal()),
-                grabCoral()
-            );
-        } else {
-            return reset();
-        }
-    }
+    // public Command intakeCoral() {
+    //     if (getPiece() == '!') {
+    //         return Commands.sequence(
+    //             Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
+    //             Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.intake)),
+    //             Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.intake)),
+    //             Commands.waitUntil(() -> arm.atGoal()),
+    //             Commands.waitUntil(() -> wrist.atGoal()),
+    //             grabCoral()
+    //         );
+    //     } else {
+    //         return reset();
+    //     }
+    // }
 
     public Command grabCoral() {
         return Commands.sequence(
@@ -110,50 +113,50 @@ public class Automation extends SubsystemBase{
     // * Algae
 
     // | De-Reef
-    public Command grabAlgae(double level) {
-        if (getPiece() == '!') {
-            return Commands.sequence(
-                Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
-                Commands.runOnce(() -> elevator.setClampedGoal(level)),
-                Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.algae)),
-                grabAlgae(),
-                prepAlgae()
-            );
-        } else {
-            return reset();
-        }
-    }
+    // public Command grabAlgae(double level) {
+    //     if (getPiece() == '!') {
+    //         return Commands.sequence(
+    //             Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
+    //             Commands.runOnce(() -> elevator.setClampedGoal(level)),
+    //             Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.algae)),
+    //             grabAlgae(),
+    //             prepAlgae()
+    //         );
+    //     } else {
+    //         return reset();
+    //     }
+    // }
 
     // | Process
 
     // | Barge
-    public Command scoreBarge() {
-        if (getPiece() == 'A') {
-            return Commands.sequence(
-                Commands.runOnce(() -> intake.outtake()),
-                Commands.waitUntil(() -> getPiece() == '!'),
-                reset()
-            );
-        } else {
-            return reset();
-        }
-    }
+    // public Command scoreBarge() {
+    //     if (getPiece() == 'A') {
+    //         return Commands.sequence(
+    //             Commands.runOnce(() -> intake.outtake()),
+    //             Commands.waitUntil(() -> getPiece() == '!'),
+    //             reset()
+    //         );
+    //     } else {
+    //         return reset();
+    //     }
+    // }
 
     // | Intake
-    public Command intakeAlgae() {
-        if (getPiece() == '!') {
-            return Commands.sequence(
-                Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
-                Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.intake)),
-                Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.intake)),
-                Commands.waitUntil(() -> arm.atGoal()),
-                Commands.waitUntil(() -> wrist.atGoal()),
-                grabAlgae()
-            );
-        } else {
-            return reset();
-        }
-    }
+    // public Command intakeAlgae() {
+    //     if (getPiece() == '!') {
+    //         return Commands.sequence(
+    //             Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
+    //             Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.intake)),
+    //             Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.intake)),
+    //             Commands.waitUntil(() -> arm.atGoal()),
+    //             Commands.waitUntil(() -> wrist.atGoal()),
+    //             grabAlgae()
+    //         );
+    //     } else {
+    //         return reset();
+    //     }
+    // }
 
     public Command grabAlgae() {
         return Commands.sequence(
@@ -166,56 +169,56 @@ public class Automation extends SubsystemBase{
     // * Prep
 
     // | Coral
-    public Command prepScore(double pos) {
-        if (getPiece() == 'C') {
-            return Commands.sequence(
-                Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.vertical)),
-                Commands.waitUntil(() -> wrist.atGoal()),
-                Commands.runOnce(() -> elevator.setClampedGoal(pos)),
-                Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.prepScore)),
-                Commands.waitUntil(() -> elevator.atGoal()),
-                Commands.waitUntil(() -> arm.atGoal()),
-                Commands.runOnce(() -> coralReady = true)
-            );
-        } else {
-            return reset();
-        }
-    }
+    // public Command prepScore(double pos) {
+    //     if (getPiece() == 'C') {
+    //         return Commands.sequence(
+    //             Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.vertical)),
+    //             Commands.waitUntil(() -> wrist.atGoal()),
+    //             Commands.runOnce(() -> elevator.setClampedGoal(pos)),
+    //             Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.prepScore)),
+    //             Commands.waitUntil(() -> elevator.atGoal()),
+    //             Commands.waitUntil(() -> arm.atGoal()),
+    //             Commands.runOnce(() -> coralReady = true)
+    //         );
+    //     } else {
+    //         return reset();
+    //     }
+    // }
 
-    public Command prepCoral() {
-        return Commands.sequence(
-            Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.prepCoral)),
-            Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.stow)),
-            Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.vertical))
-        );
-    }
+    // public Command prepCoral() {
+    //     return Commands.sequence(
+    //         Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.prepCoral)),
+    //         Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.stow)),
+    //         Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.vertical))
+    //     );
+    // }
 
     // | Algae
-    public Command prepAlgae() {
-        if (getPiece() == 'A') {
-            return Commands.sequence(
-                Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.aStow)),
-                Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.stow)),
-                Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal))
-            );
-        } else {
-            return reset();
-        }
-    }
+    // public Command prepAlgae() {
+    //     if (getPiece() == 'A') {
+    //         return Commands.sequence(
+    //             Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.aStow)),
+    //             Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.stow)),
+    //             Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal))
+    //         );
+    //     } else {
+    //         return reset();
+    //     }
+    // }
 
-    public Command prepBarge() {
-        if (getPiece() == 'A') {
-            return Commands.sequence(
-                Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
-                Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.barge)),
-                Commands.waitUntil(() -> elevator.atGoal()),
-                Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.barge)),
-                Commands.runOnce(() -> bargeReady = true)
-            );
-        } else {
-            return reset();
-        }
-    }
+    // public Command prepBarge() {
+    //     if (getPiece() == 'A') {
+    //         return Commands.sequence(
+    //             Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
+    //             Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.barge)),
+    //             Commands.waitUntil(() -> elevator.atGoal()),
+    //             Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.barge)),
+    //             Commands.runOnce(() -> bargeReady = true)
+    //         );
+    //     } else {
+    //         return reset();
+    //     }
+    // }
 
     // * Logic
     // Todo: Tune actual RGB Values
@@ -295,19 +298,19 @@ public class Automation extends SubsystemBase{
     // ! TESTING ONLY COMMANDS
 
     public void l4() {
-        elevator.l4();
+        elevator.setClampedGoal(ElevatorStates.L4);
     }
 
     public void l3() {
-        elevator.l3();
+        elevator.setClampedGoal(ElevatorStates.L3);
     }
 
     public void l2() {
-        elevator.l2();
+        elevator.setClampedGoal(ElevatorStates.L2);
     }
 
     public void l1() {
-        elevator.l1();
+        elevator.setClampedGoal(ElevatorStates.L1);
     }
 
     public void intake() {
