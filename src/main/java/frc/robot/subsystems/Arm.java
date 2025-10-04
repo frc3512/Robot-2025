@@ -53,12 +53,12 @@ public class Arm extends ProfiledPIDSubsystem{
     @Override
     public void periodic() {
         // Log PID
-        DogLog.log("Arm Pos", getPosition());
-        DogLog.log("Arm Goal", getController().getGoal().position);
-        DogLog.log("Arm Voltage", motor.getStatorCurrent().getValueAsDouble());
+        DogLog.log("Arm/Arm Pos", getPosition());
+        DogLog.log("Arm/Arm Goal", getController().getGoal().position);
+        DogLog.log("Arm/Arm Voltage", motor.getStatorCurrent().getValueAsDouble());
 
         // Log Basics
-        DogLog.log("Temp", motor.getDeviceTemp().getValueAsDouble());
+        DogLog.log("Arm/Temp", motor.getDeviceTemp().getValueAsDouble());
     }
 
     @Override

@@ -64,6 +64,6 @@ public class LED extends SubsystemBase {
     led.setData(ledBuffer);
     led.start();
 
-    DogLog.log("LED Pattern", ledBuffer.getLED(0).toString());
+    DogLog.log("LED/LED Pattern", ledBuffer.getLED(0).toString());
   }
 }

@@ -1,7 +1,9 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import dev.doglog.DogLog;
@@ -16,6 +18,8 @@ public class Wrist extends ProfiledPIDSubsystem{
 
     private final TalonFX motor;
 
+    private final TalonFXConfiguration config;
+
     public Wrist() {
         super(
             new ProfiledPIDController(
@@ -26,7 +30,16 @@ public class Wrist extends ProfiledPIDSubsystem{
         getController().setTolerance(Constants.ArmConstants.tolerance);
 
         motor = new TalonFX(15);
-        motor.setNeutralMode(NeutralModeValue.Brake);
+
+        config = new TalonFXConfiguration();
+
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        config.Feedback.SensorToMechanismRatio = 12.5 / 1;
+
+        motor.getConfigurator().apply(config);
+
+        motor.setPosition(0.000);
 
         enable();
     }
@@ -46,12 +59,12 @@ public class Wrist extends ProfiledPIDSubsystem{
     @Override
     public void periodic() {
         // Log PID
-        DogLog.log("Arm Pos", getMeasurement());
-        DogLog.log("Arm Goal", getController().getGoal().position);
-        DogLog.log("Arm Voltage", motor.getStatorCurrent().getValueAsDouble());
+        DogLog.log("Wrist/Wrist Pos", getMeasurement());
+        DogLog.log("Wrist/Wrist Goal", getController().getGoal().position);
+        DogLog.log("Wrist/Wrist Voltage", motor.getStatorCurrent().getValueAsDouble());
 
         // Log Basics
-        DogLog.log("Temp", motor.getDeviceTemp().getValueAsDouble());
+        DogLog.log("Wrist/Motor Temp", motor.getDeviceTemp().getValueAsDouble());
     }
 
     @Override

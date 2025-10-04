@@ -15,9 +15,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
 public class Constants {
-  public static class GeneralConstants {
-    public static final boolean tuningMode = true;
-  }
+  public static class GeneralConstants {}
 
   public static class ArmConstants {
     // Todo: TUNE PID
@@ -32,12 +30,13 @@ public class Constants {
 
     // ! Tune all these and add as needed
     public static final double stow = 0.0;
-    public static final double prepScore = 0.0;
-    public static final double intake = 0.0;
-    public static final double algae = 0.0;
-    public static final double score = 0.0;
-    public static final double barge = 0.0;
+    public static final double prepScore = 0.472;
+    public static final double intake = 0.003;
+    public static final double algae = 0.65;
+    public static final double score = 0.509;
+    public static final double barge = 0.47;
     public static final double processor = 0.0;
+    public static final double trough = 0.59;
   }
 
   public static class ElevatorConstants {
@@ -45,7 +44,7 @@ public class Constants {
     public static final int backMotorID = 14;
 
     // ? Check if PID needs ajustments first
-    public static final double kP = 0.75;
+    public static final double kP = 10;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
 
@@ -56,18 +55,18 @@ public class Constants {
 
     // ! Needs tuning
     // Reset due to added gear rario in config for better acuracy
-    public static final double stow = 0;
-    public static final double intake = 0;
+    public static final double stow = 0.2;
+    public static final double intake = 10.27;
     public static final double prepCoral = 0.0;
 
-    public static final double l1 = 0;
-    public static final double l2 = 0;
-    public static final double l3 = 0;
-    public static final double l4 = 0;
+    public static final double l1 = 9.05;
+    public static final double l2 = 4.09;
+    public static final double l3 = 15.56;
+    public static final double l4 = 37.39;
 
-    public static final double a1 = 0;
-    public static final double a2 = 0;
-    public static final double aStow = 0;
+    public static final double a1 = 28.75;
+    public static final double a2 = 39.12;
+    public static final double aStow = 43.6;
     public static final double barge = 0;
 
   }
@@ -84,8 +83,8 @@ public class Constants {
       new TrapezoidProfile.Constraints(50, 50);
 
     // ! Tune all these
-    public static final double horizontal = 0.0;
-    public static final double vertical = 0.0;
+    public static final double horizontal = 0.000;
+    public static final double vertical = 0.064;
   }
 
   public static class VisionConstants {

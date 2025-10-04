@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.LED;
@@ -65,6 +66,9 @@ public class Robot extends TimedRobot {
 
   // | Driver Camera Thread for crosshair
   private final Thread m_visionThread;
+
+  // Actions
+  private final Automation actions = new Automation();
 
   // | Auton
   private final AutoFactory autoFactory;
@@ -145,15 +149,29 @@ public class Robot extends TimedRobot {
     // controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     // | Aiming Controls
-    controller.leftBumper().onTrue(drivetrain.selectReef("Left"));
-    controller.rightBumper().onTrue(drivetrain.selectReef("Right"));
+    // controller.leftBumper().onTrue(drivetrain.selectReef("Left"));
+    // controller.rightBumper().onTrue(drivetrain.selectReef("Right"));
 
-    controller.y().onTrue(drivetrain.selectPiece("Coral"));
-    controller.a().onTrue(drivetrain.selectPiece("Algae"));
+    // controller.y().onTrue(drivetrain.selectPiece("Coral"));
+    // controller.a().onTrue(drivetrain.selectPiece("Algae"));
 
-    controller.x().whileTrue(autoAim());
+    // controller.x().whileTrue(autoAim());
 
     // * -- Bindings for the button box --
+
+    appendageJoystick.button(6)
+      .onTrue(actions.l4());
+
+    appendageJoystick.button(5)
+      .onTrue(actions.l3());
+    
+    appendageJoystick.button(4)
+      .onTrue(actions.l2());
+
+    appendageJoystick.button(1)
+      .onTrue(new InstantCommand(() -> actions.manualElevator(1)))
+      .onFalse(new InstantCommand(() -> actions.manualElevator(0.0)));
+
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -205,7 +223,7 @@ public class Robot extends TimedRobot {
 
     CommandScheduler.getInstance().run();
     // | Tuning mode
-    DogLog.setEnabled(Constants.GeneralConstants.tuningMode);
+    DogLog.setEnabled(true);
 
     poseEstimation();
   }

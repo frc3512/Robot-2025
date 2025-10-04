@@ -46,19 +46,16 @@ public class Elevator extends ProfiledPIDSubsystem {
     frontMotor.getConfigurator().apply(config);
     backMotor.getConfigurator().apply(config);
 
-    enable();
+    // enable();
   }
 
-  public Command manualElevator(double speed) {
-    return run(
-        () -> {
-          frontMotor.set(speed);
-          backMotor.set(speed);
-        });
+  public void manualElevator(double speed) {
+    frontMotor.set(speed);
+    backMotor.set(speed);
   }
 
   public void setClampedGoal(double goal) {
-    setGoal(MathUtil.clamp(goal, 0.5, 47));
+    setGoal(goal);
   }
 
   public double getPosition() {

@@ -1,6 +1,7 @@
 package frc.robot;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -71,7 +72,7 @@ public class Automation extends SubsystemBase{
         return Commands.sequence(
             Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.l1)),
             Commands.waitUntil(() -> elevator.atGoal()),
-            Commands.runOnce(() -> arm.setClampedGoal(Constants.ElevatorConstants.l1)),
+            Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.trough)),
             Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
             Commands.waitUntil(() -> arm.atGoal()),
             Commands.waitUntil(() -> wrist.atGoal()),
@@ -232,10 +233,14 @@ public class Automation extends SubsystemBase{
     private boolean hasCoral() {
         boolean coralIn; 
 
-        if (intake.getObjectDistance() >= 0.1 && intake.getObjectDistance() <= 0.3) {
-            if (intake.getR() == 0.1 &&
-                intake.getG() == 0.1 && 
-                intake.getB() == 0.1) {
+        if (intake.getObjectDistance() >= 0.1 && intake.getObjectDistance() <= 0.4) {
+            if ( intake.getColor().toWpilibColor() == Color.kCoral
+                
+                // intake.getR() >= 0.41 && intake.getR() <= 0.65 &&
+                // intake.getG() >= 0.35 && intake.getG() <= 0.67 && 
+                // intake.getB() >= 0.11 && intake.getB() <= 0.64
+                
+                ) {
                 
                 coralIn = true;
             } else {
@@ -281,21 +286,45 @@ public class Automation extends SubsystemBase{
         );
     }
 
+    
     // ----------
-
+    
     @Override
     public void periodic() {
         // Log Logic
         DogLog.log("Has Coral", hasCoral());
         DogLog.log("Has Algae", hasAlgae());
-
+        
         DogLog.log("Coral Is Ready", coralReady);
         DogLog.log("Barge Is Ready", bargeReady);
         DogLog.log("Process Is Ready", processorReady);
-
+        
         DogLog.log("Current Peice", getPiece());
-
+        
         // Update Piece
         getPiece();
+        hasAlgae();
+        hasCoral();
+    } 
+    
+    // Testing
+    public Command l1() {
+        return Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.l1));
+    }
+
+    public Command l2() {
+        return Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.l2));
+    }
+
+    public Command l3() {
+        return Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.l3));
+    }
+
+    public Command l4() {
+        return Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.l4));
+    }
+
+    public void manualElevator(double speed) {
+        elevator.manualElevator(speed);
     }
 }
