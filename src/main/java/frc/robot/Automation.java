@@ -307,24 +307,21 @@ public class Automation extends SubsystemBase{
         hasCoral();
     } 
     
-    // Testing
-    public Command l1() {
-        return Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.l1));
+    // ! TESTING ONLY COMMANDS
+
+    public void l4() {
+        elevator.setClampedGoal(Constants.ElevatorConstants.l4);
     }
 
-    public Command l2() {
-        return Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.l2));
+    public void l3() {
+        elevator.setClampedGoal(Constants.ElevatorConstants.l3);
     }
 
-    public Command l3() {
-        return Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.l3));
+    public void l2() {
+        elevator.setClampedGoal(Constants.ElevatorConstants.l2);
     }
 
-    public Command l4() {
-        return Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.l4));
-    }
-
-    public void manualElevator(double speed) {
-        elevator.manualElevator(speed);
+    public void l1() {
+        elevator.setClampedGoal(Constants.ElevatorConstants.l1);
     }
 }

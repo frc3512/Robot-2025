@@ -46,7 +46,7 @@ public class Wrist extends ProfiledPIDSubsystem{
 
     // Tune Clamp High/Low
     public void setClampedGoal(double pos) {
-        setGoal(MathUtil.clamp(pos, 0.0, 1));
+        setGoal(MathUtil.clamp(pos, 0.0, 0.7));
     }
 
     public boolean atGoal() {
@@ -54,6 +54,12 @@ public class Wrist extends ProfiledPIDSubsystem{
             getController().getPositionError();
         
         return posError < Constants.WristConstants.tolerance;
+    }
+
+    public double getPosition() {
+        StatusSignal<Angle> rawPos = motor.getPosition();
+        double pos = rawPos.getValueAsDouble();
+        return pos;
     }
 
     @Override
@@ -74,7 +80,7 @@ public class Wrist extends ProfiledPIDSubsystem{
 
     @Override
     protected double getMeasurement() {
-        StatusSignal<Angle> rawPos = motor.getRotorPosition();
+        StatusSignal<Angle> rawPos = motor.getPosition();
         double pos = rawPos.getValueAsDouble();
         return pos;
     }

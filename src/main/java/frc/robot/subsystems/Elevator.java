@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -10,7 +9,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.command.ProfiledPIDSubsystem;
 import frc.robot.Constants;
 
@@ -18,8 +16,6 @@ public class Elevator extends ProfiledPIDSubsystem {
 
   private final TalonFX frontMotor = new TalonFX(Constants.ElevatorConstants.frontMotorID);
   private final TalonFX backMotor = new TalonFX(Constants.ElevatorConstants.backMotorID);
-
-  private final TalonFXConfiguration config = new TalonFXConfiguration();
 
   // * Use only a gravity constant
   private double gravity = 0.5;
@@ -41,12 +37,7 @@ public class Elevator extends ProfiledPIDSubsystem {
 
     backMotor.setControl(new Follower(frontMotor.getDeviceID(), false));
 
-    config.Feedback.SensorToMechanismRatio = 50 / 11;
-
-    frontMotor.getConfigurator().apply(config);
-    backMotor.getConfigurator().apply(config);
-
-    // enable();
+    enable();
   }
 
   public void manualElevator(double speed) {
@@ -55,7 +46,7 @@ public class Elevator extends ProfiledPIDSubsystem {
   }
 
   public void setClampedGoal(double goal) {
-    setGoal(goal);
+    setGoal(MathUtil.clamp(goal, 0.0, 47));
   }
 
   public double getPosition() {

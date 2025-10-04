@@ -51,7 +51,6 @@ public class Robot extends TimedRobot {
           .withRotationalDeadband(slowAngularRate * 0.07) // * Add a 7% deadband
           .withDriveRequestType(DriveRequestType.Velocity);
 
-  // | | Subsystem Objects
   public final LED leds = new LED();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
   public final Vision visionElevator =
@@ -159,19 +158,16 @@ public class Robot extends TimedRobot {
 
     // * -- Bindings for the button box --
 
-    appendageJoystick.button(6)
-      .onTrue(actions.l4());
+    // ! TESTING BINDS
 
-    appendageJoystick.button(5)
-      .onTrue(actions.l3());
-    
-    appendageJoystick.button(4)
-      .onTrue(actions.l2());
-
-    appendageJoystick.button(1)
-      .onTrue(new InstantCommand(() -> actions.manualElevator(1)))
-      .onFalse(new InstantCommand(() -> actions.manualElevator(0.0)));
-
+    controller.b()
+            .onTrue(new InstantCommand(() -> actions.l1()));
+    controller.a()
+            .onTrue(new InstantCommand(() -> actions.l2()));
+    controller.x()
+            .onTrue(new InstantCommand(() -> actions.l3()));
+    controller.y()
+            .onTrue(new InstantCommand(() -> actions.l4()));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
