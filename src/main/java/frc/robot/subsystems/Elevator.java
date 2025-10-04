@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -8,7 +7,7 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.command.ProfiledPIDSubsystem;
 import frc.robot.Constants;
 
@@ -19,6 +18,8 @@ public class Elevator extends ProfiledPIDSubsystem {
 
   // * Use only a gravity constant
   private double gravity = 0.5;
+
+  boolean bypassStop = false;
 
   public Elevator() {
     super(
@@ -33,26 +34,54 @@ public class Elevator extends ProfiledPIDSubsystem {
     backMotor.setNeutralMode(NeutralModeValue.Brake);
 
     frontMotor.setPosition(0.000);
-    backMotor.setPosition(0.000);
 
     backMotor.setControl(new Follower(frontMotor.getDeviceID(), false));
 
     enable();
   }
 
-  public void manualElevator(double speed) {
-    frontMotor.set(speed);
-    backMotor.set(speed);
+  public Command manualElevator(double speed) {
+    return run(
+        () -> {
+          frontMotor.set(speed);
+          backMotor.set(speed);
+        });
+  }
+
+  public void stow() {
+    setClampedGoal(Constants.ElevatorConstants.stow);
+  }
+
+  public void l1() {
+    setClampedGoal(Constants.ElevatorConstants.l1);
+  }
+
+  public void l2() {
+    setClampedGoal(Constants.ElevatorConstants.l2);
+  }
+
+  public void l3() {
+    setClampedGoal(Constants.ElevatorConstants.l3);
+  }
+
+  public void l4() {
+    setClampedGoal(Constants.ElevatorConstants.l4);
+  }
+
+  public void a1() {
+    setClampedGoal(Constants.ElevatorConstants.a1);
+  }
+
+  public void a2() {
+    setClampedGoal(Constants.ElevatorConstants.a2);
+  }
+
+  public void aStow() {
+    setClampedGoal(Constants.ElevatorConstants.aStow);
   }
 
   public void setClampedGoal(double goal) {
-    setGoal(MathUtil.clamp(goal, 0.0, 47));
-  }
-
-  public double getPosition() {
-    StatusSignal<Angle> frontPos = frontMotor.getRotorPosition();
-    StatusSignal<Angle> backPos = backMotor.getRotorPosition();
-    return (Math.abs(backPos.getValueAsDouble()) + Math.abs(frontPos.getValueAsDouble())) / 2;
+    setGoal(MathUtil.clamp(goal, 0.5, 47));
   }
 
   public boolean atGoal() {
@@ -67,10 +96,10 @@ public class Elevator extends ProfiledPIDSubsystem {
     super.periodic();
 
     // Values for PID graphing
-    DogLog.log("Elevator/ Elevator Pos", getPosition());
+    DogLog.log(
+        "Elevator/ Elevator Front Motor Encoder", frontMotor.getPosition().getValueAsDouble());
     DogLog.log("Elevator/Elevator Goal", getController().getSetpoint().position);
-    DogLog.log("Elevator/Elevator Front Voltage", frontMotor.getMotorVoltage().getValueAsDouble());
-    DogLog.log("Elevator/Elevator Back Voltage", backMotor.getMotorVoltage().getValueAsDouble());
+    DogLog.log("Elevator/Elevator Voltage", frontMotor.getMotorVoltage().getValueAsDouble());
 
     // General Info
     DogLog.log("Elevator/Front Motor Temp", frontMotor.getDeviceTemp().getValueAsDouble());
@@ -85,8 +114,6 @@ public class Elevator extends ProfiledPIDSubsystem {
 
   @Override
   protected double getMeasurement() {
-    StatusSignal<Angle> frontPos = frontMotor.getRotorPosition();
-    StatusSignal<Angle> backPos = backMotor.getRotorPosition();
-    return (Math.abs(backPos.getValueAsDouble()) + Math.abs(frontPos.getValueAsDouble())) / 2;
+    return frontMotor.getPosition().getValueAsDouble();
   }
 }

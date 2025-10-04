@@ -44,7 +44,7 @@ public class Constants {
     public static final int backMotorID = 14;
 
     // ? Check if PID needs ajustments first
-    public static final double kP = 10;
+    public static final double kP = 0.75;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
 

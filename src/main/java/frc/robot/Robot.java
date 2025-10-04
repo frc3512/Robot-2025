@@ -159,6 +159,8 @@ public class Robot extends TimedRobot {
     // * -- Bindings for the button box --
 
     // ! TESTING BINDS
+    controller.button(8)
+            .onTrue(new InstantCommand(() -> drivetrain.seedFieldCentric()));
 
     controller.b()
             .onTrue(new InstantCommand(() -> actions.l1()));
@@ -168,6 +170,13 @@ public class Robot extends TimedRobot {
             .onTrue(new InstantCommand(() -> actions.l3()));
     controller.y()
             .onTrue(new InstantCommand(() -> actions.l4()));
+
+    controller.leftBumper()
+            .onTrue(new InstantCommand(() -> actions.intake()))
+            .onFalse(new InstantCommand(() -> actions.stopRollers()));
+    controller.rightBumper()
+            .onTrue(new InstantCommand(() -> actions.outtake()))
+            .onFalse(new InstantCommand(() -> actions.stopRollers()));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }

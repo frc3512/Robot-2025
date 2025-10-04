@@ -1,7 +1,6 @@
 package frc.robot;
 
 import dev.doglog.DogLog;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -22,7 +21,7 @@ public class Automation extends SubsystemBase{
     boolean bargeReady = false;
     boolean processorReady = false;
 
-    char piece = '!';
+    char piece = 'C';
 
     public Automation() {
         arm = new Arm();
@@ -220,7 +219,6 @@ public class Automation extends SubsystemBase{
 
     // * Logic
     // Todo: Tune actual RGB Values
-    // ? should we add a range check of rgb for more acurate scanning instead of exact value (probably)
 
     private char getPiece() {
         if (hasCoral()) piece = 'C';
@@ -231,45 +229,33 @@ public class Automation extends SubsystemBase{
     }
 
     private boolean hasCoral() {
-        boolean coralIn; 
-
-        if (intake.getObjectDistance() >= 0.1 && intake.getObjectDistance() <= 0.4) {
-            if ( intake.getColor().toWpilibColor() == Color.kCoral
+        if (intake.getObjectDistance() <= 0.04) {
+            if (intake.getR() >= 0.29 && intake.getR() <= 0.36 &&
+                intake.getG() >= 0.40 && intake.getG() <= 0.49 && 
+                intake.getB() >= 0.14 && intake.getB() <= 0.20) {
                 
-                // intake.getR() >= 0.41 && intake.getR() <= 0.65 &&
-                // intake.getG() >= 0.35 && intake.getG() <= 0.67 && 
-                // intake.getB() >= 0.11 && intake.getB() <= 0.64
-                
-                ) {
-                
-                coralIn = true;
+                return true;
             } else {
-                coralIn = false;
+                return false;
             }
         } else {
-            coralIn = false;            
+            return false;            
         }
-
-        return coralIn;
     }
 
     private boolean hasAlgae() {
-        boolean algaeIn;
-
-        if (intake.getObjectDistance() >= 0.1 && intake.getObjectDistance() <= 0.3) {
-            if (intake.getR() == 0.1 &&
-                intake.getG() == 0.1 && 
-                intake.getB() == 0.1) {
+        if (intake.getObjectDistance() <= 0.07) {
+            if (intake.getR() >= 0.04 && intake.getR() <= 0.12 && 
+                intake.getG() >= 0.30 && intake.getG() <= 0.36 && 
+                intake.getB() >= 0.10 && intake.getB() <= 0.18) {
                 
-                algaeIn = true;
+                return true;
             } else {
-                algaeIn = false;
+                return false;
             }
         } else {
-            algaeIn = false;            
+            return false;            
         }
-
-        return algaeIn;
     }
 
     // * Parallel
@@ -285,7 +271,6 @@ public class Automation extends SubsystemBase{
             Commands.runOnce(() -> intake.stop())
         );
     }
-
     
     // ----------
     
@@ -310,18 +295,30 @@ public class Automation extends SubsystemBase{
     // ! TESTING ONLY COMMANDS
 
     public void l4() {
-        elevator.setClampedGoal(Constants.ElevatorConstants.l4);
+        elevator.l4();
     }
 
     public void l3() {
-        elevator.setClampedGoal(Constants.ElevatorConstants.l3);
+        elevator.l3();
     }
 
     public void l2() {
-        elevator.setClampedGoal(Constants.ElevatorConstants.l2);
+        elevator.l2();
     }
 
     public void l1() {
-        elevator.setClampedGoal(Constants.ElevatorConstants.l1);
+        elevator.l1();
+    }
+
+    public void intake() {
+        intake.intakeCoral();
+    }
+
+    public void outtake() {
+        intake.outtake();
+    }
+
+    public void stopRollers() {
+        intake.stop();
     }
 }

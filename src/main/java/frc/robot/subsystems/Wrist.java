@@ -65,7 +65,7 @@ public class Wrist extends ProfiledPIDSubsystem{
     @Override
     public void periodic() {
         // Log PID
-        DogLog.log("Wrist/Wrist Pos", getMeasurement());
+        DogLog.log("Wrist/Wrist Pos", getPosition());
         DogLog.log("Wrist/Wrist Goal", getController().getGoal().position);
         DogLog.log("Wrist/Wrist Voltage", motor.getStatorCurrent().getValueAsDouble());
 
