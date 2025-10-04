@@ -298,4 +298,22 @@ public class Automation extends SubsystemBase{
         // Update Piece
         getPiece();
     }
+
+    // ! TESTING ONLY COMMANDS
+
+    public void l4() {
+        elevator.setClampedGoal(Constants.ElevatorConstants.l4);
+    }
+
+    public void l3() {
+        elevator.setClampedGoal(Constants.ElevatorConstants.l3);
+    }
+
+    public void l2() {
+        elevator.setClampedGoal(Constants.ElevatorConstants.l2);
+    }
+
+    public void l1() {
+        elevator.setClampedGoal(Constants.ElevatorConstants.l1);
+    }
 }

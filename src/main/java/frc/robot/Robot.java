@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.LED;
@@ -51,6 +52,8 @@ public class Robot extends TimedRobot {
           .withDriveRequestType(DriveRequestType.Velocity);
 
   // | | Subsystem Objects
+  public final Automation actions = new Automation();
+
   public final LED leds = new LED();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
   public final Vision visionElevator =
@@ -145,15 +148,26 @@ public class Robot extends TimedRobot {
     // controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     // | Aiming Controls
-    controller.leftBumper().onTrue(drivetrain.selectReef("Left"));
-    controller.rightBumper().onTrue(drivetrain.selectReef("Right"));
+    // controller.leftBumper().onTrue(drivetrain.selectReef("Left"));
+    // controller.rightBumper().onTrue(drivetrain.selectReef("Right"));
 
-    controller.y().onTrue(drivetrain.selectPiece("Coral"));
-    controller.a().onTrue(drivetrain.selectPiece("Algae"));
+    // controller.y().onTrue(drivetrain.selectPiece("Coral"));
+    // controller.a().onTrue(drivetrain.selectPiece("Algae"));
 
-    controller.x().whileTrue(autoAim());
+    // controller.x().whileTrue(autoAim());
 
     // * -- Bindings for the button box --
+
+    // ! TESTING BINDS
+
+    controller.b()
+            .onTrue(new InstantCommand(() -> actions.l1()));
+    controller.a()
+            .onTrue(new InstantCommand(() -> actions.l2()));
+    controller.x()
+            .onTrue(new InstantCommand(() -> actions.l3()));
+    controller.y()
+            .onTrue(new InstantCommand(() -> actions.l4()));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }

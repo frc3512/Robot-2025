@@ -50,7 +50,7 @@ public class Elevator extends ProfiledPIDSubsystem {
   }
 
   public void setClampedGoal(double goal) {
-    setGoal(MathUtil.clamp(goal, 0.5, 47));
+    setGoal(MathUtil.clamp(goal, 0.0, 47));
   }
 
   public double getPosition() {
