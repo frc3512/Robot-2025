@@ -48,6 +48,9 @@ public class Constants {
     public static final double kI = 0.0;
     public static final double kD = 0.0;
 
+    public static final double PULLEY_DIAMETER = 1.8798;
+    public static final double GEAR_RATIO = 50.0 / 11.0;
+
     public static final double tolerance = 0.002;
 
     public static final TrapezoidProfile.Constraints constraints =

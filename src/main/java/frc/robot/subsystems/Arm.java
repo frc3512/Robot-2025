@@ -36,7 +36,7 @@ public class Arm extends ProfiledPIDSubsystem{
 
     // Tune Clamp High/Low
     public void setClampedGoal(double pos) {
-        setGoal(MathUtil.clamp(pos, 0.005, 0.7));
+        setGoal(MathUtil.clamp(pos, 0.002, 0.7));
     }
 
     public double getPosition() {

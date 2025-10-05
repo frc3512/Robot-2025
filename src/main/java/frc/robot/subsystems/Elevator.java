@@ -40,11 +40,11 @@ public class Elevator extends SubsystemBase{
 
     frontMotor.setPosition(0.000);
 
-    backMotor.setControl(new Follower(frontMotor.getDeviceID(), false));
+    config.Feedback.SensorToMechanismRatio = Constants.ElevatorConstants.GEAR_RATIO;
+    
+    config.Slot0.withKP(Constants.ElevatorConstants.kP);
+    config.Slot0.withKG(gravity);
 
-    config.Feedback.SensorToMechanismRatio = 50.0 / 11.0;
-    config.Slot0.withKP(0.75);
-    config.Slot0.withKG(0.5);
     config.Slot0.withGravityType(GravityTypeValue.Elevator_Static);
   }
 
@@ -77,18 +77,21 @@ public class Elevator extends SubsystemBase{
 
   @Override
   public void periodic() {
-    frontMotor.setControl(positionRequest.withPosition(desiredState / 1.8798));
-
-
     // Values for PID graphing
     DogLog.log("Elevator/ Elevator Front Motor Encoder", frontMotor.getPosition().getValueAsDouble());
     DogLog.log("Elevator/Elevator Front Voltage", frontMotor.getMotorVoltage().getValueAsDouble());
     DogLog.log("Elevator/Elevator Rear Voltage", backMotor.getMotorVoltage().getValueAsDouble());
     DogLog.log("Elevator/ELevator Goal", desiredState);
-    DogLog.log("Elevator/Elevator Pos", getPosition() * 1.8798);
+    DogLog.log("Elevator/Elevator Pos", getPosition() * Constants.ElevatorConstants.PULLEY_DIAMETER);
 
     // General Info
     DogLog.log("Elevator/Front Motor Temp", frontMotor.getDeviceTemp().getValueAsDouble());
     DogLog.log("Elevator/Back Motor Temp", backMotor.getDeviceTemp().getValueAsDouble());
+
+    frontMotor.setControl(
+      positionRequest.withPosition(
+        desiredState / Constants.ElevatorConstants.PULLEY_DIAMETER));
+
+    backMotor.setControl(new Follower(frontMotor.getDeviceID(), false));
   }
 }

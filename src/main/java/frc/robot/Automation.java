@@ -1,7 +1,5 @@
 package frc.robot;
 
-import com.ctre.phoenix6.signals.ConnectedMotorValue;
-
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -82,7 +80,7 @@ public class Automation extends SubsystemBase{
     //         Commands.waitSeconds(0.5),
     //         Commands.runOnce(() -> intake.stop()),
     //         reset()
-    //         // * Command is Automatic!!
+    //        // * Command is Automatic!!
     //     );
     // }   
 
