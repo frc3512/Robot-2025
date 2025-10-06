@@ -35,7 +35,7 @@ public class Wrist extends ProfiledPIDSubsystem{
 
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        config.Feedback.SensorToMechanismRatio = 12.5 / 1;
+        config.Feedback.SensorToMechanismRatio = 12.5 / 1.0;
 
         motor.getConfigurator().apply(config);
 
@@ -64,6 +64,8 @@ public class Wrist extends ProfiledPIDSubsystem{
 
     @Override
     public void periodic() {
+        super.periodic();
+
         // Log PID
         DogLog.log("Wrist/Wrist Pos", getPosition());
         DogLog.log("Wrist/Wrist Goal", getController().getGoal().position);
