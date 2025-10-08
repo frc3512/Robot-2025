@@ -6,6 +6,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
@@ -39,6 +40,7 @@ public class Elevator extends SubsystemBase{
     backMotor.setNeutralMode(NeutralModeValue.Brake);
 
     frontMotor.setPosition(0.000);
+    backMotor.setPosition(0.000);
 
     config.Feedback.SensorToMechanismRatio = Constants.ElevatorConstants.GEAR_RATIO;
     
@@ -46,6 +48,11 @@ public class Elevator extends SubsystemBase{
     config.Slot0.withKG(gravity);
 
     config.Slot0.withGravityType(GravityTypeValue.Elevator_Static);
+
+    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
+    frontMotor.getConfigurator().apply(config);
+    backMotor.getConfigurator().apply(config);
   }
 
   public Command manualElevator(double speed) {
@@ -65,12 +72,12 @@ public class Elevator extends SubsystemBase{
         Math.abs(
                 (frontMotor.getClosedLoopError().getValueAsDouble()
                 + backMotor.getClosedLoopError().getValueAsDouble())) / 2.0;
-    return positionError < 0.1;
+    return positionError < 0.05;
   }
   
   public double getPosition() {
-    StatusSignal<Angle> frontSignal = frontMotor.getRotorPosition();
-    StatusSignal<Angle> backSignal = backMotor.getRotorPosition();
+    StatusSignal<Angle> frontSignal = frontMotor.getPosition();
+    StatusSignal<Angle> backSignal = backMotor.getPosition();
     var posSignal = (frontSignal.getValueAsDouble() + backSignal.getValueAsDouble()) / 2.0;
     return posSignal;
   }
@@ -78,9 +85,9 @@ public class Elevator extends SubsystemBase{
   @Override
   public void periodic() {
     // Values for PID graphing
-    DogLog.log("Elevator/ Elevator Front Motor Encoder", frontMotor.getPosition().getValueAsDouble());
     DogLog.log("Elevator/Elevator Front Voltage", frontMotor.getMotorVoltage().getValueAsDouble());
     DogLog.log("Elevator/Elevator Rear Voltage", backMotor.getMotorVoltage().getValueAsDouble());
+    
     DogLog.log("Elevator/ELevator Goal", desiredState);
     DogLog.log("Elevator/Elevator Pos", getPosition() * Constants.ElevatorConstants.PULLEY_DIAMETER);
 
@@ -92,6 +99,6 @@ public class Elevator extends SubsystemBase{
       positionRequest.withPosition(
         desiredState / Constants.ElevatorConstants.PULLEY_DIAMETER));
 
-    backMotor.setControl(new Follower(frontMotor.getDeviceID(), false));
+    backMotor.setControl(new Follower(frontMotor.getDeviceID(), true));
   }
 }

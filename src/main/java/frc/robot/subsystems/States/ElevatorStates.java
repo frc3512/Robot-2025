@@ -3,31 +3,31 @@ package frc.robot.subsystems.States;
 public enum ElevatorStates {
 
     // * Defualt
-    STOW(0.2),
+    STOW(0.0),
  
     // * Coral
 
     // | Reef
-    L4(37.39),
-    L3(15.56),
-    L2(4.09),
-    L1(9.05),
+    L4(0.0),
+    L3(0.0),
+    L2(0.02),
+    L1(0.0),
 
     // | Intake
-    INTAKE(10.27),
+    INTAKE(0.0),
     PREP_CORAL(0.0),
 
     // * Algae
 
     // | De-Reef
-    ALGAE_L1(28.75),
-    ALGAE_L2(39.12),
+    ALGAE_L1(0.0),
+    ALGAE_L2(0.0),
 
     // | Prep
-    ALGAE_STOW(5.3),
+    ALGAE_STOW(0.0),
 
     // | Barge
-    BARGE(43.6);
+    BARGE(0.0);
 
     public final double position;
 
