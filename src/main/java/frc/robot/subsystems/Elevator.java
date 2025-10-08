@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -21,7 +22,7 @@ public class Elevator extends SubsystemBase{
 
   private final TalonFXConfiguration config = new TalonFXConfiguration();
 
-  private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(ElevatorStates.STOW.position);
+  private final PositionVoltage positionRequest = new PositionVoltage(ElevatorStates.STOW.position);
 
   private double desiredState;
 
@@ -66,10 +67,8 @@ public class Elevator extends SubsystemBase{
 
   public boolean atSetpoint() {
     double positionError = 
-        Math.abs(
-                (frontMotor.getClosedLoopError().getValueAsDouble()
-                + backMotor.getClosedLoopError().getValueAsDouble())) / 2.0;
-    return positionError < 0.05;
+        Math.abs((frontMotor.getClosedLoopError().getValueAsDouble()));
+    return positionError < 0.3;
   }
 
   @Override
@@ -82,7 +81,7 @@ public class Elevator extends SubsystemBase{
     DogLog.log("Elevator/At Goal", atSetpoint());
     DogLog.log("Elevator/Elevator Pos", 
       frontMotor.getPosition().getValueAsDouble()* 
-        Constants.ElevatorConstants.PULLEY_DIAMETER);
+        Constants.ElevatorConstants.PULLEY_CIRCUMFERENCE);
 
     // General Info
     DogLog.log("Elevator/Front Motor Temp", frontMotor.getDeviceTemp().getValueAsDouble());
@@ -90,8 +89,10 @@ public class Elevator extends SubsystemBase{
 
     frontMotor.setControl(
       positionRequest.withPosition(
-        desiredState / Constants.ElevatorConstants.PULLEY_DIAMETER));
+        desiredState / Constants.ElevatorConstants.PULLEY_CIRCUMFERENCE));
 
-    backMotor.setControl(new Follower(frontMotor.getDeviceID(), true));
+    backMotor.setControl(
+      new Follower(
+        frontMotor.getDeviceID(), true));
   }
 }

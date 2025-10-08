@@ -8,6 +8,7 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.States.ArmStates;
 import frc.robot.subsystems.States.ElevatorStates;
 
 public class Automation extends SubsystemBase{
@@ -262,7 +263,7 @@ public class Automation extends SubsystemBase{
     // * Parallel
 
     private Command setPlace() {
-        return Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.score));
+        return Commands.runOnce(() -> arm.setClampedGoal(ArmStates.PLACE_CORAL));
     }
 
     private Command placeCoral() {
@@ -301,6 +302,18 @@ public class Automation extends SubsystemBase{
 
     public void down() {
         elevator.setClampedGoal(ElevatorStates.STOW);
+    }
+
+    public void l4() {
+        elevator.setClampedGoal(ElevatorStates.L4);
+    }
+
+    public void l3() {
+        elevator.setClampedGoal(ElevatorStates.L3);
+    }
+    
+    public void l2() {
+        elevator.setClampedGoal(ElevatorStates.L2);
     }
 
     public void intake() {

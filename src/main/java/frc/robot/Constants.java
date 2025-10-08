@@ -22,11 +22,11 @@ public class Constants {
     public static final double kP = 0.1;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
-
-    public static TrapezoidProfile.Constraints constraints = 
-      new TrapezoidProfile.Constraints(100, 200);
+    public static final double kG = 0.0;
 
     public static final double tolerance = 0.01;
+
+    public static final double GEAR_RATIO = 23.0 / 1.0;
 
     // ! Tune all these and add as needed
     public static final double stow = 0.0;
@@ -44,11 +44,11 @@ public class Constants {
     public static final int backMotorID = 14;
 
     // ? Check if PID needs ajustments first
-    public static final double kP = 1;
+    public static final double kP = 1.5;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
 
-    public static final double PULLEY_DIAMETER = 1.8798 * Math.PI;
+    public static final double PULLEY_CIRCUMFERENCE = 1.8798 * Math.PI;
     public static final double GEAR_RATIO = 50.0 / 11.0;
 
     public static final double tolerance = 0.002;
