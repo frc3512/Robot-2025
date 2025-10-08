@@ -295,20 +295,12 @@ public class Automation extends SubsystemBase{
     
     // ! TESTING ONLY COMMANDS
 
-    public void l4() {
-        elevator.setClampedGoal(ElevatorStates.L4);
+    public void test1() {
+        elevator.setClampedGoal(ElevatorStates.TEST_1);
     }
 
-    public void l3() {
-        elevator.setClampedGoal(ElevatorStates.L3);
-    }
-
-    public void l2() {
-        elevator.setClampedGoal(ElevatorStates.L2);
-    }
-
-    public void l1() {
-        elevator.setClampedGoal(ElevatorStates.L1);
+    public void down() {
+        elevator.setClampedGoal(ElevatorStates.STOW);
     }
 
     public void intake() {

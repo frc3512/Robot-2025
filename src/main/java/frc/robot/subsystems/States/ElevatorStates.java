@@ -10,7 +10,7 @@ public enum ElevatorStates {
     // | Reef
     L4(0.0),
     L3(0.0),
-    L2(0.02),
+    L2(0.0),
     L1(0.0),
 
     // | Intake
@@ -27,7 +27,10 @@ public enum ElevatorStates {
     ALGAE_STOW(0.0),
 
     // | Barge
-    BARGE(0.0);
+    BARGE(0.0),
+
+    // * Testing
+    TEST_1(25.0);
 
     public final double position;
 
