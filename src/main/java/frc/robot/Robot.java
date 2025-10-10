@@ -182,6 +182,7 @@ public class Robot extends TimedRobot {
     // ! TESTING BINDS
 
     controller.button(8).onTrue(new InstantCommand(() -> setCoralMode()));
+    controller.button(7).onTrue(new InstantCommand(() -> setAlgaeMode()));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -294,6 +295,14 @@ public class Robot extends TimedRobot {
     //     .onFalse(reset());
   }
 
+  public void setAlgaeMode() {
+
+    drivetrain.selectPiece("Algae");
+
+    controller.rightBumper().whileTrue(allignAlgae());
+
+  }
+
   // * AUTOMATION ACTIONS
   // was moved here becuase it didnt work in Automation class :(
 
@@ -309,6 +318,15 @@ public class Robot extends TimedRobot {
     public Command allignRight() {
         return Commands.sequence(
             drivetrain.selectReef("Right"),
+            drivetrain.resetAutoAimPID(), 
+            drivetrain.goToPose(
+                () -> drivetrain.getNearestReef())
+        );
+    }
+
+    public Command allignAlgae() {
+        return Commands.sequence(
+            drivetrain.selectPiece("Algae"),
             drivetrain.resetAutoAimPID(), 
             drivetrain.goToPose(
                 () -> drivetrain.getNearestReef())
