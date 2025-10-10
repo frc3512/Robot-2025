@@ -25,6 +25,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.States.ElevatorStates;
+
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
@@ -162,24 +164,24 @@ public class Robot extends TimedRobot {
     controller.button(8)
             .onTrue(new InstantCommand(() -> drivetrain.seedFieldCentric()));
 
-    // controller.y()
-    //         .onTrue(new InstantCommand(() -> actions.l4()))
-    //         .onFalse(new InstantCommand(() -> actions.down()));
-    // controller.x()
-    //         .onTrue(new InstantCommand(() -> actions.l3()))
-    //         .onFalse(new InstantCommand(() -> actions.down()));
-    // controller.a()
-    //         .onTrue(new InstantCommand(() -> actions.l2()))
-    //         .onFalse(new InstantCommand(() -> actions.down()));
+    controller.y()
+            .onTrue(new InstantCommand(() -> actions.setLevel(ElevatorStates.L4)));
 
-        
+    controller.x()
+            .onTrue(new InstantCommand(() -> actions.setLevel(ElevatorStates.L3)));
+
+    controller.a()
+            .onTrue(new InstantCommand(() -> actions.setLevel(ElevatorStates.L2)));
+
+    controller.b()
+            .onTrue(new InstantCommand(() -> actions.manualPlace()))
+            .onFalse(new InstantCommand(() -> actions.stow()));
     
-    controller.leftBumper()
+    controller.rightTrigger()
             .onTrue(new InstantCommand(() -> actions.intake()))
-            .onFalse(new InstantCommand(() -> actions.stopRollers()));
-    controller.rightBumper()
-            .onTrue(new InstantCommand(() -> actions.outtake()))
-            .onFalse(new InstantCommand(() -> actions.stopRollers()));
+            .onTrue(new InstantCommand(() -> actions.back()))
+            .onFalse(new InstantCommand(() -> actions.stopRollers()))
+            .onFalse(new InstantCommand(() -> actions.middle()));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }

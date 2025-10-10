@@ -19,7 +19,7 @@ public class Wrist extends SubsystemBase{
 
     public Wrist() {
 
-        motor = new TalonFX(15);
+        motor = new TalonFX(16);
 
         config = new TalonFXConfiguration();
 

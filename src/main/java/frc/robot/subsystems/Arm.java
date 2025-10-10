@@ -4,6 +4,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.reduxrobotics.sensors.canandmag.Canandmag;
 
 import dev.doglog.DogLog;
@@ -28,12 +29,15 @@ public class Arm extends SubsystemBase{
         motor = new TalonFX(15);
 
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         config.Feedback.SensorToMechanismRatio = Constants.ArmConstants.GEAR_RATIO;
 
         config.Slot0.withKP(Constants.ArmConstants.kP);
 
         motor.setPosition(getAbsEncoderDeg() / 360);
+
+        motor.getConfigurator().apply(config);
     }
 
     public void setClampedGoal(ArmStates goal) {

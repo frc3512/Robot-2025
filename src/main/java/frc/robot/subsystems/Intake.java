@@ -9,6 +9,8 @@ import com.reduxrobotics.sensors.canandcolor.CanandcolorSettings;
 import com.reduxrobotics.sensors.canandcolor.ColorData;
 import com.reduxrobotics.sensors.canandcolor.ProximityPeriod;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 // * Algae HSV -> 165, 51, 80 *
@@ -64,19 +66,19 @@ public class Intake extends SubsystemBase {
     }
 
     public void intakeCoral() {
-        motor.set(0.5);
+        motor.set(-0.8);
     }
 
     public void intakeAlgae() {
-        motor.set(0.6);
+        motor.set(-0.6);
     }
 
     public void outtake() {
-        motor.set(-0.5);
+        motor.set(0.5);
     }
 
     public void placeCoral() {
-        motor.set(-0.15);
+        motor.set(0.1);
     }
 
     public void hold() {

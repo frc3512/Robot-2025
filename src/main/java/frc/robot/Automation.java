@@ -34,39 +34,50 @@ public class Automation extends SubsystemBase{
     }
 
     // * Reset / Defualt
-    // public Command reset() {
-    //     return Commands.sequence(
-    //         Commands.runOnce(() -> intake.stop()), 
-    //         Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.stow)),
-    //         Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.stow)),
-    //         Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.vertical)),
-    //         Commands.runOnce(() -> coralReady = false),
-    //         Commands.runOnce(() -> bargeReady = false),
-    //         Commands.runOnce(() -> processorReady = false)
-    //     );
-    // }
+    public Command reset() {
+        return Commands.sequence(
+            Commands.runOnce(() -> intake.stop()), 
+            Commands.runOnce(() -> elevator.setClampedGoal(ElevatorStates.STOW)),
+            Commands.runOnce(() -> arm.setClampedGoal(ArmStates.STOW)),
+            // Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.vertical)),
+            Commands.runOnce(() -> coralReady = false),
+            Commands.runOnce(() -> bargeReady = false),
+            Commands.runOnce(() -> processorReady = false)
+        );
+    }
+
+    public void stow() {
+        elevator.setClampedGoal(ElevatorStates.STOW);
+        arm.setClampedGoal(ArmStates.STOW);
+        intake.stop();
+    }
 
     // * Full Auto
 
     // | Coral
-    // public Command autoScore(double pos) {
-    //     return Commands.sequence(
-    //         prepScore(pos),
-    //         Commands.waitUntil(() -> coralReady == true),
-    //         score()
-    //     );
-    // }
+    public void autoScore(ElevatorStates pos) {
+        Commands.sequence(
+            prepScore(pos),
+            Commands.waitUntil(() -> coralReady == true),
+            score()
+        );
+    }
 
     // * Coral 
 
     // | L2 ^
-    // public Command score() {
-    //     return Commands.sequence(
-    //         Commands.parallel(setPlace(), placeCoral()),
-    //         Commands.waitUntil(() -> getPiece() == '!'), 
-    //         Commands.runOnce(() -> reset())
-    //     );
-    // }
+    public Command score() {
+        return Commands.sequence(
+            Commands.parallel(setPlace(), placeCoral()),
+            Commands.waitUntil(() -> !hasCoral()), 
+            Commands.runOnce(() -> reset())
+        );
+    }
+
+    public void manualPlace() {
+        arm.setClampedGoal(ArmStates.PLACE_CORAL);
+        intake.placeCoral();
+    }
 
     // | L1
     // public Command trough() {
@@ -104,7 +115,7 @@ public class Automation extends SubsystemBase{
     public Command grabCoral() {
         return Commands.sequence(
             Commands.runOnce(() -> intake.intakeCoral()),
-            Commands.waitUntil(() -> getPiece() == 'C'),
+            Commands.waitUntil(() -> hasCoral()),
             Commands.runOnce(() -> intake.stop())
         );
     }
@@ -168,21 +179,27 @@ public class Automation extends SubsystemBase{
     // * Prep
 
     // | Coral
-    // public Command prepScore(double pos) {
-    //     if (getPiece() == 'C') {
-    //         return Commands.sequence(
-    //             Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.vertical)),
-    //             Commands.waitUntil(() -> wrist.atGoal()),
-    //             Commands.runOnce(() -> elevator.setClampedGoal(pos)),
-    //             Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.prepScore)),
-    //             Commands.waitUntil(() -> elevator.atGoal()),
-    //             Commands.waitUntil(() -> arm.atGoal()),
-    //             Commands.runOnce(() -> coralReady = true)
-    //         );
-    //     } else {
-    //         return reset();
-    //     }
-    // }
+    public Command prepScore(ElevatorStates pos) {
+        if (hasCoral()) {
+            return Commands.sequence(
+                // Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.vertical)),
+                // Commands.waitUntil(() -> wrist.atGoal()),
+                Commands.runOnce(() -> elevator.setClampedGoal(pos)),
+                Commands.runOnce(() -> arm.setClampedGoal(ArmStates.PREP_CORAL)),
+                Commands.waitSeconds(0.75),
+                Commands.waitUntil(() -> elevator.atSetpoint()),
+                Commands.waitUntil(() -> arm.atSetpoint()),
+                Commands.runOnce(() -> coralReady = true)
+            );
+        } else {
+            return reset();
+        }
+    }
+
+    public void setLevel(ElevatorStates level) {
+        elevator.setClampedGoal(level);
+        arm.setClampedGoal(ArmStates.PREP_CORAL);
+    }
 
     // public Command prepCoral() {
     //     return Commands.sequence(
@@ -295,6 +312,18 @@ public class Automation extends SubsystemBase{
     } 
     
     // ! TESTING ONLY COMMANDS
+
+    public void front() {
+        arm.setClampedGoal(ArmStates.FRONT);
+    }
+
+    public void back() {
+        arm.setClampedGoal(ArmStates.BACK);
+    }
+
+    public void middle() {
+        arm.setClampedGoal(ArmStates.MIDDLE);
+    }
 
     public void test1() {
         elevator.setClampedGoal(ElevatorStates.TEST_1);

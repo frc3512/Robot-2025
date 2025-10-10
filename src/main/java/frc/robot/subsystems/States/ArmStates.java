@@ -1,6 +1,8 @@
 package frc.robot.subsystems.States;
 
 public enum ArmStates{
+
+    // negative = forward
     
     // * Defualt
     STOW(0.0),
@@ -8,8 +10,8 @@ public enum ArmStates{
     // * Coral 
 
     // | Score
-    PREP_CORAL(0.472),
-    PLACE_CORAL(0.509),
+    PREP_CORAL(-28),
+    PLACE_CORAL(-48),
 
     TROUGH(0.59),
 
@@ -29,7 +31,13 @@ public enum ArmStates{
     PROCESS(0.0),
 
     // | Barge
-    BARGE(0.47);
+    BARGE(0.47),
+
+    // * Test
+    FRONT(-40),
+    BACK(40),
+    MIDDLE(0);
+
 
     public double position;
 

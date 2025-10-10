@@ -8,10 +8,10 @@ public enum ElevatorStates {
     // * Coral
 
     // | Reef
-    L4(44.44),
-    L3(20.01),
-    L2(3.89),
-    L1(7.84),
+    L4(46),
+    L3(20.0),
+    L2(5),
+    L1(7.89),
 
     // | Intake
     INTAKE(9.39),
