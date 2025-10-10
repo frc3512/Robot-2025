@@ -162,16 +162,18 @@ public class Robot extends TimedRobot {
     controller.button(8)
             .onTrue(new InstantCommand(() -> drivetrain.seedFieldCentric()));
 
-    controller.y()
-            .onTrue(new InstantCommand(() -> actions.l4()))
-            .onFalse(new InstantCommand(() -> actions.down()));
-    controller.x()
-            .onTrue(new InstantCommand(() -> actions.l3()))
-            .onFalse(new InstantCommand(() -> actions.down()));
-    controller.a()
-            .onTrue(new InstantCommand(() -> actions.l2()))
-            .onFalse(new InstantCommand(() -> actions.down()));
+    // controller.y()
+    //         .onTrue(new InstantCommand(() -> actions.l4()))
+    //         .onFalse(new InstantCommand(() -> actions.down()));
+    // controller.x()
+    //         .onTrue(new InstantCommand(() -> actions.l3()))
+    //         .onFalse(new InstantCommand(() -> actions.down()));
+    // controller.a()
+    //         .onTrue(new InstantCommand(() -> actions.l2()))
+    //         .onFalse(new InstantCommand(() -> actions.down()));
 
+        
+    
     controller.leftBumper()
             .onTrue(new InstantCommand(() -> actions.intake()))
             .onFalse(new InstantCommand(() -> actions.stopRollers()));

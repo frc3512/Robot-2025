@@ -19,14 +19,13 @@ public class Constants {
 
   public static class ArmConstants {
     // Todo: TUNE PID
-    public static final double kP = 0.1;
+    public static final double kP = 1;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
-    public static final double kG = 0.0;
 
     public static final double tolerance = 0.01;
 
-    public static final double GEAR_RATIO = 23.0 / 1.0;
+    public static final double GEAR_RATIO = 23.0 * (45.0/12.0);
 
     // ! Tune all these and add as needed
     public static final double stow = 0.0;

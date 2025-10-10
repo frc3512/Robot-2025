@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.reduxrobotics.sensors.canandmag.Canandmag;
 
@@ -16,18 +15,12 @@ import frc.robot.subsystems.States.ArmStates;
 public class Arm extends SubsystemBase{
 
     private final TalonFX motor;
-
     private final Canandmag encoder;
 
     private final TalonFXConfiguration config = new TalonFXConfiguration();
-
     private PositionVoltage positionRequest = new PositionVoltage(ArmStates.STOW.position);
 
     private double desiredState;
-
-    private static double clamp(double height) {
-        return MathUtil.clamp(height, 0.001, 0.7);
-    }
 
     public Arm() {
         encoder = new Canandmag(30);
@@ -39,36 +32,38 @@ public class Arm extends SubsystemBase{
         config.Feedback.SensorToMechanismRatio = Constants.ArmConstants.GEAR_RATIO;
 
         config.Slot0.withKP(Constants.ArmConstants.kP);
-        config.Slot0.withKG(Constants.ArmConstants.kG);
 
-        config.Slot0.withGravityType(GravityTypeValue.Arm_Cosine);
-
+        motor.setPosition(getAbsEncoderDeg() / 360);
     }
 
-    // Tune Clamp High/Low
     public void setClampedGoal(ArmStates goal) {
-        desiredState = clamp(goal.position);
-    } 
-
-    public double getPosition() {
-        return encoder.getAbsPosition();
+        desiredState = MathUtil.clamp(goal.position, -123, 123);
     }
 
-    public boolean atGoal() {
-        double posError = 
-          Math.abs(motor.getClosedLoopError().getValueAsDouble());
-    
-        return posError < Constants.ArmConstants.tolerance;
+    public double getAbsEncoderDeg() {
+        return ((360.0 * encoder.getAbsPosition() + 180 ) % 360.0) - 180.0; 
     }
+
+    public boolean atSetpoint() {
+        double positionError = 
+            Math.abs((motor.getClosedLoopError().getValueAsDouble()));
+        return positionError * 360.0 < 5; // 5 degrees of error, make smaller if needed
+      }
 
     @Override
     public void periodic() {
         // Log PID
-        DogLog.log("Arm/Arm Pos", getPosition());
+        DogLog.log("Arm/Arm Abs Deg", getAbsEncoderDeg());
+        DogLog.log("Arm/Arm Real Deg", motor.getPosition().getValueAsDouble() * 360);
+
         DogLog.log("Arm/Arm Goal", desiredState);
         DogLog.log("Arm/Arm Voltage", motor.getStatorCurrent().getValueAsDouble());
 
+        DogLog.log("Arm/At Goal", atSetpoint());
+
         // Log Basics
         DogLog.log("Arm/Temp", motor.getDeviceTemp().getValueAsDouble());
+
+        motor.setControl(positionRequest.withPosition(desiredState / 360.0));
     }
 }

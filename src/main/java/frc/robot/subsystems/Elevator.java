@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -49,6 +48,8 @@ public class Elevator extends SubsystemBase{
 
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
+    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
     frontMotor.getConfigurator().apply(config);
     backMotor.getConfigurator().apply(config);
   }
@@ -68,7 +69,8 @@ public class Elevator extends SubsystemBase{
   public boolean atSetpoint() {
     double positionError = 
         Math.abs((frontMotor.getClosedLoopError().getValueAsDouble()));
-    return positionError < 0.3;
+    return positionError * 
+      Constants.ElevatorConstants.PULLEY_CIRCUMFERENCE < 1; // 1 inch of error, make smaller if needed
   }
 
   @Override
