@@ -37,7 +37,12 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+@SuppressWarnings("unused")
 public class Robot extends TimedRobot {
+
+  // | Bugs 
+
+  // Fix: Automation after it has been moved into Robot.java
 
   private double maxSpeed = DriveConstants.maxSpeed;
   private double maxAngularRate = DriveConstants.maxAngularRate;
@@ -175,26 +180,8 @@ public class Robot extends TimedRobot {
     // * -- Bindings for the button box --
 
     // ! TESTING BINDS
-    controller.button(8)
-            .onTrue(new InstantCommand(() -> drivetrain.seedFieldCentric()));
 
-    controller.y()
-            .onTrue(new InstantCommand(() -> setLevel(ElevatorStates.L4)));
-
-    controller.x()
-            .onTrue(new InstantCommand(() -> setLevel(ElevatorStates.L3)));
-
-    controller.a()
-            .onTrue(new InstantCommand(() -> setLevel(ElevatorStates.L2)));
-
-    controller.b()
-            .onTrue(new InstantCommand(() -> score()));
-    
-    controller.rightTrigger()
-            .onTrue(new InstantCommand(() -> intake()))
-            .onTrue(new InstantCommand(() -> back()))
-            .onFalse(new InstantCommand(() -> stopRollers()))
-            .onFalse(new InstantCommand(() -> middle()));
+    controller.button(8).onTrue(new InstantCommand(() -> setCoralMode()));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -275,34 +262,58 @@ public class Robot extends TimedRobot {
           () -> drivetrain.getNearestReef()));
   }
 
-  // | Auto paths
-  public AutoRoutine midl4() {
-    AutoRoutine routine = autoFactory.newRoutine("Mid l4");
-    AutoTrajectory trajectory = routine.trajectory("Mid l4");
+  public void setCoralMode() {
 
-    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
-    return routine;
-  }
+    drivetrain.selectPiece("Coral");
 
-  public AutoRoutine midl4Barge() {
-    AutoRoutine routine = autoFactory.newRoutine("Mid l4 - Barge");
-    AutoTrajectory trajectory = routine.trajectory("Mid l4 - Barge");
-    AutoTrajectory trajectory2 = routine.trajectory("De-reef");
+    controller.rightBumper().whileTrue(allignRight());
+    controller.leftBumper().whileTrue(allignLeft());
 
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                trajectory.resetOdometry(),
-                trajectory.cmd(),
-                trajectory2.resetOdometry(),
-                trajectory2.cmd()));
-    return routine;
+    // Prep Score
+    controller.y()
+        .onTrue(new InstantCommand(() -> prepScore(ElevatorStates.L4)));
+    controller.x()
+        .onTrue(new InstantCommand(() -> prepScore(ElevatorStates.L3)));
+    controller.a()
+        .onTrue(new InstantCommand(() -> prepScore(ElevatorStates.L2)));
+
+    // Score
+    controller.b()
+        .onTrue(new InstantCommand(() -> score()));
+
+    // | Manual Feed
+    controller.rightTrigger()
+        .onTrue(new InstantCommand(() -> intake()))
+        .onTrue(new InstantCommand(() -> back()))
+        .onFalse(new InstantCommand(() -> stopRollers()))
+        .onFalse(new InstantCommand(() -> middle()));
+
+    // | Ground Intake
+    // controller.rightTrigger()
+    //     .onTrue(intakeCoral())
+    //     .onFalse(reset());
   }
 
   // * AUTOMATION ACTIONS
-
   // was moved here becuase it didnt work in Automation class :(
+
+    public Command allignLeft() {
+        return Commands.sequence(
+            drivetrain.selectReef("Left"),
+            drivetrain.resetAutoAimPID(), 
+            drivetrain.goToPose(
+                () -> drivetrain.getNearestReef())
+        );
+    }
+
+    public Command allignRight() {
+        return Commands.sequence(
+            drivetrain.selectReef("Right"),
+            drivetrain.resetAutoAimPID(), 
+            drivetrain.goToPose(
+                () -> drivetrain.getNearestReef())
+        );
+    }
 
   // * Reset / Defualt
     public Command reset() {
@@ -367,20 +378,20 @@ public class Robot extends TimedRobot {
     // }   
 
     // | Intake
-    // public Command intakeCoral() {
-    //     if (getPiece() == '!') {
-    //         return Commands.sequence(
-    //             Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
-    //             Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.intake)),
-    //             Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.intake)),
-    //             Commands.waitUntil(() -> arm.atGoal()),
-    //             Commands.waitUntil(() -> wrist.atGoal()),
-    //             grabCoral()
-    //         );
-    //     } else {
-    //         return reset();
-    //     }
-    // }
+    public Command intakeCoral() {
+        if (!hasCoral()) {
+            return Commands.sequence(
+                // Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
+                Commands.runOnce(() -> elevator.setClampedGoal(ElevatorStates.INTAKE)),
+                Commands.runOnce(() -> arm.setClampedGoal(ArmStates.INTAKE)),
+                Commands.waitUntil(() -> arm.atSetpoint()),
+                // Commands.waitUntil(() -> wrist.atGoal()),
+                grabCoral()
+            );
+        } else {
+            return reset();
+        }
+    }
 
     public Command grabCoral() {
         return Commands.sequence(
@@ -471,13 +482,12 @@ public class Robot extends TimedRobot {
         arm.setClampedGoal(ArmStates.PREP_CORAL);
     }
 
-    // public Command prepCoral() {
-    //     return Commands.sequence(
-    //         Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.prepCoral)),
-    //         Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.stow)),
-    //         Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.vertical))
-    //     );
-    // }
+    public Command prepCoral() {
+        return Commands.sequence(
+            Commands.runOnce(() -> arm.setClampedGoal(ArmStates.HOLD_CORAL))
+            // Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.vertical))
+        );
+    }
 
     // | Algae
     // public Command prepAlgae() {
@@ -556,9 +566,6 @@ public class Robot extends TimedRobot {
     
     // ! TESTING ONLY COMMANDS
 
-    public void front() {
-        arm.setClampedGoal(ArmStates.FRONT);
-    }
 
     public void back() {
         arm.setClampedGoal(ArmStates.BACK);
@@ -566,26 +573,6 @@ public class Robot extends TimedRobot {
 
     public void middle() {
         arm.setClampedGoal(ArmStates.MIDDLE);
-    }
-
-    public void test1() {
-        elevator.setClampedGoal(ElevatorStates.TEST_1);
-    }
-
-    public void down() {
-        elevator.setClampedGoal(ElevatorStates.STOW);
-    }
-
-    public void l4() {
-        elevator.setClampedGoal(ElevatorStates.L4);
-    }
-
-    public void l3() {
-        elevator.setClampedGoal(ElevatorStates.L3);
-    }
-    
-    public void l2() {
-        elevator.setClampedGoal(ElevatorStates.L2);
     }
 
     public void intake() {
@@ -598,5 +585,30 @@ public class Robot extends TimedRobot {
 
     public void stopRollers() {
         intake.stop();
-    }  
+    }
+    
+    // | Auto paths
+    public AutoRoutine midl4() {
+        AutoRoutine routine = autoFactory.newRoutine("Mid l4");
+        AutoTrajectory trajectory = routine.trajectory("Mid l4");
+
+        routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+        return routine;
+    }
+
+    public AutoRoutine midl4Barge() {
+        AutoRoutine routine = autoFactory.newRoutine("Mid l4 - Barge");
+        AutoTrajectory trajectory = routine.trajectory("Mid l4 - Barge");
+        AutoTrajectory trajectory2 = routine.trajectory("De-reef");
+
+        routine
+            .active()
+            .onTrue(
+                Commands.sequence(
+                    trajectory.resetOdometry(),
+                    trajectory.cmd(),
+                    trajectory2.resetOdometry(),
+                    trajectory2.cmd()));
+        return routine;
+    }
 }

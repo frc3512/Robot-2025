@@ -13,29 +13,29 @@ public enum ArmStates{
     PREP_CORAL(-28),
     PLACE_CORAL(-48),
 
-    TROUGH(0.59),
+    TROUGH(-59),
 
     // | Intake
-    INTAKE(0.003),
-    HP(0.0),
+    INTAKE(100),
+    HOLD_CORAL(-10),
 
     // * Algae
 
     // | De-Reef
-    REMOVE_ALGAE(0.65),
+    REMOVE_ALGAE(-65),
 
     // | Prep 
     PREP_ALGAE(0.0),
 
     // | Process
-    PROCESS(0.0),
+    PROCESS(-100),
 
     // | Barge
-    BARGE(0.47),
+    BARGE(-47),
 
     // * Test
     FRONT(-40),
-    BACK(40),
+    BACK(20),
     MIDDLE(0);
 
 
