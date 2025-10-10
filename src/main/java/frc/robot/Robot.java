@@ -22,9 +22,14 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.States.ArmStates;
 import frc.robot.subsystems.States.ElevatorStates;
 
 import org.opencv.core.Mat;
@@ -38,6 +43,18 @@ public class Robot extends TimedRobot {
   private double maxAngularRate = DriveConstants.maxAngularRate;
   private double slowSpeed = DriveConstants.slowSpeed;
   private double slowAngularRate = DriveConstants.slowAngularRate;
+
+  private final Arm arm = new Arm();
+  private final Elevator elevator = new Elevator();
+  private final Wrist wrist = new Wrist();
+
+  private final Intake intake = new Intake();
+
+  boolean coralReady = false;
+  boolean bargeReady = false;
+  boolean processorReady = false;
+
+  char piece = 'C';
 
   private SendableChooser<AutoRoutine> autoChooser = new SendableChooser<>();
 
@@ -67,9 +84,6 @@ public class Robot extends TimedRobot {
 
   // | Driver Camera Thread for crosshair
   private final Thread m_visionThread;
-
-  // Actions
-  private final Automation actions = new Automation();
 
   // | Auton
   private final AutoFactory autoFactory;
@@ -165,23 +179,22 @@ public class Robot extends TimedRobot {
             .onTrue(new InstantCommand(() -> drivetrain.seedFieldCentric()));
 
     controller.y()
-            .onTrue(new InstantCommand(() -> actions.setLevel(ElevatorStates.L4)));
+            .onTrue(new InstantCommand(() -> setLevel(ElevatorStates.L4)));
 
     controller.x()
-            .onTrue(new InstantCommand(() -> actions.setLevel(ElevatorStates.L3)));
+            .onTrue(new InstantCommand(() -> setLevel(ElevatorStates.L3)));
 
     controller.a()
-            .onTrue(new InstantCommand(() -> actions.setLevel(ElevatorStates.L2)));
+            .onTrue(new InstantCommand(() -> setLevel(ElevatorStates.L2)));
 
     controller.b()
-            .onTrue(new InstantCommand(() -> actions.manualPlace()))
-            .onFalse(new InstantCommand(() -> actions.stow()));
+            .onTrue(new InstantCommand(() -> score()));
     
     controller.rightTrigger()
-            .onTrue(new InstantCommand(() -> actions.intake()))
-            .onTrue(new InstantCommand(() -> actions.back()))
-            .onFalse(new InstantCommand(() -> actions.stopRollers()))
-            .onFalse(new InstantCommand(() -> actions.middle()));
+            .onTrue(new InstantCommand(() -> intake()))
+            .onTrue(new InstantCommand(() -> back()))
+            .onFalse(new InstantCommand(() -> stopRollers()))
+            .onFalse(new InstantCommand(() -> middle()));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -236,6 +249,18 @@ public class Robot extends TimedRobot {
     DogLog.setEnabled(true);
 
     poseEstimation();
+
+    // Log Logic
+    DogLog.log("Has Coral", hasCoral());
+    DogLog.log("Has Algae", hasAlgae());
+            
+    DogLog.log("Coral Is Ready", coralReady);
+    DogLog.log("Barge Is Ready", bargeReady);
+    DogLog.log("Process Is Ready", processorReady);
+                        
+    // Update Piece
+    hasAlgae();
+    hasCoral();
   }
 
   @Override
@@ -274,4 +299,304 @@ public class Robot extends TimedRobot {
                 trajectory2.cmd()));
     return routine;
   }
+
+  // * AUTOMATION ACTIONS
+
+  // was moved here becuase it didnt work in Automation class :(
+
+  // * Reset / Defualt
+    public Command reset() {
+        return Commands.sequence(
+            Commands.runOnce(() -> intake.stop()), 
+            Commands.runOnce(() -> elevator.setClampedGoal(ElevatorStates.STOW)),
+            Commands.runOnce(() -> arm.setClampedGoal(ArmStates.STOW)),
+            // Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.vertical)),
+            Commands.runOnce(() -> coralReady = false),
+            Commands.runOnce(() -> bargeReady = false),
+            Commands.runOnce(() -> processorReady = false)
+        );
+    }
+
+    public void stow() {
+        elevator.setClampedGoal(ElevatorStates.STOW);
+        arm.setClampedGoal(ArmStates.STOW);
+        intake.stop();
+    }
+
+    // * Full Auto
+
+    // | Coral
+    public Command autoScore(ElevatorStates pos) {
+        return Commands.sequence(
+            prepScore(pos),
+            Commands.waitUntil(() -> coralReady == true),
+            score()
+        );
+    }
+
+    // * Coral 
+
+    // | L2 ^
+    public Command score() {
+      if (coralReady == true) {
+        return Commands.sequence(
+            Commands.parallel(setPlace(), placeCoral()),
+            Commands.waitUntil(() -> !hasCoral()), 
+            Commands.runOnce(() -> reset())
+        );
+      } else {
+        return reset();
+      }
+    }
+
+    // | L1
+    // public Command trough() {
+    //     return Commands.sequence(
+    //         Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.l1)),
+    //         Commands.waitUntil(() -> elevator.atGoal()),
+    //         Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.trough)),
+    //         Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
+    //         Commands.waitUntil(() -> arm.atGoal()),
+    //         Commands.waitUntil(() -> wrist.atGoal()),
+    //         Commands.runOnce(() -> intake.placeCoral()),
+    //         Commands.waitSeconds(0.5),
+    //         Commands.runOnce(() -> intake.stop()),
+    //         reset()
+    //        // * Command is Automatic!!
+    //     );
+    // }   
+
+    // | Intake
+    // public Command intakeCoral() {
+    //     if (getPiece() == '!') {
+    //         return Commands.sequence(
+    //             Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
+    //             Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.intake)),
+    //             Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.intake)),
+    //             Commands.waitUntil(() -> arm.atGoal()),
+    //             Commands.waitUntil(() -> wrist.atGoal()),
+    //             grabCoral()
+    //         );
+    //     } else {
+    //         return reset();
+    //     }
+    // }
+
+    public Command grabCoral() {
+        return Commands.sequence(
+            Commands.runOnce(() -> intake.intakeCoral()),
+            Commands.waitUntil(() -> hasCoral()),
+            Commands.runOnce(() -> intake.stop())
+        );
+    }
+
+    // * Algae
+
+    // | De-Reef
+    // public Command grabAlgae(double level) {
+    //     if (getPiece() == '!') {
+    //         return Commands.sequence(
+    //             Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
+    //             Commands.runOnce(() -> elevator.setClampedGoal(level)),
+    //             Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.algae)),
+    //             grabAlgae(),
+    //             prepAlgae()
+    //         );
+    //     } else {
+    //         return reset();
+    //     }
+    // }
+
+    // | Process
+
+    // | Barge
+    // public Command scoreBarge() {
+    //     if (getPiece() == 'A') {
+    //         return Commands.sequence(
+    //             Commands.runOnce(() -> intake.outtake()),
+    //             Commands.waitUntil(() -> getPiece() == '!'),
+    //             reset()
+    //         );
+    //     } else {
+    //         return reset();
+    //     }
+    // }
+
+    // | Intake
+    // public Command intakeAlgae() {
+    //     if (getPiece() == '!') {
+    //         return Commands.sequence(
+    //             Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
+    //             Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.intake)),
+    //             Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.intake)),
+    //             Commands.waitUntil(() -> arm.atGoal()),
+    //             Commands.waitUntil(() -> wrist.atGoal()),
+    //             grabAlgae()
+    //         );
+    //     } else {
+    //         return reset();
+    //     }
+    // }
+
+    public Command grabAlgae() {
+        return Commands.sequence(
+            Commands.runOnce(() -> intake.intakeAlgae()),
+            Commands.waitUntil(() -> hasAlgae()),
+            Commands.runOnce(() -> intake.hold())
+        );
+    }
+
+    // * Prep
+
+    // | Coral
+    public Command prepScore(ElevatorStates pos) {
+        if (hasCoral()) {
+            return Commands.sequence(
+                // Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.vertical)),
+                // Commands.waitUntil(() -> wrist.atGoal()),
+                Commands.runOnce(() -> elevator.setClampedGoal(pos)),
+                Commands.runOnce(() -> arm.setClampedGoal(ArmStates.PREP_CORAL)),
+                Commands.waitSeconds(0.5),
+                Commands.waitUntil(() -> elevator.atSetpoint()),
+                Commands.waitUntil(() -> arm.atSetpoint()),
+                Commands.runOnce(() -> coralReady = true)
+            );
+        } else {
+            return reset();
+        }
+    }
+
+    public void setLevel(ElevatorStates level) {
+        elevator.setClampedGoal(level);
+        arm.setClampedGoal(ArmStates.PREP_CORAL);
+    }
+
+    // public Command prepCoral() {
+    //     return Commands.sequence(
+    //         Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.prepCoral)),
+    //         Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.stow)),
+    //         Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.vertical))
+    //     );
+    // }
+
+    // | Algae
+    // public Command prepAlgae() {
+    //     if (getPiece() == 'A') {
+    //         return Commands.sequence(
+    //             Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.aStow)),
+    //             Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.stow)),
+    //             Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal))
+    //         );
+    //     } else {
+    //         return reset();
+    //     }
+    // }
+
+    // public Command prepBarge() {
+    //     if (getPiece() == 'A') {
+    //         return Commands.sequence(
+    //             Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
+    //             Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.barge)),
+    //             Commands.waitUntil(() -> elevator.atGoal()),
+    //             Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.barge)),
+    //             Commands.runOnce(() -> bargeReady = true)
+    //         );
+    //     } else {
+    //         return reset();
+    //     }
+    // }
+
+    // * Logic
+
+    private boolean hasCoral() {
+        if (intake.getObjectDistance() <= 0.04) {
+            if (intake.getR() >= 0.29 && intake.getR() <= 0.36 &&
+                intake.getG() >= 0.40 && intake.getG() <= 0.49 && 
+                intake.getB() >= 0.14 && intake.getB() <= 0.20) {
+                
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;            
+        }
+    }
+
+    private boolean hasAlgae() {
+        if (intake.getObjectDistance() <= 0.07) {
+            if (intake.getR() >= 0.04 && intake.getR() <= 0.12 && 
+                intake.getG() >= 0.30 && intake.getG() <= 0.36 && 
+                intake.getB() >= 0.10 && intake.getB() <= 0.18) {
+                
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;            
+        }
+    }
+
+    // * Parallel
+
+    private Command setPlace() {
+        return Commands.runOnce(() -> arm.setClampedGoal(ArmStates.PLACE_CORAL));
+    }
+
+    private Command placeCoral() {
+        return Commands.sequence(
+            Commands.runOnce(() -> intake.placeCoral()),
+            Commands.waitUntil(() -> !hasCoral()),
+            Commands.runOnce(() -> intake.stop())
+        );
+    }
+    
+    // ----------
+    
+    // ! TESTING ONLY COMMANDS
+
+    public void front() {
+        arm.setClampedGoal(ArmStates.FRONT);
+    }
+
+    public void back() {
+        arm.setClampedGoal(ArmStates.BACK);
+    }
+
+    public void middle() {
+        arm.setClampedGoal(ArmStates.MIDDLE);
+    }
+
+    public void test1() {
+        elevator.setClampedGoal(ElevatorStates.TEST_1);
+    }
+
+    public void down() {
+        elevator.setClampedGoal(ElevatorStates.STOW);
+    }
+
+    public void l4() {
+        elevator.setClampedGoal(ElevatorStates.L4);
+    }
+
+    public void l3() {
+        elevator.setClampedGoal(ElevatorStates.L3);
+    }
+    
+    public void l2() {
+        elevator.setClampedGoal(ElevatorStates.L2);
+    }
+
+    public void intake() {
+        intake.intakeCoral();
+    }
+
+    public void outtake() {
+        intake.outtake();
+    }
+
+    public void stopRollers() {
+        intake.stop();
+    }  
 }
