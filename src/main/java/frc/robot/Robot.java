@@ -31,6 +31,7 @@ import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
 import frc.robot.subsystems.States.ArmStates;
 import frc.robot.subsystems.States.ElevatorStates;
+import frc.robot.subsystems.States.WristStates;
 
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -311,9 +312,13 @@ public class Robot extends TimedRobot {
 
   public void setTestMode() {
 
-    controller.a().onTrue(new InstantCommand(() -> back()));
-    controller.y().onTrue(new InstantCommand(() -> front()));
-    controller.x().onTrue(new InstantCommand(() -> middle()));
+    // controller.a().onTrue(new InstantCommand(() -> back()));
+    // controller.y().onTrue(new InstantCommand(() -> front()));
+    // controller.x().onTrue(new InstantCommand(() -> middle()));
+
+    controller.a()
+        .onTrue(new InstantCommand(() -> vertical()))
+        .onFalse(new InstantCommand(() -> horizontal()));
 
   }
 
@@ -407,12 +412,13 @@ public class Robot extends TimedRobot {
     public Command intakeCoral() {
         if (!hasCoral()) {
             return Commands.sequence(
-                // Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
+                Commands.runOnce(() -> wrist.setClampedGoal(WristStates.INTAKE)),
                 Commands.runOnce(() -> elevator.setClampedGoal(ElevatorStates.INTAKE)),
                 Commands.runOnce(() -> arm.setClampedGoal(ArmStates.INTAKE)),
                 Commands.waitUntil(() -> arm.atSetpoint()),
-                // Commands.waitUntil(() -> wrist.atGoal()),
-                grabCoral()
+                grabCoral(),
+                Commands.waitUntil(() -> hasCoral()),
+                prepCoral()
             );
         } else {
             return reset();
@@ -506,8 +512,8 @@ public class Robot extends TimedRobot {
 
     public Command prepCoral() {
         return Commands.sequence(
-            Commands.runOnce(() -> arm.setClampedGoal(ArmStates.HOLD_CORAL))
-            // Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.vertical))
+            Commands.runOnce(() -> arm.setClampedGoal(ArmStates.HOLD_CORAL)),
+            Commands.runOnce(() -> wrist.setClampedGoal(WristStates.CORAL))
         );
     }
 
@@ -584,6 +590,13 @@ public class Robot extends TimedRobot {
     
     // ! TESTING ONLY COMMANDS
 
+    public void vertical() {
+        wrist.setClampedGoal(WristStates.CORAL);
+    }
+
+    public void horizontal() {
+        wrist.setClampedGoal(WristStates.ALGAE);
+    }
 
     public void back() {
         arm.setClampedGoal(ArmStates.BACK);

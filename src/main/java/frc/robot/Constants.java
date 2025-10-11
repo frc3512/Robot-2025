@@ -48,33 +48,11 @@ public class Constants {
 
     public static final double PULLEY_CIRCUMFERENCE = 1.8798 * Math.PI;
     public static final double GEAR_RATIO = 50.0 / 11.0;
-
-    public static final double tolerance = 0.002;
-
-    public static final TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(1000, 1000);
-
-    // ! Needs tuning
-    // Reset due to added gear rario in config for better acuracy
-    public static final double stow = 0.2;
-    public static final double intake = 10.27;
-    public static final double prepCoral = 0.0;
-
-    public static final double l1 = 9.05;
-    public static final double l2 = 4.09;
-    public static final double l3 = 15.56;
-    public static final double l4 = 37.39;
-
-    public static final double a1 = 28.75;
-    public static final double a2 = 39.12;
-    public static final double aStow = 5.3;
-    public static final double barge = 43.6;
-
   }
 
   public static class WristConstants {
     // Todo: TUNE PID
-    public static final double kP = 0.1;
+    public static final double kP = 48;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
 
