@@ -34,6 +34,8 @@ public class Arm extends SubsystemBase{
         config.Feedback.SensorToMechanismRatio = Constants.ArmConstants.GEAR_RATIO;
 
         config.Slot0.withKP(Constants.ArmConstants.kP);
+        config.Slot0.withKD(Constants.ArmConstants.kD);
+        config.Slot0.withKA(Constants.ArmConstants.kA);
 
         motor.setPosition(getAbsEncoderDeg() / 360);
 

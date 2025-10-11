@@ -19,11 +19,10 @@ public class Constants {
 
   public static class ArmConstants {
     // Todo: TUNE PID
-    public static final double kP = 25;
+    public static final double kP = 30;
     public static final double kI = 0.0;
-    public static final double kD = 0.0;
-
-    public static final double tolerance = 0.01;
+    public static final double kD = 0;
+    public static final double kA = 25;
 
     public static final double GEAR_RATIO = 23.0 * (45.0 / 12.0);
 
@@ -79,36 +78,37 @@ public class Constants {
     public static final double kI = 0.0;
     public static final double kD = 0.0;
 
-    public static final double tolerance = 0.01;
-
-    public static final TrapezoidProfile.Constraints constraints = 
-      new TrapezoidProfile.Constraints(50, 50);
-
-    // ! Tune all these
-    public static final double horizontal = 0.000;
-    public static final double vertical = 0.064;
+    public static final double GEAR_RATIO = 10.178;
+    
+    public static final int motorID = 16;
   }
 
   public static class VisionConstants {
-    public static final String elevatorCam = "ElevatorCam";
-    public static final String climberCam = "ClimberCam";
+    public static final String leftCam = "LeftCam"; // Previously "ElevatorCam"
+    public static final String rightCam = "RightCam"; // Previously "ClimberCam"
 
     public static final AprilTagFieldLayout tagLayout =
         AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
-    public static final Transform3d elevatorCamOffset =
-        new Transform3d(
-            Units.inchesToMeters(11), // Left to right
-            Units.inchesToMeters(-6), // Front to back
-            Units.inchesToMeters(17), // Bottom to top
-            new Rotation3d(0.0, Units.degreesToRadians(0.0), Units.degreesToRadians(0)));
+    public static final Transform3d leftCameraOffset =
+        new Transform3d( // Always measure from center of the robot
+            Units.inchesToMeters(6.0), // Forward / Back
+            Units.inchesToMeters(11), // Left / Right
+            Units.inchesToMeters(10.5), // Height
+            new Rotation3d( 
+                Units.degreesToRadians(0.0),
+                Units.degreesToRadians(0.0),
+                Units.degreesToRadians(0.0)));
 
-    public static final Transform3d climberCamOffset =
-        new Transform3d(
-            Units.inchesToMeters(8),
-            Units.inchesToMeters(11),
-            Units.inchesToMeters(6.5),
-            new Rotation3d(0.0, Units.degreesToRadians(0.0), Units.degreesToRadians(0)));
+    public static final Transform3d rightCameraOffset =
+        new Transform3d( // Always measure from center of the robot
+            Units.inchesToMeters(6.0), // Forward / Back
+            Units.inchesToMeters(-11), // Left / Right
+            Units.inchesToMeters(10.5), // Height
+            new Rotation3d(
+              Units.degreesToRadians(0.0), 
+              Units.degreesToRadians(0.0), 
+              Units.degreesToRadians(0.0)));
 
     public static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(1, 1, 2);
     public static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.2, 0.2, 0.2);
@@ -129,15 +129,15 @@ public class Constants {
   }
 
   public static class AimingConstants {
-    public static final double xP = 5;
+    public static final double xP = 10;
     public static final double xI = 0.0;
     public static final double xD = 0.0;
 
-    public static final double yP = 5;
+    public static final double yP = 10;
     public static final double yI = 0.0;
     public static final double yD = 0.0;
 
-    public static final double thetaP = 2.5;
+    public static final double thetaP = 7.5;
     public static final double thetaI = 0.0;
     public static final double thetaD = 0.0;
 
@@ -147,7 +147,7 @@ public class Constants {
         new TrapezoidProfile.Constraints(Units.rotationsToRadians(1), Units.rotationsToRadians(2));
   }
 
-// Credit to 6657
+  // Credit to 6657
   public static class FieldConstants {
     private static Pose2d getRedReefPose(Pose2d reefPose) {
       return new Pose2d(
@@ -176,24 +176,24 @@ public class Constants {
       Reef_3(new Pose2d(5.16, 5.16, Rotation2d.fromDegrees(-120))),
       Reef_4(new Pose2d(5.6, 4.03, Rotation2d.fromDegrees(-180))),
       Reef_5(new Pose2d(5.11, 2.91, Rotation2d.fromDegrees(120))),
-      Reef_6(new Pose2d(3.73, 2.89, Rotation2d.fromDegrees(60)));
+      Reef_6(new Pose2d(3.84, 2.91, Rotation2d.fromDegrees(60)));
 
       public ReefSlot blue;
       public ReefSlot red;
 
-      // Shift the pose to the coral left node
+      // Shift the pose to the robot's left
       public Pose2d getLeftPose(Pose2d pose) {
-        return pose.transformBy(new Transform2d(-0.01, 0.38, new Rotation2d()));
+        return pose.transformBy(new Transform2d(-0.18, 0.16, new Rotation2d()));
       }
 
-      // Shift the pose to the coral right node
+      // Shift the pose to the robot's right
       public Pose2d getRightPose(Pose2d pose) {
-        return pose.transformBy(new Transform2d(-0.01, 0, new Rotation2d()));
+        return pose.transformBy(new Transform2d(-0.18, 0-.16, new Rotation2d()));
       }
 
-      // Shift the pose to the algae
+      // Shift the pose to the center
       public Pose2d getAlgaePose(Pose2d pose) {
-        return pose.transformBy(new Transform2d(-0.067, 0.2, new Rotation2d()));
+        return pose.transformBy(new Transform2d(-0.18, -0.0, new Rotation2d()));
       }
 
       ReefPoses(Pose2d pose) {

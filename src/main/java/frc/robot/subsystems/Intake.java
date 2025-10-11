@@ -11,9 +11,6 @@ import com.reduxrobotics.sensors.canandcolor.ProximityPeriod;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-// * Algae HSV -> 165, 51, 80 *
-// * Coral HSV -> 27, 4, 87 *
-
 public class Intake extends SubsystemBase {
     
     private final TalonFX motor;

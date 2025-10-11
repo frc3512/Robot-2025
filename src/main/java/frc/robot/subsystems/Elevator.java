@@ -29,7 +29,7 @@ public class Elevator extends SubsystemBase{
   private double gravity = 0.4;
 
   private static double clampHeight(double height) {
-    return MathUtil.clamp(height, 0.0, 56);
+    return MathUtil.clamp(height, 0, 56);
   }
 
   public Elevator() {

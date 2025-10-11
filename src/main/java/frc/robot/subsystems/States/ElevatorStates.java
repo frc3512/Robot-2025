@@ -10,7 +10,7 @@ public enum ElevatorStates {
     // | Reef
     L4(46),
     L3(20.0),
-    L2(5),
+    L2(0.0),
     L1(7.89),
 
     // | Intake

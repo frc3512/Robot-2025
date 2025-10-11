@@ -35,7 +35,7 @@ public enum ArmStates{
 
     // * Test
     FRONT(-40),
-    BACK(20),
+    BACK(40),
     MIDDLE(0);
 
 

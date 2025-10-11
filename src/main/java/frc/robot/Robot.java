@@ -77,11 +77,11 @@ public class Robot extends TimedRobot {
 
   public final LED leds = new LED();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
-  public final Vision visionElevator =
+  public final Vision leftCamera =
       new Vision(
-          Constants.VisionConstants.elevatorCam, Constants.VisionConstants.elevatorCamOffset);
-  public final Vision visionClimber =
-      new Vision(Constants.VisionConstants.climberCam, Constants.VisionConstants.climberCamOffset);
+          Constants.VisionConstants.leftCam, Constants.VisionConstants.leftCameraOffset);
+  public final Vision rightCamera =
+      new Vision(Constants.VisionConstants.rightCam, Constants.VisionConstants.rightCameraOffset);
 
   // | Controller Objects
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -181,8 +181,8 @@ public class Robot extends TimedRobot {
 
     // ! TESTING BINDS
 
-    controller.button(8).onTrue(new InstantCommand(() -> setCoralMode()));
-    controller.button(7).onTrue(new InstantCommand(() -> setAlgaeMode()));
+    // controller.button(8).onTrue(new InstantCommand(() -> setCoralMode()));
+    // controller.button(7).onTrue(new InstantCommand(() -> setAlgaeMode()));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -202,23 +202,23 @@ public class Robot extends TimedRobot {
 
   public void poseEstimation() {
 
-    var visionElevatorEst = visionElevator.getEstimatedGlobalPose(visionElevator.getCamera());
-    var visionClimberEst = visionClimber.getEstimatedGlobalPose(visionClimber.getCamera());
+    var visionLeftEst = leftCamera.getEstimatedGlobalPose(leftCamera.getCamera());
+    var visionRightEst = rightCamera.getEstimatedGlobalPose(rightCamera.getCamera());
 
-    visionElevatorEst.ifPresent(
+    visionLeftEst.ifPresent(
         est -> {
-          var estStdDevs = visionElevator.getEstimationStdDevs();
-          DogLog.log("Vision/Elevator Estimated Pose", est.estimatedPose);
+          var estStdDevs = leftCamera.getEstimationStdDevs();
+          DogLog.log("Vision/LeftCam Estimated Pose", est.estimatedPose);
           drivetrain.addVisionMeasurement(
               est.estimatedPose.toPose2d(),
               Utils.fpgaToCurrentTime(est.timestampSeconds),
               estStdDevs);
         });
 
-    visionClimberEst.ifPresent(
+    visionRightEst.ifPresent(
         est -> {
-          var estStdDevs = visionClimber.getEstimationStdDevs();
-          DogLog.log("Vision/Climber Estimated Pose", est.estimatedPose);
+          var estStdDevs = rightCamera.getEstimationStdDevs();
+          DogLog.log("Vision/RightCam Estimated Pose", est.estimatedPose);
           drivetrain.addVisionMeasurement(
               est.estimatedPose.toPose2d(),
               Utils.fpgaToCurrentTime(est.timestampSeconds),
@@ -249,6 +249,8 @@ public class Robot extends TimedRobot {
     // Update Piece
     hasAlgae();
     hasCoral();
+
+    setTestMode();
   }
 
   @Override
@@ -272,22 +274,26 @@ public class Robot extends TimedRobot {
 
     // Prep Score
     controller.y()
-        .onTrue(new InstantCommand(() -> prepScore(ElevatorStates.L4)));
+        .onTrue(prepScore(ElevatorStates.L4));
     controller.x()
-        .onTrue(new InstantCommand(() -> prepScore(ElevatorStates.L3)));
+        .onTrue(prepScore(ElevatorStates.L3));
     controller.a()
-        .onTrue(new InstantCommand(() -> prepScore(ElevatorStates.L2)));
+        .onTrue(prepScore(ElevatorStates.L2));
 
     // Score
     controller.b()
-        .onTrue(new InstantCommand(() -> score()));
+        .onTrue(score())
+        .onFalse(reset());
 
     // | Manual Feed
-    controller.rightTrigger()
+    controller.leftTrigger()
         .onTrue(new InstantCommand(() -> intake()))
         .onTrue(new InstantCommand(() -> back()))
         .onFalse(new InstantCommand(() -> stopRollers()))
         .onFalse(new InstantCommand(() -> middle()));
+        
+    controller.rightTrigger()
+        .onTrue(reset());
 
     // | Ground Intake
     // controller.rightTrigger()
@@ -300,6 +306,14 @@ public class Robot extends TimedRobot {
     drivetrain.selectPiece("Algae");
 
     controller.rightBumper().whileTrue(allignAlgae());
+
+  }
+
+  public void setTestMode() {
+
+    controller.a().onTrue(new InstantCommand(() -> back()));
+    controller.y().onTrue(new InstantCommand(() -> front()));
+    controller.x().onTrue(new InstantCommand(() -> middle()));
 
   }
 
@@ -367,15 +381,9 @@ public class Robot extends TimedRobot {
 
     // | L2 ^
     public Command score() {
-      if (coralReady == true) {
         return Commands.sequence(
-            Commands.parallel(setPlace(), placeCoral()),
-            Commands.waitUntil(() -> !hasCoral()), 
-            Commands.runOnce(() -> reset())
+            Commands.parallel(setPlace(), placeCoral())
         );
-      } else {
-        return reset();
-      }
     }
 
     // | L1
@@ -479,20 +487,16 @@ public class Robot extends TimedRobot {
 
     // | Coral
     public Command prepScore(ElevatorStates pos) {
-        if (hasCoral()) {
-            return Commands.sequence(
-                // Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.vertical)),
-                // Commands.waitUntil(() -> wrist.atGoal()),
-                Commands.runOnce(() -> elevator.setClampedGoal(pos)),
-                Commands.runOnce(() -> arm.setClampedGoal(ArmStates.PREP_CORAL)),
-                Commands.waitSeconds(0.5),
-                Commands.waitUntil(() -> elevator.atSetpoint()),
-                Commands.waitUntil(() -> arm.atSetpoint()),
-                Commands.runOnce(() -> coralReady = true)
-            );
-        } else {
-            return reset();
-        }
+        return Commands.sequence(
+            // Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.vertical)),
+            // Commands.waitUntil(() -> wrist.atGoal()),
+            Commands.runOnce(() -> elevator.setClampedGoal(pos)),
+            Commands.runOnce(() -> arm.setClampedGoal(ArmStates.PREP_CORAL)),
+            Commands.waitSeconds(0.75),
+            Commands.waitUntil(() -> elevator.atSetpoint()),
+            Commands.waitUntil(() -> arm.atSetpoint()),
+            Commands.runOnce(() -> coralReady = true)
+        );
     }
 
     public void setLevel(ElevatorStates level) {
@@ -573,11 +577,7 @@ public class Robot extends TimedRobot {
     }
 
     private Command placeCoral() {
-        return Commands.sequence(
-            Commands.runOnce(() -> intake.placeCoral()),
-            Commands.waitUntil(() -> !hasCoral()),
-            Commands.runOnce(() -> intake.stop())
-        );
+        return Commands.runOnce(() -> intake.placeCoral());
     }
     
     // ----------
@@ -587,6 +587,10 @@ public class Robot extends TimedRobot {
 
     public void back() {
         arm.setClampedGoal(ArmStates.BACK);
+    }
+
+    public void front() {
+        arm.setClampedGoal(ArmStates.FRONT);
     }
 
     public void middle() {
