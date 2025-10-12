@@ -17,32 +17,30 @@ public class Wrist extends SubsystemBase{
 
     private final TalonFX motor;
 
+    private double statorLimit = 20;
+    private double supplyLimit = 20;
+
     private final TalonFXConfiguration config = new TalonFXConfiguration();
-    private final CurrentLimitsConfigs currentConfigs;
+    private final CurrentLimitsConfigs currentConfigs = new CurrentLimitsConfigs()
+    .withStatorCurrentLimit(statorLimit)
+    .withSupplyCurrentLimit(supplyLimit)
+    .withStatorCurrentLimitEnable(true)
+    .withSupplyCurrentLimitEnable(true)
+    .withSupplyCurrentLowerLimit(supplyLimit)
+    .withSupplyCurrentLowerTime(0);
 
     private PositionVoltage positionRequest = new PositionVoltage(WristStates.CORAL.position);
 
     private double desiredState;
 
-    private double statorLimit = 20;
-    private double supplyLimit = 20;
-
     public Wrist() {
 
         motor = new TalonFX(Constants.WristConstants.motorID);
 
-        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         config.Feedback.SensorToMechanismRatio = Constants.WristConstants.GEAR_RATIO;
         config.Slot0.withKP(Constants.WristConstants.kP);
-
-        currentConfigs = new CurrentLimitsConfigs()
-          .withStatorCurrentLimit(statorLimit)
-          .withSupplyCurrentLimit(supplyLimit)
-          .withStatorCurrentLimitEnable(true)
-          .withSupplyCurrentLimitEnable(true)
-          .withSupplyCurrentLowerLimit(supplyLimit)
-          .withSupplyCurrentLowerTime(0);
 
         motor.setPosition(0.00000);
 
@@ -50,7 +48,7 @@ public class Wrist extends SubsystemBase{
     }
 
     public void setClampedGoal(WristStates goal) {
-        desiredState = MathUtil.clamp(goal.position, 0, 90);
+        desiredState = MathUtil.clamp(goal.position, -95, 95);
     }
 
     public boolean atSetpoint() {

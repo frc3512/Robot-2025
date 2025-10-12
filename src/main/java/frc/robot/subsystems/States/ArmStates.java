@@ -13,10 +13,13 @@ public enum ArmStates{
     PREP_CORAL(-28),
     PLACE_CORAL(-48),
 
-    TROUGH(-59),
+    TROUGH(-75),
 
     // | Intake
-    INTAKE(100),
+    INTAKE(117),
+    INTAKE_ALGAE(75),
+
+    // | Prep
     HOLD_CORAL(-10),
 
     // * Algae
@@ -28,10 +31,10 @@ public enum ArmStates{
     PREP_ALGAE(0.0),
 
     // | Process
-    PROCESS(-100),
+    PROCESS(-80),
 
     // | Barge
-    BARGE(-47),
+    BARGE(20),
 
     // * Test
     FRONT(-40),

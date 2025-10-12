@@ -52,7 +52,7 @@ public class Constants {
 
   public static class WristConstants {
     // Todo: TUNE PID
-    public static final double kP = 48;
+    public static final double kP = 35;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
 

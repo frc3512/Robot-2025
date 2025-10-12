@@ -7,12 +7,13 @@ public enum WristStates {
     // * Positions in degrees
 
     // | HORIZONTAL
-    INTAKE(-2),
-    ALGAE(-2),
-    PROCESS(-2),
+    INTAKE(95),
+    ALGAE(95),
+    PROCESS5(95),
+    TROUGH(95),
 
     // | VERTICAL
-    CORAL(92);
+    CORAL(0);
 
     public double position;
 

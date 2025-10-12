@@ -43,7 +43,6 @@ public class Robot extends TimedRobot {
 
   // | Bugs 
 
-  // Fix: Automation after it has been moved into Robot.java
 
   private double maxSpeed = DriveConstants.maxSpeed;
   private double maxAngularRate = DriveConstants.maxAngularRate;
@@ -60,7 +59,7 @@ public class Robot extends TimedRobot {
   boolean bargeReady = false;
   boolean processorReady = false;
 
-  char piece = 'C';
+  String driverMode;
 
   private SendableChooser<AutoRoutine> autoChooser = new SendableChooser<>();
 
@@ -182,8 +181,8 @@ public class Robot extends TimedRobot {
 
     // ! TESTING BINDS
 
-    // controller.button(8).onTrue(new InstantCommand(() -> setCoralMode()));
-    // controller.button(7).onTrue(new InstantCommand(() -> setAlgaeMode()));
+    controller.button(8).onTrue(new InstantCommand(() -> updateMode("Coral")));
+    controller.button(7).onTrue(new InstantCommand(() -> updateMode("Algae")));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -194,7 +193,9 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    reset();
+  }
 
   @Override
   public void robotInit(){
@@ -251,12 +252,26 @@ public class Robot extends TimedRobot {
     hasAlgae();
     hasCoral();
 
-    setTestMode();
+    setMode(driverMode);
+
+    DogLog.log("Driver Mode", driverMode);
   }
 
   @Override
   public void teleopPeriodic() {
     drivetrain.getNearestReef();
+  }
+
+  public void setMode(String mode) {
+    if (mode == "Coral") {
+        setCoralMode();
+    } else if (mode == "Algae") {
+        setAlgaeMode();
+    }
+  }
+
+  public void updateMode(String mode) {
+    driverMode = mode;
   }
 
   public Command autoAim() {
@@ -280,26 +295,19 @@ public class Robot extends TimedRobot {
         .onTrue(prepScore(ElevatorStates.L3));
     controller.a()
         .onTrue(prepScore(ElevatorStates.L2));
+    controller.b()
+        .onTrue(prepTrough())
+        .onFalse(trough());
 
     // Score
-    controller.b()
+    controller.leftTrigger()
         .onTrue(score())
         .onFalse(reset());
 
-    // | Manual Feed
-    controller.leftTrigger()
-        .onTrue(new InstantCommand(() -> intake()))
-        .onTrue(new InstantCommand(() -> back()))
-        .onFalse(new InstantCommand(() -> stopRollers()))
-        .onFalse(new InstantCommand(() -> middle()));
-        
-    controller.rightTrigger()
-        .onTrue(reset());
-
     // | Ground Intake
-    // controller.rightTrigger()
-    //     .onTrue(intakeCoral())
-    //     .onFalse(reset());
+    controller.rightTrigger()
+        .onTrue(intakeCoral())
+        .onFalse(reset());
   }
 
   public void setAlgaeMode() {
@@ -308,13 +316,32 @@ public class Robot extends TimedRobot {
 
     controller.rightBumper().whileTrue(allignAlgae());
 
+    controller.b()
+        .onTrue(prepProcess())
+        .onFalse(process());
+
+    controller.x()
+        .onTrue(prepBarge())
+        .onFalse(scoreBarge());
+
+    controller.y()
+        .onTrue(grabAlgaeReef(ElevatorStates.ALGAE_L2))
+        .onFalse(prepAlgae());
+    controller.a()
+        .onTrue(grabAlgaeReef(ElevatorStates.ALGAE_L1))
+        .onFalse(prepAlgae());
+
+    controller.leftTrigger()
+        .onTrue(intakeAlgae())
+        .onFalse(prepAlgae());
+
   }
 
   public void setTestMode() {
 
-    // controller.a().onTrue(new InstantCommand(() -> back()));
-    // controller.y().onTrue(new InstantCommand(() -> front()));
-    // controller.x().onTrue(new InstantCommand(() -> middle()));
+    controller.a().onTrue(new InstantCommand(() -> back()));
+    controller.y().onTrue(new InstantCommand(() -> front()));
+    controller.x().onTrue(new InstantCommand(() -> middle()));
 
     controller.a()
         .onTrue(new InstantCommand(() -> vertical()))
@@ -358,17 +385,11 @@ public class Robot extends TimedRobot {
             Commands.runOnce(() -> intake.stop()), 
             Commands.runOnce(() -> elevator.setClampedGoal(ElevatorStates.STOW)),
             Commands.runOnce(() -> arm.setClampedGoal(ArmStates.STOW)),
-            // Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.vertical)),
+            Commands.runOnce(() -> wrist.setClampedGoal(WristStates.CORAL)),
             Commands.runOnce(() -> coralReady = false),
             Commands.runOnce(() -> bargeReady = false),
             Commands.runOnce(() -> processorReady = false)
         );
-    }
-
-    public void stow() {
-        elevator.setClampedGoal(ElevatorStates.STOW);
-        arm.setClampedGoal(ArmStates.STOW);
-        intake.stop();
     }
 
     // * Full Auto
@@ -392,37 +413,38 @@ public class Robot extends TimedRobot {
     }
 
     // | L1
-    // public Command trough() {
-    //     return Commands.sequence(
-    //         Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.l1)),
-    //         Commands.waitUntil(() -> elevator.atGoal()),
-    //         Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.trough)),
-    //         Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
-    //         Commands.waitUntil(() -> arm.atGoal()),
-    //         Commands.waitUntil(() -> wrist.atGoal()),
-    //         Commands.runOnce(() -> intake.placeCoral()),
-    //         Commands.waitSeconds(0.5),
-    //         Commands.runOnce(() -> intake.stop()),
-    //         reset()
-    //        // * Command is Automatic!!
-    //     );
-    // }   
+    public Command prepTrough() {
+        return Commands.sequence(
+            Commands.runOnce(() -> elevator.setClampedGoal(ElevatorStates.L1)),
+            Commands.runOnce(() -> arm.setClampedGoal(ArmStates.TROUGH)),
+            Commands.runOnce(() -> wrist.setClampedGoal(WristStates.TROUGH)),
+            Commands.runOnce(() -> coralReady = true)
+        );
+    }
+
+    public Command trough() {
+        return Commands.sequence(
+            Commands.runOnce(() -> intake.trough()),
+            Commands.waitSeconds(0.5),
+            Commands.runOnce(() -> intake.stop()),
+            reset()
+        );
+    }   
 
     // | Intake
     public Command intakeCoral() {
-        if (!hasCoral()) {
+        // if (!hasCoral()) {
             return Commands.sequence(
                 Commands.runOnce(() -> wrist.setClampedGoal(WristStates.INTAKE)),
                 Commands.runOnce(() -> elevator.setClampedGoal(ElevatorStates.INTAKE)),
                 Commands.runOnce(() -> arm.setClampedGoal(ArmStates.INTAKE)),
-                Commands.waitUntil(() -> arm.atSetpoint()),
                 grabCoral(),
                 Commands.waitUntil(() -> hasCoral()),
                 prepCoral()
             );
-        } else {
-            return reset();
-        }
+        // } else {
+        //     return reset();
+        // }
     }
 
     public Command grabCoral() {
@@ -436,50 +458,55 @@ public class Robot extends TimedRobot {
     // * Algae
 
     // | De-Reef
-    // public Command grabAlgae(double level) {
-    //     if (getPiece() == '!') {
-    //         return Commands.sequence(
-    //             Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
-    //             Commands.runOnce(() -> elevator.setClampedGoal(level)),
-    //             Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.algae)),
-    //             grabAlgae(),
-    //             prepAlgae()
-    //         );
-    //     } else {
-    //         return reset();
-    //     }
-    // }
+    public Command grabAlgaeReef(ElevatorStates level) {
+        return Commands.sequence(
+            Commands.runOnce(() -> wrist.setClampedGoal(WristStates.ALGAE)),
+            Commands.runOnce(() -> elevator.setClampedGoal(level)),
+            Commands.runOnce(() -> arm.setClampedGoal(ArmStates.REMOVE_ALGAE)),
+            grabAlgae()
+        );
+    }
 
     // | Process
+    public Command prepProcess() {
+        return Commands.sequence(
+            Commands.runOnce(() -> elevator.setClampedGoal(ElevatorStates.STOW)),
+            Commands.runOnce(() -> arm.setClampedGoal(ArmStates.PROCESS)),
+            Commands.runOnce(() -> wrist.setClampedGoal(WristStates.ALGAE)),
+            Commands.runOnce(() -> processorReady = true)
+        );
+    }
+
+    public Command process() {
+        return Commands.sequence(
+            Commands.runOnce(() -> intake.outtake()),
+            Commands.waitSeconds(1),
+            reset()
+        );
+    }
 
     // | Barge
-    // public Command scoreBarge() {
-    //     if (getPiece() == 'A') {
-    //         return Commands.sequence(
-    //             Commands.runOnce(() -> intake.outtake()),
-    //             Commands.waitUntil(() -> getPiece() == '!'),
-    //             reset()
-    //         );
-    //     } else {
-    //         return reset();
-    //     }
-    // }
+    public Command scoreBarge() {
+        return Commands.sequence(
+            Commands.runOnce(() -> intake.outtake()),
+            Commands.waitSeconds(0.5),
+            reset()
+        );
+    }
 
     // | Intake
-    // public Command intakeAlgae() {
-    //     if (getPiece() == '!') {
-    //         return Commands.sequence(
-    //             Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
-    //             Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.intake)),
-    //             Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.intake)),
-    //             Commands.waitUntil(() -> arm.atGoal()),
-    //             Commands.waitUntil(() -> wrist.atGoal()),
-    //             grabAlgae()
-    //         );
-    //     } else {
-    //         return reset();
-    //     }
-    // }
+    public Command intakeAlgae() {
+        // if (getPiece() == '!') {
+            return Commands.sequence(
+                Commands.runOnce(() -> wrist.setClampedGoal(WristStates.INTAKE)),
+                Commands.runOnce(() -> elevator.setClampedGoal(ElevatorStates.ALGAE_INTAKE)),
+                Commands.runOnce(() -> arm.setClampedGoal(ArmStates.INTAKE_ALGAE)),
+                grabAlgae()
+            );
+        // } else {
+        //     return reset();
+        // }
+    }
 
     public Command grabAlgae() {
         return Commands.sequence(
@@ -505,11 +532,6 @@ public class Robot extends TimedRobot {
         );
     }
 
-    public void setLevel(ElevatorStates level) {
-        elevator.setClampedGoal(level);
-        arm.setClampedGoal(ArmStates.PREP_CORAL);
-    }
-
     public Command prepCoral() {
         return Commands.sequence(
             Commands.runOnce(() -> arm.setClampedGoal(ArmStates.HOLD_CORAL)),
@@ -518,31 +540,30 @@ public class Robot extends TimedRobot {
     }
 
     // | Algae
-    // public Command prepAlgae() {
-    //     if (getPiece() == 'A') {
-    //         return Commands.sequence(
-    //             Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.aStow)),
-    //             Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.stow)),
-    //             Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal))
-    //         );
-    //     } else {
-    //         return reset();
-    //     }
-    // }
+    public Command prepAlgae() {
+        // if (hasAlgae()) {
+            return Commands.sequence(
+                Commands.runOnce(() -> elevator.setClampedGoal(ElevatorStates.ALGAE_STOW)),
+                Commands.runOnce(() -> arm.setClampedGoal(ArmStates.STOW)),
+                Commands.runOnce(() -> wrist.setClampedGoal(WristStates.ALGAE))
+            );
+        // } else {
+        //     return reset();
+        // }
+    }
 
-    // public Command prepBarge() {
-    //     if (getPiece() == 'A') {
-    //         return Commands.sequence(
-    //             Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.horizontal)),
-    //             Commands.runOnce(() -> elevator.setClampedGoal(Constants.ElevatorConstants.barge)),
-    //             Commands.waitUntil(() -> elevator.atGoal()),
-    //             Commands.runOnce(() -> arm.setClampedGoal(Constants.ArmConstants.barge)),
-    //             Commands.runOnce(() -> bargeReady = true)
-    //         );
-    //     } else {
-    //         return reset();
-    //     }
-    // }
+    public Command prepBarge() {
+        // if (getPiece() == 'A') {
+            return Commands.sequence(
+                Commands.runOnce(() -> wrist.setClampedGoal(WristStates.ALGAE)),
+                Commands.runOnce(() -> elevator.setClampedGoal(ElevatorStates.BARGE)),
+                Commands.runOnce(() -> arm.setClampedGoal(ArmStates.BARGE)),
+                Commands.runOnce(() -> bargeReady = true)
+            );
+        // } else {
+        //     return reset();
+        // }
+    }
 
     // * Logic
 
@@ -575,6 +596,9 @@ public class Robot extends TimedRobot {
             return false;            
         }
     }
+
+    // Use if needed to prep coral before spearing
+    // private boolean coralPreped() {}
 
     // * Parallel
 

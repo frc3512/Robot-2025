@@ -65,19 +65,23 @@ public class Intake extends SubsystemBase {
     }
 
     public void intakeAlgae() {
-        motor.set(-0.6);
+        motor.set(-1);
     }
 
     public void outtake() {
-        motor.set(0.5);
+        motor.set(0.8);
     }
 
     public void placeCoral() {
         motor.set(0.1);
     }
 
+    public void trough() {
+        motor.set(0.5);
+    }
+
     public void hold() {
-        motor.set(0.1);
+        motor.set(-0.15);
     }
 
     public void setSpeed(double speed) {
