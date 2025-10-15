@@ -151,8 +151,9 @@ public class Robot extends TimedRobot {
             false,
             drivetrain);
 
-    autoChooser.addOption("Mid l4", midl4());
-    autoChooser.addOption("Mid l4 - Barge", midl4Barge());
+    autoChooser.addOption("Mid", mid());
+
+    autoFactory.bind("Place L1", autoL1());
 
     // * -- Constant Bindings --
     // Not effected by driving mode
@@ -188,6 +189,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    CommandScheduler.getInstance().cancelAll();
     reset();
   }
 
@@ -433,7 +435,7 @@ public class Robot extends TimedRobot {
         );
     }
 
-  // * Reset / Defualt
+    // * Reset / Defualt
     public Command reset() {
         return Commands.sequence(
             Commands.runOnce(() -> intake.stop()), 
@@ -708,29 +710,22 @@ public class Robot extends TimedRobot {
     public void stopRollers() {
         intake.stop();
     }
+
+    // | Auto Commands
+    public Command autoL1() {
+        return Commands.sequence(
+            prepTrough(),
+            Commands.waitUntil(() -> arm.atSetpoint()),
+            trough()
+        );
+    }
     
     // | Auto paths
-    public AutoRoutine midl4() {
-        AutoRoutine routine = autoFactory.newRoutine("Mid l4");
-        AutoTrajectory trajectory = routine.trajectory("Mid l4");
+    public AutoRoutine mid() {
+        AutoRoutine routine = autoFactory.newRoutine("L1 Straight");
+        AutoTrajectory trajectory = routine.trajectory("L1 Straight");
 
         routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
-        return routine;
-    }
-
-    public AutoRoutine midl4Barge() {
-        AutoRoutine routine = autoFactory.newRoutine("Mid l4 - Barge");
-        AutoTrajectory trajectory = routine.trajectory("Mid l4 - Barge");
-        AutoTrajectory trajectory2 = routine.trajectory("De-reef");
-
-        routine
-            .active()
-            .onTrue(
-                Commands.sequence(
-                    trajectory.resetOdometry(),
-                    trajectory.cmd(),
-                    trajectory2.resetOdometry(),
-                    trajectory2.cmd()));
         return routine;
     }
 }
