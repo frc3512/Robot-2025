@@ -32,6 +32,7 @@ import frc.robot.subsystems.Wrist;
 import frc.robot.subsystems.States.ArmStates;
 import frc.robot.subsystems.States.ElevatorStates;
 import frc.robot.subsystems.States.WristStates;
+import us.hebi.quickbuf.Descriptors.Descriptor;
 
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -58,6 +59,8 @@ public class Robot extends TimedRobot {
   boolean coralReady = false;
   boolean bargeReady = false;
   boolean processorReady = false;
+
+  ElevatorStates scoringLevel = null;
 
   String driverMode;
 
@@ -178,11 +181,9 @@ public class Robot extends TimedRobot {
     // controller.x().whileTrue(autoAim());
 
     // * -- Bindings for the button box --
-
-    // ! TESTING BINDS
-
-    controller.button(8).onTrue(new InstantCommand(() -> updateMode("Coral")));
     controller.button(7).onTrue(new InstantCommand(() -> updateMode("Algae")));
+    controller.button(8).onTrue(new InstantCommand(() -> updateMode("Coral")));
+
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -234,8 +235,16 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
 
+    if (hasCoral()) {
+        leds.setPattern(leds.white);
+    } else if (hasAlgae()) {
+        leds.setPattern(leds.cyan);
+    } else {
+        leds.setPattern(leds.red);
+    }
+
     CommandScheduler.getInstance().run();
-    // | Tuning mode
+
     DogLog.setEnabled(true);
 
     poseEstimation();
@@ -253,8 +262,6 @@ public class Robot extends TimedRobot {
     hasCoral();
 
     setMode(driverMode);
-
-    DogLog.log("Driver Mode", driverMode);
   }
 
   @Override
@@ -301,8 +308,8 @@ public class Robot extends TimedRobot {
 
     // Score
     controller.leftTrigger()
-        .onTrue(score())
-        .onFalse(reset());
+        .onTrue(place())
+        .onFalse(score());
 
     // | Ground Intake
     controller.rightTrigger()
@@ -331,7 +338,7 @@ public class Robot extends TimedRobot {
         .onTrue(grabAlgaeReef(ElevatorStates.ALGAE_L1))
         .onFalse(prepAlgae());
 
-    controller.leftTrigger()
+    controller.rightTrigger()
         .onTrue(intakeAlgae())
         .onFalse(prepAlgae());
 
@@ -383,32 +390,31 @@ public class Robot extends TimedRobot {
     public Command reset() {
         return Commands.sequence(
             Commands.runOnce(() -> intake.stop()), 
+
             Commands.runOnce(() -> elevator.setClampedGoal(ElevatorStates.STOW)),
             Commands.runOnce(() -> arm.setClampedGoal(ArmStates.STOW)),
             Commands.runOnce(() -> wrist.setClampedGoal(WristStates.CORAL)),
+
             Commands.runOnce(() -> coralReady = false),
             Commands.runOnce(() -> bargeReady = false),
             Commands.runOnce(() -> processorReady = false)
         );
     }
 
-    // * Full Auto
-
-    // | Coral
-    public Command autoScore(ElevatorStates pos) {
-        return Commands.sequence(
-            prepScore(pos),
-            Commands.waitUntil(() -> coralReady == true),
-            score()
-        );
-    }
-
     // * Coral 
 
     // | L2 ^
+    public Command place() {
+        return Commands.sequence(
+            Commands.runOnce(() -> arm.setClampedGoal(ArmStates.PLACE_CORAL))
+        );
+    }
+
     public Command score() {
         return Commands.sequence(
-            Commands.parallel(setPlace(), placeCoral())
+            Commands.runOnce(() -> intake.placeCoral()),
+            Commands.waitSeconds(0.75),
+            reset()
         );
     }
 
@@ -472,7 +478,7 @@ public class Robot extends TimedRobot {
         return Commands.sequence(
             Commands.runOnce(() -> elevator.setClampedGoal(ElevatorStates.STOW)),
             Commands.runOnce(() -> arm.setClampedGoal(ArmStates.PROCESS)),
-            Commands.runOnce(() -> wrist.setClampedGoal(WristStates.ALGAE)),
+            Commands.runOnce(() -> wrist.setClampedGoal(WristStates.PROCESS)),
             Commands.runOnce(() -> processorReady = true)
         );
     }
@@ -519,11 +525,10 @@ public class Robot extends TimedRobot {
     // * Prep
 
     // | Coral
-    public Command prepScore(ElevatorStates pos) {
+    public Command prepScore(ElevatorStates level) {
         return Commands.sequence(
-            // Commands.runOnce(() -> wrist.setClampedGoal(Constants.WristConstants.vertical)),
-            // Commands.waitUntil(() -> wrist.atGoal()),
-            Commands.runOnce(() -> elevator.setClampedGoal(pos)),
+            Commands.runOnce(() -> wrist.setClampedGoal(WristStates.CORAL)),
+            Commands.runOnce(() -> elevator.setClampedGoal(level)),
             Commands.runOnce(() -> arm.setClampedGoal(ArmStates.PREP_CORAL)),
             Commands.waitSeconds(0.75),
             Commands.waitUntil(() -> elevator.atSetpoint()),
@@ -604,10 +609,6 @@ public class Robot extends TimedRobot {
 
     private Command setPlace() {
         return Commands.runOnce(() -> arm.setClampedGoal(ArmStates.PLACE_CORAL));
-    }
-
-    private Command placeCoral() {
-        return Commands.runOnce(() -> intake.placeCoral());
     }
     
     // ----------

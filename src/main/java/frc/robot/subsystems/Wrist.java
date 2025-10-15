@@ -54,7 +54,7 @@ public class Wrist extends SubsystemBase{
     public boolean atSetpoint() {
         double positionError = 
             Math.abs((motor.getClosedLoopError().getValueAsDouble()));
-        return positionError * 360.0 < 2; // 1 degree of error, make smaller if needed
+        return positionError * 360.0 < 2; // 2 degree of error, make smaller if needed
       }
 
     @Override

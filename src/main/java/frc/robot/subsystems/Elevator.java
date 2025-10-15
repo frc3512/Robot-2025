@@ -16,6 +16,8 @@ import frc.robot.subsystems.States.ElevatorStates;
 
 public class Elevator extends SubsystemBase{
 
+  // Todo: Tune setScoreHeight lowering amount
+
   private TalonFX frontMotor = new TalonFX(Constants.ElevatorConstants.frontMotorID);
   private TalonFX backMotor = new TalonFX(Constants.ElevatorConstants.backMotorID);
 

@@ -53,7 +53,7 @@ public class Arm extends SubsystemBase{
     public boolean atSetpoint() {
         double positionError = 
             Math.abs((motor.getClosedLoopError().getValueAsDouble()));
-        return positionError * 360.0 < 5; // 5 degrees of error, make smaller if needed
+        return positionError * 360.0 < 3; // 3 degrees of error, make smaller if needed
       }
 
     @Override

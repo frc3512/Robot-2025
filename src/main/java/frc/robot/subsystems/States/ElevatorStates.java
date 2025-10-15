@@ -2,6 +2,8 @@ package frc.robot.subsystems.States;
 
 public enum ElevatorStates {
 
+    // * Values are in inches, conversion happens in Elevator.java
+
     // * Defualt
     STOW(0.0),
  
@@ -20,7 +22,7 @@ public enum ElevatorStates {
     // * Algae
 
     // | De-Reef
-    ALGAE_L1(16),
+    ALGAE_L1(15),
     ALGAE_L2(28),
 
     // | Intake

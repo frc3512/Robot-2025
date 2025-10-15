@@ -2,6 +2,7 @@ package frc.robot.subsystems.States;
 
 public enum ArmStates{
 
+    // * Units are in degrees
     // negative = forward
     
     // * Defualt
@@ -11,7 +12,10 @@ public enum ArmStates{
 
     // | Score
     PREP_CORAL(-28),
-    PLACE_CORAL(-48),
+    PLACE_CORAL(-65),
+
+    // May need a seperate value bc kremer picky
+    PREP_L4(-32),
 
     TROUGH(-75),
 
@@ -31,10 +35,10 @@ public enum ArmStates{
     PREP_ALGAE(0.0),
 
     // | Process
-    PROCESS(-80),
+    PROCESS(-75),
 
     // | Barge
-    BARGE(20),
+    BARGE(15),
 
     // * Test
     FRONT(-40),
