@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.States.WristStates;
 
+@SuppressWarnings("unused")
 public class Wrist extends SubsystemBase{
 
     private final TalonFX motor;

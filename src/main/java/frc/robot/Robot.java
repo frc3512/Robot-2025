@@ -45,7 +45,7 @@ import org.opencv.imgproc.Imgproc;
 public class Robot extends TimedRobot {
 
   // | Bugs 
-
+  // Bug - Algae detection needs retuning, boolean not updating so logic does not work
 
   private double maxSpeed = DriveConstants.maxSpeed;
   private double maxAngularRate = DriveConstants.maxAngularRate;
@@ -154,7 +154,8 @@ public class Robot extends TimedRobot {
     autoChooser.addOption("Mid l4", midl4());
     autoChooser.addOption("Mid l4 - Barge", midl4Barge());
 
-    // * -- Controler Bindings --
+    // * -- Constant Bindings --
+    // Not effected by driving mode
     drivetrain.setDefaultCommand(
         drivetrain.applyRequest(
             () ->
@@ -173,21 +174,9 @@ public class Robot extends TimedRobot {
                         .withVelocityY(-controller.getLeftX() * slowSpeed)
                         .withRotationalRate(-controller.getRightX() * slowAngularRate)));
 
-    // controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-    // | Aiming Controls
-    // controller.leftBumper().onTrue(drivetrain.selectReef("Left"));
-    // controller.rightBumper().onTrue(drivetrain.selectReef("Right"));
-
-    // controller.y().onTrue(drivetrain.selectPiece("Coral"));
-    // controller.a().onTrue(drivetrain.selectPiece("Algae"));
-
-    // controller.x().whileTrue(autoAim());
-
-    // * -- Bindings for the button box --
     controller.button(7).onTrue(new InstantCommand(() -> updateMode("Algae")));
     controller.button(8).onTrue(new InstantCommand(() -> updateMode("Coral")));
-
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -268,7 +257,7 @@ public class Robot extends TimedRobot {
     hasAlgae();
     hasCoral();
 
-    setMode(driverMode);
+    setMode("Dual");
   }
 
   @Override
@@ -281,6 +270,8 @@ public class Robot extends TimedRobot {
         setCoralMode();
     } else if (mode == "Algae") {
         setAlgaeMode();
+    } else if (mode == "Dual") {
+        setDualMode();
     }
   }
 
@@ -293,6 +284,63 @@ public class Robot extends TimedRobot {
         drivetrain.resetAutoAimPID(), 
         drivetrain.goToPose(
           () -> drivetrain.getNearestReef()));
+  }
+
+  public void setDualMode() {
+
+    // * Controller
+
+    //  | Vision
+    controller.rightBumper().whileTrue(allignRight());
+    controller.leftBumper().whileTrue(allignLeft());
+
+    controller.a().whileTrue(allignAlgae());
+
+    // | Intake
+    controller.rightTrigger()
+        .onTrue(intakeCoral())
+        .onFalse(prepCoral());
+
+    controller.leftTrigger()
+        .onTrue(intakeAlgae())
+        .onFalse(prepAlgae());  
+        
+    // | Score
+    controller.y()
+        .onTrue(place())
+        .onFalse(score());
+
+    // * Button Box
+
+    // | Prep
+    appendageJoystick.button(3)
+        .onTrue(prepL4());
+
+    appendageJoystick.button(4)
+        .onTrue(prepMidPlace(ElevatorStates.L3));
+    appendageJoystick.button(5)
+        .onTrue(prepMidPlace(ElevatorStates.L2));
+
+    appendageJoystick.button(6)
+        .onTrue(prepTrough())
+        .onFalse(trough());
+
+    // | De-Reef
+    appendageJoystick.button(7)
+        .onTrue(grabAlgaeReef(ElevatorStates.ALGAE_L2))
+        .onFalse(prepAlgae());
+    appendageJoystick.button(8)
+        .onTrue(grabAlgaeReef(ElevatorStates.ALGAE_L1))
+        .onFalse(prepAlgae());
+
+    // | Barge
+    appendageJoystick.button(10)
+        .onTrue(prepBarge())
+        .onFalse(scoreBarge());
+
+    // Stow / Reset incase robot bugs
+    appendageJoystick.button(9)
+        .onTrue(reset());
   }
 
   public void setCoralMode() {
@@ -321,7 +369,7 @@ public class Robot extends TimedRobot {
     // | Ground Intake
     controller.rightTrigger()
         .onTrue(intakeCoral())
-        .onFalse(reset());
+        .onFalse(prepCoral());
   }
 
   public void setAlgaeMode() {
@@ -351,23 +399,14 @@ public class Robot extends TimedRobot {
 
   }
 
-  public void setTestMode() {
-
-    controller.a().onTrue(new InstantCommand(() -> back()));
-    controller.y().onTrue(new InstantCommand(() -> front()));
-    controller.x().onTrue(new InstantCommand(() -> middle()));
-
-    controller.a()
-        .onTrue(new InstantCommand(() -> vertical()))
-        .onFalse(new InstantCommand(() -> horizontal()));
-
-  }
+  public void setTestMode() {}
 
   // * AUTOMATION ACTIONS
   // was moved here becuase it didnt work in Automation class :(
 
     public Command allignLeft() {
         return Commands.sequence(
+            drivetrain.selectPiece("Coral"),
             drivetrain.selectReef("Left"),
             drivetrain.resetAutoAimPID(), 
             drivetrain.goToPose(
@@ -377,6 +416,7 @@ public class Robot extends TimedRobot {
 
     public Command allignRight() {
         return Commands.sequence(
+            drivetrain.selectPiece("Coral"),
             drivetrain.selectReef("Right"),
             drivetrain.resetAutoAimPID(), 
             drivetrain.goToPose(
@@ -451,9 +491,7 @@ public class Robot extends TimedRobot {
                 Commands.runOnce(() -> wrist.setClampedGoal(WristStates.INTAKE)),
                 Commands.runOnce(() -> elevator.setClampedGoal(ElevatorStates.INTAKE)),
                 Commands.runOnce(() -> arm.setClampedGoal(ArmStates.INTAKE)),
-                grabCoral(),
-                Commands.waitUntil(() -> hasCoral()),
-                prepCoral()
+                grabCoral()
             );
         // } else {
         //     return reset();
@@ -557,10 +595,14 @@ public class Robot extends TimedRobot {
     }
 
     public Command prepCoral() {
-        return Commands.sequence(
-            Commands.runOnce(() -> arm.setClampedGoal(ArmStates.HOLD_CORAL)),
-            Commands.runOnce(() -> wrist.setClampedGoal(WristStates.CORAL))
-        );
+        if (hasCoral()) {
+            return Commands.sequence(
+                Commands.runOnce(() -> arm.setClampedGoal(ArmStates.HOLD_CORAL)),
+                Commands.runOnce(() -> wrist.setClampedGoal(WristStates.CORAL))
+            );
+        } else {
+            return reset();
+        }
     }
 
     // | Algae
@@ -606,6 +648,7 @@ public class Robot extends TimedRobot {
         }
     }
 
+    // fix-me
     private boolean hasAlgae() {
         if (intake.getObjectDistance() <= 0.07) {
             if (intake.getR() >= 0.04 && intake.getR() <= 0.12 && 
