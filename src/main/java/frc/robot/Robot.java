@@ -12,8 +12,10 @@ import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.net.WebServer;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -63,6 +65,8 @@ public class Robot extends TimedRobot {
   ElevatorStates scoringLevel = null;
 
   String driverMode;
+
+  public double previousTimeStamp = Timer.getFPGATimestamp();
 
   private SendableChooser<AutoRoutine> autoChooser = new SendableChooser<>();
 
@@ -235,6 +239,9 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
 
+    DogLog.log("Loop Time", Timer.getFPGATimestamp() - previousTimeStamp);
+    previousTimeStamp = Timer.getFPGATimestamp();
+
     if (hasCoral()) {
         leds.setPattern(leds.white);
     } else if (hasAlgae()) {
@@ -297,11 +304,11 @@ public class Robot extends TimedRobot {
 
     // Prep Score
     controller.y()
-        .onTrue(prepScore(ElevatorStates.L4));
+        .onTrue(prepL4());
     controller.x()
-        .onTrue(prepScore(ElevatorStates.L3));
+        .onTrue(prepMidPlace(ElevatorStates.L3));
     controller.a()
-        .onTrue(prepScore(ElevatorStates.L2));
+        .onTrue(prepMidPlace(ElevatorStates.L2));
     controller.b()
         .onTrue(prepTrough())
         .onFalse(trough());
@@ -413,7 +420,7 @@ public class Robot extends TimedRobot {
     public Command score() {
         return Commands.sequence(
             Commands.runOnce(() -> intake.placeCoral()),
-            Commands.waitSeconds(0.75),
+            Commands.waitSeconds(0.5),
             reset()
         );
     }
@@ -525,12 +532,24 @@ public class Robot extends TimedRobot {
     // * Prep
 
     // | Coral
-    public Command prepScore(ElevatorStates level) {
+
+    // | Used for L2 & l3
+    public Command prepMidPlace(ElevatorStates level) {
         return Commands.sequence(
             Commands.runOnce(() -> wrist.setClampedGoal(WristStates.CORAL)),
             Commands.runOnce(() -> elevator.setClampedGoal(level)),
             Commands.runOnce(() -> arm.setClampedGoal(ArmStates.PREP_CORAL)),
-            Commands.waitSeconds(0.75),
+            Commands.waitUntil(() -> elevator.atSetpoint()),
+            Commands.waitUntil(() -> arm.atSetpoint()),
+            Commands.runOnce(() -> coralReady = true)
+        );
+    }
+
+    public Command prepL4() {
+        return Commands.sequence(
+            Commands.runOnce(() -> wrist.setClampedGoal(WristStates.CORAL)),
+            Commands.runOnce(() -> elevator.setClampedGoal(ElevatorStates.L4)),
+            Commands.runOnce(() -> arm.setClampedGoal(ArmStates.PREP_L4)),
             Commands.waitUntil(() -> elevator.atSetpoint()),
             Commands.waitUntil(() -> arm.atSetpoint()),
             Commands.runOnce(() -> coralReady = true)

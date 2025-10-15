@@ -77,7 +77,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void trough() {
-        motor.set(0.5);
+        motor.set(0.4);
     }
 
     public void hold() {
