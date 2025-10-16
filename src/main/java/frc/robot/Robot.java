@@ -637,9 +637,9 @@ public class Robot extends TimedRobot {
 
     private boolean hasCoral() {
         if (intake.getObjectDistance() <= 0.04) {
-            if (intake.getR() >= 0.29 && intake.getR() <= 0.36 &&
-                intake.getG() >= 0.40 && intake.getG() <= 0.49 && 
-                intake.getB() >= 0.14 && intake.getB() <= 0.20) {
+            if (intake.getR() >= 0 && intake.getR() <= 0.06 &&
+                intake.getG() >= 0 && intake.getG() <= 0.06 && 
+                intake.getB() >= 0 && intake.getB() <= 0.06) {
                 
                 return true;
             } else {
@@ -652,11 +652,10 @@ public class Robot extends TimedRobot {
 
     // fix-me
     private boolean hasAlgae() {
-        if (intake.getObjectDistance() <= 0.07) {
-            if (intake.getR() >= 0.04 && intake.getR() <= 0.12 && 
-                intake.getG() >= 0.30 && intake.getG() <= 0.36 && 
-                intake.getB() >= 0.10 && intake.getB() <= 0.18) {
-                
+        if (intake.getObjectDistance() <= 0.05) {
+            if (intake.getR() >= 0.07 && intake.getR() <= 0.13 && 
+                intake.getG() >= 0.27 && intake.getG() <= 0.34 && 
+                intake.getB() >= 0.09 && intake.getB() <= 0.15) {
                 return true;
             } else {
                 return false;

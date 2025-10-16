@@ -8,9 +8,9 @@ public enum WristStates {
     // * use an overshoot to ensure contact with hardstops
 
     // | HORIZONTAL
-    INTAKE(95),
-    ALGAE(95),
-    TROUGH(95),
+    INTAKE(90),
+    ALGAE(90),
+    TROUGH(90),
     
     // | VERTICAL
     CORAL(0),
