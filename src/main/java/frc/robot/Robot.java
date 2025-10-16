@@ -94,53 +94,10 @@ public class Robot extends TimedRobot {
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandJoystick appendageJoystick = new CommandJoystick(1);
 
-  // | Driver Camera Thread for crosshair
-  private final Thread m_visionThread;
-
   // | Auton
   private final AutoFactory autoFactory;
 
   public Robot() {
-
-    CameraServer.startAutomaticCapture();
-
-    m_visionThread =
-        new Thread(
-            () -> {
-              // * Get the UsbCamera from CameraServer
-              UsbCamera camera = CameraServer.startAutomaticCapture();
-              // * Set the resolution
-              camera.setResolution(320, 240);
-
-              CvSink cvSink = CameraServer.getVideo();
-              CvSource outputStream = CameraServer.putVideo("Drive Cam", 640, 480);
-
-              Mat mat = new Mat();
-              Point pt1 = new Point(0, 65);
-              Point pt2 = new Point(400, 65);
-              Point pt3 = new Point(0, 55);
-              Point pt4 = new Point(400, 55);
-              Point pt5 = new Point(0, 30);
-              Point pt6 = new Point(400, 30);
-              Scalar coralColor = new Scalar(28, 239, 84);
-              Scalar algaeColor = new Scalar(18, 5, 92);
-
-              while (!Thread.interrupted()) {
-
-                if (cvSink.grabFrame(mat) == 0) {
-                  outputStream.notifyError(cvSink.getError());
-                  continue;
-                }
-
-                Imgproc.line(mat, pt1, pt2, coralColor, 2);
-                Imgproc.line(mat, pt3, pt4, coralColor, 2);
-                Imgproc.line(mat, pt5, pt6, algaeColor, 3);
-                outputStream.putFrame(mat);
-              }
-            });
-
-    m_visionThread.setDaemon(true);
-    m_visionThread.start();
 
     // | Create Choreo
     autoFactory =
@@ -640,7 +597,7 @@ public class Robot extends TimedRobot {
             if (intake.getR() >= 0 && intake.getR() <= 0.06 &&
                 intake.getG() >= 0 && intake.getG() <= 0.06 && 
                 intake.getB() >= 0 && intake.getB() <= 0.06) {
-                
+                    
                 return true;
             } else {
                 return false;
