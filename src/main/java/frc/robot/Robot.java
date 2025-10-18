@@ -64,8 +64,6 @@ public class Robot extends TimedRobot {
 
   ElevatorStates scoringLevel = null;
 
-  String driverMode;
-
   public double previousTimeStamp = Timer.getFPGATimestamp();
 
   private SendableChooser<AutoRoutine> autoChooser = new SendableChooser<>();
@@ -132,9 +130,59 @@ public class Robot extends TimedRobot {
                         .withVelocityY(-controller.getLeftX() * slowSpeed)
                         .withRotationalRate(-controller.getRightX() * slowAngularRate)));
 
+    // * Controller
 
-    controller.button(7).onTrue(new InstantCommand(() -> updateMode("Algae")));
-    controller.button(8).onTrue(new InstantCommand(() -> updateMode("Coral")));
+    //  | Vision
+    // controller.rightBumper().whileTrue(allignRight());
+    // controller.leftBumper().whileTrue(allignLeft());
+
+    // controller.a().whileTrue(allignAlgae());
+
+    // | Intake
+    controller.rightTrigger()
+        .onTrue(intakeCoral())
+        .onFalse(prepCoral());
+
+    controller.leftTrigger()
+        .onTrue(intakeAlgae())
+        .onFalse(prepAlgae());  
+        
+    // | Score
+    controller.y()
+        .onTrue(place())
+        .onFalse(score());
+
+    // * Button Box
+
+    // | Prep
+    appendageJoystick.button(3)
+        .onTrue(prepL4());
+
+    appendageJoystick.button(4)
+        .onTrue(prepMidPlace(ElevatorStates.L3));
+    appendageJoystick.button(5)
+        .onTrue(prepMidPlace(ElevatorStates.L2));
+
+    appendageJoystick.button(6)
+        .onTrue(prepTrough())
+        .onFalse(trough());
+
+    // | De-Reef
+    appendageJoystick.button(7)
+        .onTrue(grabAlgaeReef(ElevatorStates.ALGAE_L2))
+        .onFalse(prepAlgae());
+    appendageJoystick.button(8)
+        .onTrue(grabAlgaeReef(ElevatorStates.ALGAE_L1))
+        .onFalse(prepAlgae());
+
+    // | Barge
+    appendageJoystick.button(10)
+        .onTrue(prepBarge())
+        .onFalse(scoreBarge());
+
+    // Stow / Reset incase robot bugs
+    appendageJoystick.button(9)
+        .onTrue(reset());
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -215,27 +263,11 @@ public class Robot extends TimedRobot {
     // Update Piece
     hasAlgae();
     hasCoral();
-
-    setMode("Dual");
   }
 
   @Override
   public void teleopPeriodic() {
     drivetrain.getNearestReef();
-  }
-
-  public void setMode(String mode) {
-    if (mode == "Coral") {
-        setCoralMode();
-    } else if (mode == "Algae") {
-        setAlgaeMode();
-    } else if (mode == "Dual") {
-        setDualMode();
-    }
-  }
-
-  public void updateMode(String mode) {
-    driverMode = mode;
   }
 
   public Command autoAim() {
@@ -244,121 +276,6 @@ public class Robot extends TimedRobot {
         drivetrain.goToPose(
           () -> drivetrain.getNearestReef()));
   }
-
-  public void setDualMode() {
-
-    // * Controller
-
-    //  | Vision
-    controller.rightBumper().whileTrue(allignRight());
-    controller.leftBumper().whileTrue(allignLeft());
-
-    controller.a().whileTrue(allignAlgae());
-
-    // | Intake
-    controller.rightTrigger()
-        .onTrue(intakeCoral())
-        .onFalse(prepCoral());
-
-    controller.leftTrigger()
-        .onTrue(intakeAlgae())
-        .onFalse(prepAlgae());  
-        
-    // | Score
-    controller.y()
-        .onTrue(place())
-        .onFalse(score());
-
-    // * Button Box
-
-    // | Prep
-    appendageJoystick.button(3)
-        .onTrue(prepL4());
-
-    appendageJoystick.button(4)
-        .onTrue(prepMidPlace(ElevatorStates.L3));
-    appendageJoystick.button(5)
-        .onTrue(prepMidPlace(ElevatorStates.L2));
-
-    appendageJoystick.button(6)
-        .onTrue(prepTrough())
-        .onFalse(trough());
-
-    // | De-Reef
-    appendageJoystick.button(7)
-        .onTrue(grabAlgaeReef(ElevatorStates.ALGAE_L2))
-        .onFalse(prepAlgae());
-    appendageJoystick.button(8)
-        .onTrue(grabAlgaeReef(ElevatorStates.ALGAE_L1))
-        .onFalse(prepAlgae());
-
-    // | Barge
-    appendageJoystick.button(10)
-        .onTrue(prepBarge())
-        .onFalse(scoreBarge());
-
-    // Stow / Reset incase robot bugs
-    appendageJoystick.button(9)
-        .onTrue(reset());
-  }
-
-  public void setCoralMode() {
-
-    drivetrain.selectPiece("Coral");
-
-    controller.rightBumper().whileTrue(allignRight());
-    controller.leftBumper().whileTrue(allignLeft());
-
-    // Prep Score
-    controller.y()
-        .onTrue(prepL4());
-    controller.x()
-        .onTrue(prepMidPlace(ElevatorStates.L3));
-    controller.a()
-        .onTrue(prepMidPlace(ElevatorStates.L2));
-    controller.b()
-        .onTrue(prepTrough())
-        .onFalse(trough());
-
-    // Score
-    controller.leftTrigger()
-        .onTrue(place())
-        .onFalse(score());
-
-    // | Ground Intake
-    controller.rightTrigger()
-        .onTrue(intakeCoral())
-        .onFalse(prepCoral());
-  }
-
-  public void setAlgaeMode() {
-
-    drivetrain.selectPiece("Algae");
-
-    controller.rightBumper().whileTrue(allignAlgae());
-
-    controller.b()
-        .onTrue(prepProcess())
-        .onFalse(process());
-
-    controller.x()
-        .onTrue(prepBarge())
-        .onFalse(scoreBarge());
-
-    controller.y()
-        .onTrue(grabAlgaeReef(ElevatorStates.ALGAE_L2))
-        .onFalse(prepAlgae());
-    controller.a()
-        .onTrue(grabAlgaeReef(ElevatorStates.ALGAE_L1))
-        .onFalse(prepAlgae());
-
-    controller.rightTrigger()
-        .onTrue(intakeAlgae())
-        .onFalse(prepAlgae());
-
-  }
-
-  public void setTestMode() {}
 
   // * AUTOMATION ACTIONS
   // was moved here becuase it didnt work in Automation class :(
