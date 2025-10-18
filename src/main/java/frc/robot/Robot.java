@@ -318,9 +318,7 @@ public class Robot extends TimedRobot {
             Commands.runOnce(() -> arm.setClampedGoal(ArmStates.STOW)),
             Commands.runOnce(() -> wrist.setClampedGoal(WristStates.CORAL)),
 
-            Commands.runOnce(() -> coralReady = false),
-            Commands.runOnce(() -> bargeReady = false),
-            Commands.runOnce(() -> processorReady = false)
+            Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll())
         );
     }
 
