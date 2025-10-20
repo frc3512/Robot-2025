@@ -21,7 +21,7 @@ public enum ArmStates{
 
     // | Intake
     INTAKE(117),
-    INTAKE_ALGAE(75),
+    INTAKE_ALGAE(80),
 
     // | Prep
     HOLD_CORAL(-10),

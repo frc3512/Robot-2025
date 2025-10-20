@@ -129,6 +129,28 @@ public class Robot extends TimedRobot {
                         .withVelocityX(-controller.getLeftY() * slowSpeed)
                         .withVelocityY(-controller.getLeftX() * slowSpeed)
                         .withRotationalRate(-controller.getRightX() * slowAngularRate)));
+    
+    controller
+        .rightTrigger()
+        .whileTrue(
+            drivetrain.applyRequest(
+                () ->
+                    driveSlow
+                        .withVelocityX(-controller.getLeftY() * slowSpeed)
+                        .withVelocityY(-controller.getLeftX() * slowSpeed)
+                        .withRotationalRate(-controller.getRightX() * slowAngularRate)));
+
+    controller
+        .leftTrigger()
+        .whileTrue(
+            drivetrain.applyRequest(
+                () ->
+                    driveSlow
+                        .withVelocityX(-controller.getLeftY() * slowSpeed)
+                        .withVelocityY(-controller.getLeftX() * slowSpeed)
+                        .withRotationalRate(-controller.getRightX() * slowAngularRate)));
+
+    controller.x().onTrue(new InstantCommand(() -> drivetrain.seedFieldCentric()));
 
     // * Controller
 
@@ -136,7 +158,7 @@ public class Robot extends TimedRobot {
     // controller.rightBumper().whileTrue(allignRight());
     // controller.leftBumper().whileTrue(allignLeft());
 
-    // controller.a().whileTrue(allignAlgae());
+    controller.a().whileTrue(reset());
 
     // | Intake
     controller.rightTrigger()
@@ -250,7 +272,7 @@ public class Robot extends TimedRobot {
 
     DogLog.setEnabled(true);
 
-    poseEstimation();
+    // poseEstimation();
 
     // Log Logic
     DogLog.log("Has Coral", hasCoral());
@@ -585,9 +607,9 @@ public class Robot extends TimedRobot {
     // | Auto Commands
     public Command autoL1() {
         return Commands.sequence(
-            prepTrough(),
+            Commands.runOnce(() -> prepTrough()),
             Commands.waitUntil(() -> arm.atSetpoint()),
-            trough()
+            Commands.runOnce(() -> trough())
         );
     }
     

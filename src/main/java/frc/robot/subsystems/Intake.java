@@ -81,7 +81,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void hold() {
-        motor.set(-0.15);
+        motor.set(-0.25);
     }
 
     public void setSpeed(double speed) {
