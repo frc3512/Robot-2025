@@ -227,20 +227,24 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
   }
 
   public void controlPosition(Pose2d targetPose) {
-    double x = aimXController.calculate(getState().Pose.getX(), targetPose.getX());
-    double y = aimYController.calculate(getState().Pose.getY(), targetPose.getY());
-    double rot =
-        aimThetaController.calculate(
-            getState().Pose.getRotation().getRadians(), targetPose.getRotation().getRadians());
+
+    aimThetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+    Pose2d currentPose = getState().Pose;
 
     ChassisSpeeds speeds =
-        ChassisSpeeds.fromFieldRelativeSpeeds(x, y, rot, getState().Pose.getRotation());
+        new ChassisSpeeds(
+            aimXController.calculate(currentPose.getX(), targetPose.getX()),
+            aimYController.calculate(currentPose.getY(), targetPose.getY()),
+            aimThetaController.calculate(
+                currentPose.getRotation().getRadians(),
+                targetPose.getRotation().getRadians()));
 
     this.setControl(
-        new SwerveRequest.FieldCentric()
-            .withVelocityX(speeds.vxMetersPerSecond)
-            .withVelocityY(speeds.vyMetersPerSecond)
-            .withRotationalRate(speeds.omegaRadiansPerSecond));
+      new SwerveRequest.FieldCentric()
+          .withVelocityX(speeds.vxMetersPerSecond)
+          .withVelocityY(speeds.vyMetersPerSecond)
+          .withRotationalRate(speeds.omegaRadiansPerSecond));
 
     DogLog.log("Swerve/Aim Target", targetPose);
   }
