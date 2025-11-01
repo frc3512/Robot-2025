@@ -61,8 +61,8 @@ public class DriveConstants {
 
   public static final CANBus kCANBus = new CANBus("Drivetrain", "./logs/example.hoot");
 
-  public static double maxSpeed = 5.2 * 0.80; // * Drive velocity in meters per second
-  public static double maxAngularRate = 3.25; // * Controls how fast the robot quick turns
+  public static double maxSpeed = 5.2 * 0.67; // * Drive velocity in meters per second
+  public static double maxAngularRate = 2.75; // * Controls how fast the robot quick turns
   public static double slowSpeed = 5.2 * 0.25; // * Drive velocity for slow mode in meters per second
   public static double slowAngularRate = 1.15; // * Controls how fast the robot quick turns in slow mode
 

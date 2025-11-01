@@ -1,18 +1,14 @@
 package frc.robot;
 
-import choreo.auto.AutoFactory;
-import choreo.auto.AutoRoutine;
-import choreo.auto.AutoTrajectory;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+
+import choreo.auto.AutoFactory;
+import choreo.auto.AutoRoutine;
+import choreo.auto.AutoTrajectory;
 import dev.doglog.DogLog;
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.CvSink;
-import edu.wpi.first.cscore.CvSource;
-import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.net.WebServer;
-import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -24,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
@@ -34,12 +31,6 @@ import frc.robot.subsystems.Wrist;
 import frc.robot.subsystems.States.ArmStates;
 import frc.robot.subsystems.States.ElevatorStates;
 import frc.robot.subsystems.States.WristStates;
-import us.hebi.quickbuf.Descriptors.Descriptor;
-
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
 
 @SuppressWarnings("unused")
 public class Robot extends TimedRobot {
@@ -95,6 +86,14 @@ public class Robot extends TimedRobot {
   // | Auton
   private final AutoFactory autoFactory;
 
+  // * Create Mode Selector for single driver
+  private enum driverMode {
+    CORAL,
+    ALGAE
+  }
+
+  private driverMode currentMode;
+
   public Robot() {
 
     // | Create Choreo
@@ -116,19 +115,9 @@ public class Robot extends TimedRobot {
         drivetrain.applyRequest(
             () ->
                 drive
-                    .withVelocityX(-controller.getLeftY() * maxSpeed)
-                    .withVelocityY(-controller.getLeftX() * maxSpeed)
-                    .withRotationalRate(-controller.getRightX() * maxAngularRate)));
-
-    controller
-        .b()
-        .whileTrue(
-            drivetrain.applyRequest(
-                () ->
-                    driveSlow
-                        .withVelocityX(-controller.getLeftY() * slowSpeed)
-                        .withVelocityY(-controller.getLeftX() * slowSpeed)
-                        .withRotationalRate(-controller.getRightX() * slowAngularRate)));
+                    .withVelocityX(getThrottle())
+                    .withVelocityY(getStrafe())
+                    .withRotationalRate(getRotation())));
     
     controller
         .rightTrigger()
@@ -136,9 +125,9 @@ public class Robot extends TimedRobot {
             drivetrain.applyRequest(
                 () ->
                     driveSlow
-                        .withVelocityX(-controller.getLeftY() * slowSpeed)
-                        .withVelocityY(-controller.getLeftX() * slowSpeed)
-                        .withRotationalRate(-controller.getRightX() * slowAngularRate)));
+                        .withVelocityX(getThrottle())
+                        .withVelocityY(getStrafe())
+                        .withRotationalRate(getRotation())));
 
     controller
         .leftTrigger()
@@ -146,11 +135,11 @@ public class Robot extends TimedRobot {
             drivetrain.applyRequest(
                 () ->
                     driveSlow
-                        .withVelocityX(-controller.getLeftY() * slowSpeed)
-                        .withVelocityY(-controller.getLeftX() * slowSpeed)
-                        .withRotationalRate(-controller.getRightX() * slowAngularRate)));
+                        .withVelocityX(getThrottle())
+                        .withVelocityY(getStrafe())
+                        .withRotationalRate(getRotation())));
 
-    controller.x().onTrue(new InstantCommand(() -> drivetrain.seedFieldCentric()));
+    resetGyro().onTrue(new InstantCommand(() -> drivetrain.seedFieldCentric()));
 
     // * Controller
 
@@ -158,53 +147,53 @@ public class Robot extends TimedRobot {
     // controller.rightBumper().whileTrue(allignRight());
     // controller.leftBumper().whileTrue(allignLeft());
 
-    controller.a().whileTrue(reset());
+    stow().onTrue(reset());
 
     // | Intake
-    controller.rightTrigger()
+    wantToIntakeCoral()
         .onTrue(intakeCoral())
         .onFalse(prepCoral());
 
-    controller.leftTrigger()
+    wantToIntakeAlgae()
         .onTrue(intakeAlgae())
         .onFalse(prepAlgae());  
         
     // | Score
-    controller.y()
+    wantToScore()
         .onTrue(place())
         .onFalse(score());
 
     // * Button Box
 
     // | Prep
-    appendageJoystick.button(3)
-        .onTrue(prepL4());
+    l4().onTrue(prepL4());
 
-    appendageJoystick.button(4)
-        .onTrue(prepMidPlace(ElevatorStates.L3));
-    appendageJoystick.button(5)
-        .onTrue(prepMidPlace(ElevatorStates.L2));
+    l3().onTrue(prepMidPlace(ElevatorStates.L3));
+    l2().onTrue(prepMidPlace(ElevatorStates.L2));
 
-    appendageJoystick.button(6)
-        .onTrue(prepTrough())
+    l1().onTrue(prepTrough())
         .onFalse(trough());
 
     // | De-Reef
-    appendageJoystick.button(7)
+    deReefA2()
         .onTrue(grabAlgaeReef(ElevatorStates.ALGAE_L2))
         .onFalse(prepAlgae());
-    appendageJoystick.button(8)
+    deReefA1()
         .onTrue(grabAlgaeReef(ElevatorStates.ALGAE_L1))
         .onFalse(prepAlgae());
 
     // | Barge
-    appendageJoystick.button(10)
+    barge()
         .onTrue(prepBarge())
         .onFalse(scoreBarge());
 
-    // Stow / Reset incase robot bugs
-    appendageJoystick.button(9)
-        .onTrue(reset());
+    wantToProcess()
+        .onTrue(prepProcess())
+        .onFalse(process());
+
+    // * Mode Switcher
+    switchToCoral().onTrue(Commands.runOnce(() -> currentMode = driverMode.CORAL));
+    switchToAlgae().onTrue(Commands.runOnce(() -> currentMode = driverMode.ALGAE));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -285,6 +274,8 @@ public class Robot extends TimedRobot {
     // Update Piece
     hasAlgae();
     hasCoral();
+
+    CommandScheduler.getInstance().run();
   }
 
   @Override
@@ -301,35 +292,6 @@ public class Robot extends TimedRobot {
 
   // * AUTOMATION ACTIONS
   // was moved here becuase it didnt work in Automation class :(
-
-    public Command allignLeft() {
-        return Commands.sequence(
-            drivetrain.selectPiece("Coral"),
-            drivetrain.selectReef("Left"),
-            drivetrain.resetAutoAimPID(), 
-            drivetrain.goToPose(
-                () -> drivetrain.getNearestReef())
-        );
-    }
-
-    public Command allignRight() {
-        return Commands.sequence(
-            drivetrain.selectPiece("Coral"),
-            drivetrain.selectReef("Right"),
-            drivetrain.resetAutoAimPID(), 
-            drivetrain.goToPose(
-                () -> drivetrain.getNearestReef())
-        );
-    }
-
-    public Command allignAlgae() {
-        return Commands.sequence(
-            drivetrain.selectPiece("Algae"),
-            drivetrain.resetAutoAimPID(), 
-            drivetrain.goToPose(
-                () -> drivetrain.getNearestReef())
-        );
-    }
 
     // * Reset / Defualt
     public Command reset() {
@@ -567,6 +529,160 @@ public class Robot extends TimedRobot {
     private Command setPlace() {
         return Commands.runOnce(() -> arm.setClampedGoal(ArmStates.PLACE_CORAL));
     }
+
+    //  * Define triggers here
+
+  // Swerve
+  // Use exponential joystick for more acceleration control
+  // Linear: input = output
+  // Exponential: greater input = greater output
+  private double getThrottle() {
+    return -(Math.pow(Math.abs(controller.getLeftY()), 1.2)) * Math.signum(controller.getLeftY());
+  }
+
+  private double getStrafe() {
+    return -(Math.pow(Math.abs(controller.getLeftX()), 1.2)) * Math.signum(controller.getLeftX());
+  }
+
+  private double getRotation() {
+    return -(Math.pow(Math.abs(controller.getRightX()), 1.5)) * Math.signum(controller.getRightX());
+  }
+
+  // Gyro
+  private Trigger resetGyro() {
+    return controller.rightStick().and(controller.leftStick());
+  }
+
+  // Superstructure
+  private Trigger stow() {
+    return controller.povDown();
+  }
+
+  // Mode Switcher
+  private Trigger switchToCoral() {
+    return controller.start();
+  }
+
+  private Trigger switchToAlgae() {
+    return controller.back();
+  }
+
+  //  --- CORAL ---
+  private Trigger wantToIntakeCoral() {
+    if (currentMode == driverMode.CORAL) {
+      return controller.leftTrigger();
+    } else {
+      return null;
+    }
+  }
+
+  private Trigger l1() {
+    if (currentMode == driverMode.CORAL) {
+      return controller.b();
+    } else {
+      return null;
+    }
+  }
+
+  private Trigger l2() {
+    if (currentMode == driverMode.CORAL) {
+      return controller.a();
+    } else {
+      return null;
+    }
+  }
+
+  private Trigger l3() {
+    if (currentMode == driverMode.CORAL) {
+      return controller.x();
+    } else {
+      return null;
+    }
+  }
+
+  private Trigger l4() {
+    if (currentMode == driverMode.CORAL) {
+      return controller.y();
+    } else {
+      return null;
+    }
+  }
+
+  // Score method in superstructure will need logic to determoine if we score on mid or l4, because they 
+  // will have differnt scoring methods due to differnt branch shapes
+  private Trigger wantToScore() {
+    if (currentMode == driverMode.CORAL) {
+      return controller.rightTrigger();
+    } else {
+      return null;
+    }
+  }
+
+  // --- ALGAE ---
+  private Trigger wantToIntakeAlgae() {
+    if (currentMode == driverMode.ALGAE) {
+      return controller.leftTrigger();
+    } else {
+      return null;
+    }
+  }
+
+  private Trigger deReefA1() {
+    if (currentMode == driverMode.ALGAE) {
+      return controller.a();
+    } else {
+      return null;
+    }
+  }
+
+  private Trigger deReefA2() {
+    if (currentMode == driverMode.ALGAE) {
+      return controller.y();
+    } else {
+      return null;
+    }
+  }
+
+  private Trigger wantToProcess() {
+    if (currentMode == driverMode.ALGAE) {
+      return controller.b();
+    } else {
+      return null;
+    }
+  }
+
+  private Trigger barge() {
+    if (currentMode == driverMode.ALGAE) {
+      return controller.x();
+    } else {
+      return null;
+    }
+  }
+
+  // Vision - Implement after IO if fully working
+  private Trigger allignLeft() {
+    if (currentMode == driverMode.CORAL) {
+      return controller.leftBumper();
+    } else {
+      return null;
+    }
+  }
+
+  private Trigger allignRight() {
+    if (currentMode == driverMode.CORAL) {
+      return controller.rightBumper();
+    } else {
+      return null;
+    }
+  }
+
+  private Trigger allignAlgae() {
+    if (currentMode == driverMode.ALGAE) {
+      return controller.leftBumper();
+    } else {
+      return null;
+    }
+  }
     
     // ----------
     
