@@ -42,6 +42,8 @@ public class Robot extends TimedRobot {
   private double maxAngularRate = DriveConstants.maxAngularRate;
   private double slowSpeed = DriveConstants.slowSpeed;
   private double slowAngularRate = DriveConstants.slowAngularRate;
+  private double DEMON_SPEED = DriveConstants.DEMON_SPEED;
+  private double DEMON_ANGULAR_RATE = DriveConstants.DEMON_ANGULAR_RATE;
 
   private final Arm arm = new Arm();
   private final Elevator elevator = new Elevator();
@@ -70,6 +72,13 @@ public class Robot extends TimedRobot {
           .withDeadband(slowSpeed * 0.1)
           .withRotationalDeadband(slowAngularRate * 0.07) // * Add a 7% deadband
           .withDriveRequestType(DriveRequestType.Velocity);
+
+  private final SwerveRequest.FieldCentric DEMON_DRIVE =
+      new SwerveRequest.FieldCentric()
+          .withDeadband(DEMON_SPEED * 0.05)
+          .withRotationalDeadband(DEMON_ANGULAR_RATE * 0.05) // * NO DEADNBAND!!!!!
+          .withDriveRequestType(DriveRequestType.Velocity);
+
 
   public final LED leds = new LED();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
@@ -115,12 +124,22 @@ public class Robot extends TimedRobot {
         drivetrain.applyRequest(
             () ->
                 drive
-                    .withVelocityX(getThrottle())
-                    .withVelocityY(getStrafe())
-                    .withRotationalRate(getRotation())));
+                    .withVelocityX(-controller.getLeftY() * maxSpeed)
+                    .withVelocityY(-controller.getLeftX() * maxSpeed)
+                    .withRotationalRate(-controller.getRightX() * maxAngularRate)));
     
     controller
-        .rightTrigger()
+        .leftTrigger()
+        .whileTrue(
+            drivetrain.applyRequest(
+                () ->
+                    DEMON_DRIVE
+                        .withVelocityX(-controller.getLeftY() * DEMON_SPEED)
+                        .withVelocityY(-controller.getLeftX() * DEMON_SPEED)
+                        .withRotationalRate(-controller.getRightX() * DEMON_ANGULAR_RATE)));
+
+    controller
+        .leftBumper()
         .whileTrue(
             drivetrain.applyRequest(
                 () ->
@@ -130,7 +149,7 @@ public class Robot extends TimedRobot {
                         .withRotationalRate(getRotation())));
 
     controller
-        .leftTrigger()
+        .rightBumper()
         .whileTrue(
             drivetrain.applyRequest(
                 () ->
@@ -147,53 +166,50 @@ public class Robot extends TimedRobot {
     // controller.rightBumper().whileTrue(allignRight());
     // controller.leftBumper().whileTrue(allignLeft());
 
-    stow().onTrue(reset());
+    controller.start().onTrue(reset());
 
     // | Intake
-    wantToIntakeCoral()
+    controller.rightBumper()
         .onTrue(intakeCoral())
         .onFalse(prepCoral());
 
-    wantToIntakeAlgae()
+    controller.leftBumper()
         .onTrue(intakeAlgae())
         .onFalse(prepAlgae());  
         
     // | Score
-    wantToScore()
+    controller.rightTrigger()
         .onTrue(place())
         .onFalse(score());
 
     // * Button Box
 
     // | Prep
-    l4().onTrue(prepL4());
+    controller.y().onTrue(prepL4());
 
-    l3().onTrue(prepMidPlace(ElevatorStates.L3));
-    l2().onTrue(prepMidPlace(ElevatorStates.L2));
+    controller.x().onTrue(prepMidPlace(ElevatorStates.L3));
+    controller.a().onTrue(prepMidPlace(ElevatorStates.L2));
 
-    l1().onTrue(prepTrough())
+    controller.b()
+        .onTrue(prepTrough())
         .onFalse(trough());
 
     // | De-Reef
-    deReefA2()
+    controller.povUp()
         .onTrue(grabAlgaeReef(ElevatorStates.ALGAE_L2))
         .onFalse(prepAlgae());
-    deReefA1()
+    controller.povDown()
         .onTrue(grabAlgaeReef(ElevatorStates.ALGAE_L1))
         .onFalse(prepAlgae());
 
     // | Barge
-    barge()
+    controller.povRight()
         .onTrue(prepBarge())
         .onFalse(scoreBarge());
 
-    wantToProcess()
+    controller.povLeft()
         .onTrue(prepProcess())
         .onFalse(process());
-
-    // * Mode Switcher
-    switchToCoral().onTrue(Commands.runOnce(() -> currentMode = driverMode.CORAL));
-    switchToAlgae().onTrue(Commands.runOnce(() -> currentMode = driverMode.ALGAE));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -533,155 +549,33 @@ public class Robot extends TimedRobot {
     //  * Define triggers here
 
   // Swerve
-  // Use exponential joystick for more acceleration control
-  // Linear: input = output
-  // Exponential: greater input = greater output
   private double getThrottle() {
-    return -(Math.pow(Math.abs(controller.getLeftY()), 1.2)) * Math.signum(controller.getLeftY());
+    return -controller.getLeftY() * maxSpeed;
   }
 
   private double getStrafe() {
-    return -(Math.pow(Math.abs(controller.getLeftX()), 1.2)) * Math.signum(controller.getLeftX());
+    return -controller.getLeftX() * maxSpeed;
   }
 
   private double getRotation() {
-    return -(Math.pow(Math.abs(controller.getRightX()), 1.5)) * Math.signum(controller.getRightX());
+    return -controller.getRightX() * maxAngularRate;
+  }
+
+  private double getDEMONTHROTLE() {
+    return -controller.getLeftY() * DEMON_SPEED;
+  }
+
+  private double getDEMONSTRAFE() {
+    return -controller.getLeftX() * DEMON_SPEED;
+  }
+
+  private double getDEMONROTATION() {
+    return -controller.getRightX() * DEMON_ANGULAR_RATE;
   }
 
   // Gyro
   private Trigger resetGyro() {
     return controller.rightStick().and(controller.leftStick());
-  }
-
-  // Superstructure
-  private Trigger stow() {
-    return controller.povDown();
-  }
-
-  // Mode Switcher
-  private Trigger switchToCoral() {
-    return controller.start();
-  }
-
-  private Trigger switchToAlgae() {
-    return controller.back();
-  }
-
-  //  --- CORAL ---
-  private Trigger wantToIntakeCoral() {
-    if (currentMode == driverMode.CORAL) {
-      return controller.leftTrigger();
-    } else {
-      return null;
-    }
-  }
-
-  private Trigger l1() {
-    if (currentMode == driverMode.CORAL) {
-      return controller.b();
-    } else {
-      return null;
-    }
-  }
-
-  private Trigger l2() {
-    if (currentMode == driverMode.CORAL) {
-      return controller.a();
-    } else {
-      return null;
-    }
-  }
-
-  private Trigger l3() {
-    if (currentMode == driverMode.CORAL) {
-      return controller.x();
-    } else {
-      return null;
-    }
-  }
-
-  private Trigger l4() {
-    if (currentMode == driverMode.CORAL) {
-      return controller.y();
-    } else {
-      return null;
-    }
-  }
-
-  // Score method in superstructure will need logic to determoine if we score on mid or l4, because they 
-  // will have differnt scoring methods due to differnt branch shapes
-  private Trigger wantToScore() {
-    if (currentMode == driverMode.CORAL) {
-      return controller.rightTrigger();
-    } else {
-      return null;
-    }
-  }
-
-  // --- ALGAE ---
-  private Trigger wantToIntakeAlgae() {
-    if (currentMode == driverMode.ALGAE) {
-      return controller.leftTrigger();
-    } else {
-      return null;
-    }
-  }
-
-  private Trigger deReefA1() {
-    if (currentMode == driverMode.ALGAE) {
-      return controller.a();
-    } else {
-      return null;
-    }
-  }
-
-  private Trigger deReefA2() {
-    if (currentMode == driverMode.ALGAE) {
-      return controller.y();
-    } else {
-      return null;
-    }
-  }
-
-  private Trigger wantToProcess() {
-    if (currentMode == driverMode.ALGAE) {
-      return controller.b();
-    } else {
-      return null;
-    }
-  }
-
-  private Trigger barge() {
-    if (currentMode == driverMode.ALGAE) {
-      return controller.x();
-    } else {
-      return null;
-    }
-  }
-
-  // Vision - Implement after IO if fully working
-  private Trigger allignLeft() {
-    if (currentMode == driverMode.CORAL) {
-      return controller.leftBumper();
-    } else {
-      return null;
-    }
-  }
-
-  private Trigger allignRight() {
-    if (currentMode == driverMode.CORAL) {
-      return controller.rightBumper();
-    } else {
-      return null;
-    }
-  }
-
-  private Trigger allignAlgae() {
-    if (currentMode == driverMode.ALGAE) {
-      return controller.leftBumper();
-    } else {
-      return null;
-    }
   }
     
     // ----------
