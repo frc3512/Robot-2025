@@ -35,12 +35,12 @@ public class Constants {
     public static final double stowPos = 1.0;
     public static final double hpPos = 5;
     public static final double l1Pos = 8.7;
-    public static final double l2Pos = 14.2;
-    public static final double l3Pos = 26;
+    public static final double l2Pos = 17.75;
+    public static final double l3Pos = 26.5;
     public static final double l4Pos = 46;
-    public static final double a1Pos = 3.5;
+    public static final double a1Pos = 2.5;
     public static final double a2Pos = 15.84;
-    public static final double aStowPos = 14.5;
+    public static final double aStowPos = 16.5;
   }
 
   public static class ClimberConstants {
@@ -64,14 +64,15 @@ public class Constants {
 
     public static final int encoderID = 30;
 
-    public static final double kP = 9;
+    public static final double kP = 5;
     public static final double kI = 0.0;
-    public static final double kD = 0.005;
+    public static final double kD = 0.5;
 
     public static final double tolerance = 0.002;
 
-    public static final double stowPos = 0.297;
-    public static final double extendPivot = 0.135;
+    public static final double stowPos = 0.0;
+    public static final double extendPivot = 0.5
+    ;
 
     public static final TrapezoidProfile.Constraints constraints =
         new TrapezoidProfile.Constraints(5, 3);
@@ -137,7 +138,7 @@ public class Constants {
         new TrapezoidProfile.Constraints(Units.rotationsToRadians(1), Units.rotationsToRadians(2));
   }
 
-// Credit to 6657
+  // Credit to 6657
   public static class FieldConstants {
     private static Pose2d getRedReefPose(Pose2d reefPose) {
       return new Pose2d(

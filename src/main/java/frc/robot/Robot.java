@@ -3,7 +3,6 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
-import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import dev.doglog.DogLog;
@@ -14,7 +13,6 @@ import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -28,13 +26,11 @@ import frc.robot.subsystems.Groundtake;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Reeftake;
 import frc.robot.subsystems.Swerve;
-import frc.robot.subsystems.Vision;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
-// TODO: Finish vision on sister branch and add in here
 public class Robot extends TimedRobot {
 
   private double maxSpeed = DriveConstants.maxSpeed;
@@ -47,36 +43,31 @@ public class Robot extends TimedRobot {
   private final SwerveRequest.FieldCentric drive =
       new SwerveRequest.FieldCentric()
           .withDeadband(maxSpeed * 0.1)
-          .withRotationalDeadband(maxAngularRate * 0.07) // * Add a 7% deadband
+          .withRotationalDeadband(maxAngularRate * 0.07) // Add a 7% deadband
           .withDriveRequestType(DriveRequestType.Velocity);
 
   private final SwerveRequest.FieldCentric driveSlow =
       new SwerveRequest.FieldCentric()
           .withDeadband(slowSpeed * 0.1)
-          .withRotationalDeadband(slowAngularRate * 0.07) // * Add a 7% deadband
+          .withRotationalDeadband(slowAngularRate * 0.07) // Add a 7% deadband
           .withDriveRequestType(DriveRequestType.Velocity);
 
-  // | | Subsystem Objects
+  // Subsystem Objects
   public final Climber climber = new Climber();
   public final Elevator elevator = new Elevator();
   public final Groundtake groundtake = new Groundtake();
   public final LED leds = new LED();
   public final Reeftake reeftake = new Reeftake();
   public final Swerve drivetrain = DriveConstants.createDrivetrain();
-  public final Vision visionElevator =
-      new Vision(
-          Constants.VisionConstants.elevatorCam, Constants.VisionConstants.elevatorCamOffset);
-  public final Vision visionClimber =
-      new Vision(Constants.VisionConstants.climberCam, Constants.VisionConstants.climberCamOffset);
 
-  // | Controller Objects
+  // Controller Objects
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandJoystick appendageJoystick = new CommandJoystick(1);
 
-  // | Driver Camera Thread for crosshair
+  // Driver Camera Thread for crosshair
   private final Thread m_visionThread;
 
-  // | Auton
+  // Auton
   private final AutoFactory autoFactory;
 
   public Robot() {
@@ -86,9 +77,9 @@ public class Robot extends TimedRobot {
     m_visionThread =
         new Thread(
             () -> {
-              // * Get the UsbCamera from CameraServer
+              // Get the UsbCamera from CameraServer
               UsbCamera camera = CameraServer.startAutomaticCapture();
-              // * Set the resolution
+              // Set the resolution
               camera.setResolution(320, 240);
 
               CvSink cvSink = CameraServer.getVideo();
@@ -99,8 +90,8 @@ public class Robot extends TimedRobot {
               Point pt2 = new Point(400, 65);
               Point pt3 = new Point(0, 55);
               Point pt4 = new Point(400, 55);
-              Point pt5 = new Point(0, 30);
-              Point pt6 = new Point(400, 30);
+              Point pt5 = new Point(0, 135);
+              Point pt6 = new Point(400, 135);
               Scalar coralColor = new Scalar(28, 239, 84);
               Scalar algaeColor = new Scalar(18, 5, 92);
 
@@ -121,7 +112,7 @@ public class Robot extends TimedRobot {
     m_visionThread.setDaemon(true);
     m_visionThread.start();
 
-    // | Create Choreo
+    // Create Choreo
     autoFactory =
         new AutoFactory(
             () -> drivetrain.getState().Pose,
@@ -137,9 +128,8 @@ public class Robot extends TimedRobot {
         .bind("Intake", intake());
 
     autoChooser.addOption("Mid l4", midl4());
-    autoChooser.addOption("Mid l4 - Barge", midl4Barge());
 
-    // * -- Controler Bindings --
+    //  -- Controler Bindings --
     drivetrain.setDefaultCommand(
         drivetrain.applyRequest(
             () ->
@@ -149,7 +139,7 @@ public class Robot extends TimedRobot {
                     .withRotationalRate(-controller.getRightX() * maxAngularRate)));
 
     controller
-        .a()
+        .rightBumper()
         .whileTrue(
             drivetrain.applyRequest(
                 () ->
@@ -160,7 +150,7 @@ public class Robot extends TimedRobot {
 
     controller.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-    // | Intake control for Groundtake
+    // Intake control for Groundtake
     controller
         .leftTrigger()
         .onTrue(
@@ -175,9 +165,11 @@ public class Robot extends TimedRobot {
         .onTrue(new InstantCommand(() -> groundtake.floorAlgaeOuttake()))
         .onFalse(new InstantCommand(() -> groundtake.floorAlgaeStop()));
 
-    // * -- Bindings for the button box --
+    controller.button(1).onTrue(new InstantCommand(() -> reeftake.pullInCoral(0.5)));
 
-    // | Elevator controls
+    //  -- Bindings for the button box --
+
+    // Elevator controls
     appendageJoystick.button(6).onTrue(new InstantCommand(() -> elevator.l1())).onFalse(score());
 
     appendageJoystick.button(5).onTrue(new InstantCommand(() -> elevator.l2())).onFalse(score());
@@ -189,13 +181,14 @@ public class Robot extends TimedRobot {
     appendageJoystick.button(9).onTrue(new InstantCommand(() -> elevator.stow()));
 
     appendageJoystick.button(12).onTrue(intake());
+    appendageJoystick.button(12).onFalse(new InstantCommand(() -> reeftake.coralStop()));
 
-    // | Dereefing controls
+    // Dereefing controls
     appendageJoystick.button(8).onTrue(a1()).onFalse(retractAlgae());
 
     appendageJoystick.button(7).onTrue(a2()).onFalse(retractAlgae());
 
-    // | Barge Scoring
+    // Barge Scoring
     appendageJoystick
         .button(10)
         .onTrue(new InstantCommand(() -> elevator.l4()))
@@ -206,37 +199,10 @@ public class Robot extends TimedRobot {
         .onTrue(new InstantCommand(() -> reeftake.algaeOuttake()))
         .onFalse(new InstantCommand(() -> reeftake.algaeStop()));
 
-    // | Climber controls
+    // Climber controls
+    appendageJoystick.button(1).onTrue(climber.setClimber(0.8)).onFalse(climber.setClimber(0.0));
 
-    // | Full auto climbing
-    // appendageJoystick.button(1)
-    //     .onTrue(climber.autoClimb())
-
-    // | Semi-automatic climbing
-    // appendageJoystick.button(1)
-    //     .onTrue(climber.extendClimber());
-
-    // appendageJoystick.button(2)
-    //     .onTrue(climber.retractClimber());
-
-    // | Manual climbing
-    appendageJoystick
-        .button(1)
-        .onTrue(
-            climber
-                .setClimber(0.8)
-                .until(() -> climber.climberAtTop() == false)
-                .andThen(climber.setClimber(0.0)))
-        .onFalse(climber.setClimber(0.0));
-
-    appendageJoystick
-        .button(2)
-        .onTrue(
-            climber
-                .setClimber(-0.8)
-                .until(() -> climber.climberAtBottom() == false)
-                .andThen(climber.setClimber(0.0)))
-        .onFalse(climber.setClimber(0.0));
+    appendageJoystick.button(2).onTrue(climber.setClimber(-0.8)).onFalse(climber.setClimber(0.0));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -249,31 +215,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     elevator.setClampedGoal(Constants.ElevatorConstants.stowPos);
-  }
-
-  public void poseEstimation() {
-    var visionElevatorEst = visionElevator.getEstimatedGlobalPose(visionElevator.getCamera());
-    var visionClimberEst = visionClimber.getEstimatedGlobalPose(visionClimber.getCamera());
-
-    visionElevatorEst.ifPresent(
-        est -> {
-          var estStdDevs = visionElevator.getEstimationStdDevs();
-          DogLog.log("Vision/Elevator Estimated Pose", est.estimatedPose);
-          drivetrain.addVisionMeasurement(
-              est.estimatedPose.toPose2d(),
-              Utils.fpgaToCurrentTime(est.timestampSeconds),
-              estStdDevs);
-        });
-
-    visionClimberEst.ifPresent(
-        est -> {
-          var estStdDevs = visionClimber.getEstimationStdDevs();
-          DogLog.log("Vision/Climber Estimated Pose", est.estimatedPose);
-          drivetrain.addVisionMeasurement(
-              est.estimatedPose.toPose2d(),
-              Utils.fpgaToCurrentTime(est.timestampSeconds),
-              estStdDevs);
-        });
+    groundtake.retractPivot();
   }
 
   @Override
@@ -295,41 +237,12 @@ public class Robot extends TimedRobot {
       leds.setPattern(leds.black);
     }
 
-    // ! Do not use until vision is working
-    // if (climber.isBeamBroken()) {
-    //   leds.setPattern(leds.purple);
-    // } else if (drivetrain.getSelectedPiece().equals("Coral")) {
-    //   switch (drivetrain.getSelectedReef()) {
-    //     case "Left":
-    //       leds.setPattern(leds.leftCoral);
-    //       break;
-    //     case "Right":
-    //       leds.setPattern(leds.rightCoral);
-    //       break;
-    //     default:
-    //       leds.setPattern(leds.white);
-    //       break;
-    //   }
-    // } else {
-    //   leds.setPattern(leds.cyan);
-    // }
-
     // Tuning mode
     DogLog.setEnabled(Constants.GeneralConstants.tuningMode);
-
-    // ! poseEstimation();
-
   }
 
   @Override
-  public void teleopPeriodic() {
-    // ! drivetrain.getNearestReef();
-  }
-
-  public Command autoAim() {
-    return Commands.sequence(
-        drivetrain.resetAutoAimPID(), drivetrain.goToPose(() -> drivetrain.getNearestReef()));
-  }
+  public void teleopPeriodic() {}
 
   public SequentialCommandGroup a1() {
     return new InstantCommand(() -> elevator.a1())
@@ -379,28 +292,12 @@ public class Robot extends TimedRobot {
         .andThen(retractAlgae());
   }
 
-  // | Auto paths
+  // Auto paths
   public AutoRoutine midl4() {
     AutoRoutine routine = autoFactory.newRoutine("Mid l4");
     AutoTrajectory trajectory = routine.trajectory("Mid l4");
 
     routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
-    return routine;
-  }
-
-  public AutoRoutine midl4Barge() {
-    AutoRoutine routine = autoFactory.newRoutine("Mid l4 - Barge");
-    AutoTrajectory trajectory = routine.trajectory("Mid l4 - Barge");
-    AutoTrajectory trajectory2 = routine.trajectory("De-reef");
-
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                trajectory.resetOdometry(),
-                trajectory.cmd(),
-                trajectory2.resetOdometry(),
-                trajectory2.cmd()));
     return routine;
   }
 }

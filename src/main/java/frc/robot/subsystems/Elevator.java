@@ -34,6 +34,7 @@ public class Elevator extends ProfiledPIDSubsystem {
     backMotor.setNeutralMode(NeutralModeValue.Brake);
 
     frontMotor.setPosition(0.000);
+    backMotor.setPosition(0.000);
 
     backMotor.setControl(new Follower(frontMotor.getDeviceID(), false));
 
@@ -50,38 +51,47 @@ public class Elevator extends ProfiledPIDSubsystem {
 
   public void stow() {
     setClampedGoal(Constants.ElevatorConstants.stowPos);
+    enable();
   }
 
   public void hp() {
     setClampedGoal(Constants.ElevatorConstants.hpPos);
+    enable();
   }
 
   public void l1() {
     setClampedGoal(Constants.ElevatorConstants.l1Pos);
+    enable();
   }
 
   public void l2() {
     setClampedGoal(Constants.ElevatorConstants.l2Pos);
+    enable();
   }
 
   public void l3() {
     setClampedGoal(Constants.ElevatorConstants.l3Pos);
+    enable();
   }
 
   public void l4() {
     setClampedGoal(Constants.ElevatorConstants.l4Pos);
+    enable();
   }
 
   public void a1() {
     setClampedGoal(Constants.ElevatorConstants.a1Pos);
+    enable();
   }
 
   public void a2() {
     setClampedGoal(Constants.ElevatorConstants.a2Pos);
+    enable();
   }
 
   public void aStow() {
     setClampedGoal(Constants.ElevatorConstants.aStowPos);
+    enable();
   }
 
   public void setClampedGoal(double goal) {

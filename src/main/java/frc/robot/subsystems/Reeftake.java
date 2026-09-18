@@ -54,10 +54,14 @@ public class Reeftake extends SubsystemBase {
     return run(() -> intakeMotor.set(speed));
   }
 
+  public Command pullInCoral(Double speed) {
+    return run(() -> intakeMotor.set(-speed));
+  }
+
   public Command autoIntake() {
     return Commands.sequence(
         Commands.runOnce(() -> coralIntake()),
-        Commands.waitUntil(() -> !coralIn.get()),
+        Commands.waitSeconds(1),
         Commands.runOnce(() -> coralStop()));
   }
 
